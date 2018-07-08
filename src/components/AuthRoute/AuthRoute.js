@@ -9,11 +9,7 @@ import { getAuth } from "../../reducers/auth.redux";
 )
 class AuthRoute extends React.Component{
 
-    constructor(props){
-        super(props);
-    }
-
-    componentDidMount(){
+        componentDidMount(){
         this.props.getAuth();
     }
 

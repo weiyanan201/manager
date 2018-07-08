@@ -144,15 +144,25 @@ module.exports = {
             },
           },
           // Process JS with Babel.
-          {
-            test: /\.(js|jsx|mjs)$/,
-            include: paths.appSrc,
-            loader: require.resolve('babel-loader'),
-            options: {
-
-              compact: true,
+            {
+                test: /\.(js|jsx)$/,
+                include: paths.appSrc,
+                loader: require.resolve('babel-loader'),
+                options: {
+                    // 改动: 添加 antd 按需加载文件处理插件
+                    plugins: [
+                        //['react-html-attrs'],//添加babel-plugin-react-html-attrs组件的插件配置
+                        // 引入样式为 css
+                        ['import', { libraryName: 'antd', style: 'css' }],
+                        // 改动: 引入样式为 less
+                        //  ['import', { libraryName: 'antd', style: true }],
+                    ],
+                    // This is a feature of `babel-loader` for webpack (not Babel itself).
+                    // It enables caching results in ./node_modules/.cache/babel-loader/
+                    // directory for faster rebuilds.
+                    cacheDirectory: true,
+                },
             },
-          },
           // The notation here is somewhat confusing.
           // "postcss" loader applies autoprefixer to our CSS.
           // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -165,57 +175,79 @@ module.exports = {
           // tags. If you use code splitting, however, any async bundles will still
           // use the "style" loader inside the async code so CSS from them won't be
           // in the main CSS file.
-          {
-            // test: /\.css$/,
-            test: /\.(css|less)$/,
-            loader: ExtractTextPlugin.extract(
-              Object.assign(
-                {
-                  fallback: {
-                    loader: require.resolve('style-loader'),
-                    options: {
-                      hmr: false,
-                    },
-                  },
-                  use: [
+            {
+                test: /\.css$/,
+                exclude: /node_modules|antd\.css/,
+                use: [
+                    require.resolve('style-loader'),
                     {
-                      loader: require.resolve('css-loader'),
-                      options: {
-                        importLoaders: 1,
-                        minimize: true,
-                        sourceMap: shouldUseSourceMap,
-                      },
+                        loader: require.resolve('css-loader'),
+                        options: {
+                            importLoaders: 1,
+                            // 改动
+                            modules: true,   // 新增对css modules的支持
+                            localIdentName: '[name]__[local]__[hash:base64:5]', //
+                        },
                     },
                     {
-                      loader: require.resolve('postcss-loader'),
-                      options: {
-                        // Necessary for external CSS imports to work
-                        // https://github.com/facebookincubator/create-react-app/issues/2677
-                        ident: 'postcss',
-                        plugins: () => [
-                          require('postcss-flexbugs-fixes'),
-                          autoprefixer({
-                            browsers: [
-                              '>1%',
-                              'last 4 versions',
-                              'Firefox ESR',
-                              'not ie < 9', // React doesn't support IE8 anyway
+                        loader: require.resolve('postcss-loader'),
+                        options: {
+                            // Necessary for external CSS imports to work
+                            // https://github.com/facebookincubator/create-react-app/issues/2677
+                            ident: 'postcss',
+                            plugins: () => [
+                                require('postcss-flexbugs-fixes'),
+                                autoprefixer({
+                                    browsers: [
+                                        '>1%',
+                                        'last 4 versions',
+                                        'Firefox ESR',
+                                        'not ie < 9', // React doesn't support IE8 anyway
+                                    ],
+                                    flexbox: 'no-2009',
+                                }),
                             ],
-                            flexbox: 'no-2009',
-                          }),
-                        ],
-                      },
+                        },
+                    },
+                ],
+            },
+            //
+            {
+                test: /\.css$/,
+                include: /node_modules|antd\.css/,
+                use: [
+                    require.resolve('style-loader'),
+                    {
+                        loader: require.resolve('css-loader'),
+                        options: {
+                            importLoaders: 1,
+                            // 改动
+                            // modules: true,   // 新增对css modules的支持
+                            // localIdentName: '[name]__[local]__[hash:base64:5]', //
+                        },
                     },
                     {
-                      loader: require.resolve('less-loader') // compiles Less to CSS
-                    }
-                  ],
-                },
-                extractTextPluginOptions
-              )
-            ),
-            // Note: this won't work without `new ExtractTextPlugin()` in `plugins`.
-          },
+                        loader: require.resolve('postcss-loader'),
+                        options: {
+                            // Necessary for external CSS imports to work
+                            // https://github.com/facebookincubator/create-react-app/issues/2677
+                            ident: 'postcss',
+                            plugins: () => [
+                                require('postcss-flexbugs-fixes'),
+                                autoprefixer({
+                                    browsers: [
+                                        '>1%',
+                                        'last 4 versions',
+                                        'Firefox ESR',
+                                        'not ie < 9', // React doesn't support IE8 anyway
+                                    ],
+                                    flexbox: 'no-2009',
+                                }),
+                            ],
+                        },
+                    },
+                ],
+            },
           // "file" loader makes sure assets end up in the `build` folder.
           // When you `import` an asset, you get its filename.
           // This loader doesn't use a "test" so it will catch all modules

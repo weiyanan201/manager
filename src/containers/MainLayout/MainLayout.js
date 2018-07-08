@@ -2,8 +2,8 @@ import React, {Component} from 'react';
 import {
     Layout
 } from 'antd';
-import {Route, Redirect} from 'react-router-dom'
-import MyBreadcrumb from '../Breadcrumb';
+import {Route} from 'react-router-dom'
+import MyBreadcrumb from './Breadcrumb';
 import HomePage from "../HomePage";
 import ApiList from '../apiList/ApiList';
 import ApiManage from '../apiManage/ApiManage';
@@ -13,20 +13,33 @@ import ConsumerManage from '../consumerManage/ConsumerManage';
 import {connect} from 'react-redux';
 import MainSider from './MainSider';
 
+import { getAuth } from "../../reducers/auth.redux";
+
 const {Content} = Layout;
 const minHeight = window.innerHeight - 120;
 
+@connect(
+    status=>status.auth,
+    {getAuth}
+)
 class MainLayout extends Component {
+
+
+    componentDidMount() {
+        console.log(this.props);
+        this.props.getAuth();
+    }
+
     render() {
         return (
             <Layout style={{minHeight: '100vh'}}>
-                <MainSider/>
+                <MainSider />
                 <Layout>
                     <Content style={{overflow: 'initial'}}>
                         <MyBreadcrumb style={{margin: '16px 0', textAlign: 'left'}}/>
                         <div style={{padding: 24, background: '#fff', minHeight: minHeight}}>
                             <Route path="/" exact component={HomePage}/>
-                            <Route path="/apiList" exact component={ApiList}/>
+                            <Route path="/api" exact component={ApiList}/>
                             <Route path="/apiManage" exact component={ApiManage}/>
                             <Route path="/consumerlist" exact component={Consumerlist}/>
                             <Route path="/consumerManage" exact component={ConsumerManage}/>
@@ -38,15 +51,5 @@ class MainLayout extends Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        counter: state
-    }
-};
-
-const mapDispatchToProps = (dispatch) => {
-    return {}
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(MainLayout);
+export default MainLayout
 

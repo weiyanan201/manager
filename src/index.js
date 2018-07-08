@@ -5,8 +5,7 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 import './mock/auth'
-
-import AuthRoute from './components/AuthRoute/AuthRoute'
+import './mock/api'
 
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();

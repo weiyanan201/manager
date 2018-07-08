@@ -1,81 +1,145 @@
 import React from 'react';
-import {Link,withRouter} from 'react-router-dom'
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import {Link, withRouter} from 'react-router-dom'
 import {
     Layout,
     Menu,
     Icon,
 } from 'antd';
-import {connect} from "react-redux";
+import { is } from 'immutable';
 
-const {
-    Sider
-} = Layout;
+
+const { Sider } = Layout;
 const SubMenu = Menu.SubMenu;
-/**
- * 侧边栏
- * 未引入redux，不方便全局管理激活状态，例如从url进入系统的，组件显示正确但menu和breadcrumb状态不正确
- *
- */
-class MainSider extends React.Component{
+const Item = Menu.Item;
 
-    constructor(){
+let menuItem = null;
+let routeToId = []
+
+@withRouter
+@connect(
+    state=>state.auth,
+    null
+)
+class MainSider extends React.Component {
+
+    constructor() {
         super();
         this.state = {
             collapsed: false,
-            openKeys: ['api_menus'],
-            lastOpenKeys:[''],
-            selectedKey : '/apiList'
+            openKeys: [''],
+            lastOpenKeys: [''],
+            selectedKeys: [''],
+        };
+        this.onCollapse = this.onCollapse.bind(this);
+        this.onClick = this.onClick.bind(this);
+        this.onOpenChange = this.onOpenChange.bind(this)
+    }
+
+    componentWillUpdate(nextProps) {
+        if (!is(this.props.menus, nextProps.menus)){
+            menuItem = genMenus(nextProps.menus);
+            const url = nextProps.location.pathname;
+            const selectItem = routeToId.filter(v=>v.route===url)[0];
+            if(selectItem){
+                if(selectItem.pid){
+                    //有父菜单
+                    this.setState({
+                        selectedKeys:[selectItem.id],
+                        openKeys:[selectItem.pid]
+                    });
+                }else{
+                    //无父菜单
+                    this.setState({
+                        selectedKeys:[selectItem.id]
+                    });
+                }
+
+            }
         }
-    }
-    
-    componentWillMount () {
-      console.log(this.props);
+        if(this.props.location.pathname!==nextProps.location.pathname){
+            //通过breadcrumb跳转的url
+            //类似onClick事件
+            const url = nextProps.location.pathname;
+            const targetItem = routeToId.find(v=>v.route===url);
+            if (targetItem){
+                //收缩状态下选择子菜单，应该添加父菜单kek，否则展开时父菜单不展开
+                if(this.state.collapsed && targetItem.pid>0){
+
+                    let newLastOpenKeys ;
+                    if(this.state.lastOpenKeys.findIndex(v=>v===targetItem.pid)===-1){
+                        newLastOpenKeys = this.state.lastOpenKeys.concat(targetItem.pid);
+                    }else{
+                        newLastOpenKeys = this.state.lastOpenKeys;
+                    }
+                    this.setState({
+                        selectedKeys:[targetItem.id],
+                        lastOpenKeys:newLastOpenKeys
+                    })
+
+                }else{
+                    this.setState({
+                        selectedKeys:[targetItem.id]
+                    })
+                }
+            }
+        }
+
     }
 
-    componentDidMount (){
-        this.setState({
-            selectedKey: this.props.location.pathname
-        })
-    }
+    //keyPath[1] 父菜单的key
+    onClick(e){
+        const keyPath = e.keyPath;
+        //收缩状态下选择子菜单，应该添加父菜单kek，否则展开时父菜单不展开
+        if(this.state.collapsed && keyPath[1]){
 
-    rootSubmenuKeys = ['api_menus', 'consumer_menus'];
-
-    onCollapse = () => {
-        if(!this.state.collapsed){
-            //展开状态
+            let newLastOpenKeys ;
+            if(this.state.lastOpenKeys.findIndex(v=>v===keyPath[1])===-1){
+                newLastOpenKeys = this.state.lastOpenKeys.concat(keyPath[1]);
+            }else{
+                newLastOpenKeys = this.state.lastOpenKeys;
+            }
             this.setState({
-                collapsed:!this.state.collapsed,
-                lastOpenKeys:this.state.openKeys,
-                openKeys:['']
+                selectedKeys:[keyPath[0]],
+                lastOpenKeys:newLastOpenKeys
             })
         }else{
             this.setState({
-                collapsed: !this.state.collapsed,
-                openKeys:this.state.lastOpenKeys
+                selectedKeys:[keyPath[0]]
             })
         }
-    };
 
-    onOpenChange = (openKeys) => {
-        const latestOpenKey = openKeys.find(key => this.state.openKeys.indexOf(key) === -1);
-        if (this.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-            this.setState({openKeys});
-        } else {
-            this.setState({
-                openKeys: latestOpenKey ? [latestOpenKey] : [],
-            });
-        }
-    };
+    }
 
-    onClick=(e)=>{
+    onOpenChange(openKeys){
         this.setState({
-            lastOpenKeys : e.keyPath.length===2?[e.keyPath[1]]:this.state.lastOpenKeys
-        });
-    };
+            openKeys : openKeys
+        })
+    }
+
+    //解决选中子菜单时，点击收缩按钮出现的bug
+    //collapsed==true 转化到收缩状态
+    onCollapse(isCollapsed){
+        if (isCollapsed){
+            //收缩
+            this.setState({
+                lastOpenKeys : this.state.openKeys,
+                openKeys : [],
+                collapsed:!this.state.collapsed
+            })
+        } else{
+            //扩张
+            this.setState({
+                openKeys : this.state.lastOpenKeys,
+                collapsed:!this.state.collapsed
+            })
+        }
+    }
 
     // sider 属性 collapsible 控制下方是否有收缩图表
-    render(){
-        return(
+    render() {
+        return (
             <Sider
                 collapsible
                 collapsed={this.state.collapsed}
@@ -88,57 +152,42 @@ class MainSider extends React.Component{
                     onOpenChange={this.onOpenChange}
                     inlineCollapsed={this.state.collapsed}
                     onClick={this.onClick}
-                    defaultSelectedKeys = {[this.props.location.pathname]}
+                    selectedKeys={this.state.selectedKeys}
                 >
-                    <Menu.Item key="/">
-                        <Icon type="pie-chart"/>
-                        <span>Home</span>
-                        <Link to="/"/>
-                    </Menu.Item>
-                    <SubMenu key="api_menus" title={<span><Icon type="appstore"/><span>接口管理</span></span>}>
-                        <Menu.Item key="/apiList">
-                            <span>浏览接口</span>
-                            <Link to="/apiList"/>
-                        </Menu.Item>
-                        <Menu.Item key="/apiManage">
-                            <span>添加接口</span>
-                            <Link to="/apiManage"/>
-                        </Menu.Item>
-                    </SubMenu>
-                    <SubMenu key="consumer_menus" title={<span><Icon type="mail"/><span>用户管理</span></span>}>
-                        <Menu.Item key="/consumerlist">
-                            <span>浏览用户</span>
-                            <Link to="/consumerlist"/>
-                        </Menu.Item>
-                        <Menu.Item key="/consumerManage">
-                            <span>添加用户</span>
-                            <Link to="/consumerManage"/>
-                        </Menu.Item>
-                    </SubMenu>
-                    <Menu.Item key="/log">
-                        <Icon type="inbox"/>
-                        <span>操作日志</span>
-                    </Menu.Item>
-                    <Menu.Item key="/statistics">
-                        <Icon type="pie-chart"/>
-                        <span>报表统计</span>
-                    </Menu.Item>
+                    {menuItem}
                 </Menu>
             </Sider>
         )
     }
 }
 
-const  mapStateToProps = (state) =>{
-    return {
-        counter: state
-    }
-};
+//递归生成菜单
+function genMenus(menus) {
+    return menus.map(item => {
+        if (item.children) {
+            return (
+                <SubMenu
+                    key={item.id}
+                    title={<span><Icon type={item.icon}/><span>{item.name}</span></span>} >
+                    { genMenus(item.children) }
+                </SubMenu>
+            )
+        } else {
+            routeToId.push({route:item.route,id:item.id,pid:item.pid});
+            return (
+                <Item key={item.id}>
+                    <Icon type={item.icon}/>
+                    <span>{item.name}</span>
+                    <Link to={item.route}/>
+                </Item>
+            )
+        }
+    })
+}
 
-const mapDispatchToProps = (dispatch) => {
-    return {
+MainSider.propTyps = {
+    menus:PropTypes.array
+}
 
-    }
-};
+export default MainSider;
 
-export default withRouter(connect(mapStateToProps,mapDispatchToProps)(MainSider));

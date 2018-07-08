@@ -13,7 +13,7 @@ let database = [
     {
         id: '3',
         pid: '2',
-        name: '接口浏览',
+        name: '接口浏览22',
         icon: 'laptop',
         route: '/api/manage',
     },
