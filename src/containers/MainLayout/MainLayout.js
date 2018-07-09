@@ -1,9 +1,14 @@
+/**
+ * 整体布局
+ */
+
 import React, {Component} from 'react';
 import {
     Layout
 } from 'antd';
 import {Route} from 'react-router-dom'
 import MyBreadcrumb from './Breadcrumb';
+import MainHeader from './MainHeader';
 import HomePage from "../HomePage";
 import ApiList from '../apiList/ApiList';
 import ApiManage from '../apiManage/ApiManage';
@@ -35,8 +40,9 @@ class MainLayout extends Component {
             <Layout style={{minHeight: '100vh'}}>
                 <MainSider />
                 <Layout>
+                    <MainHeader/>
                     <Content style={{overflow: 'initial'}}>
-                        <MyBreadcrumb style={{margin: '16px 0', textAlign: 'left'}}/>
+                        {/*<MyBreadcrumb style={{margin: '16px 0', textAlign: 'left'}}/>*/}
                         <div style={{padding: 24, background: '#fff', minHeight: minHeight}}>
                             <Route path="/" exact component={HomePage}/>
                             <Route path="/api" exact component={ApiList}/>

@@ -1,3 +1,8 @@
+/**
+ * 左侧树形菜单
+ */
+
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -144,6 +149,7 @@ class MainSider extends React.Component {
                 collapsible
                 collapsed={this.state.collapsed}
                 onCollapse={this.onCollapse}
+                // trigger={null}
             >
                 <Menu
                     mode="inline"

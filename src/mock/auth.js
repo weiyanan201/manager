@@ -68,14 +68,7 @@ let database = {
                 name: '报表统计',
                 icon: 'pie-chart',
                 route: '/chart',
-            },
-            {
-                id: '10',
-                pid:'-1',
-                name: 'test',
-                icon: 'pie-chart',
-                route: '/chart',
-            },
+            }
         ],
         username: '魏亚楠.yannis',
         isAdmin: true,
