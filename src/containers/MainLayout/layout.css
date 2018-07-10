@@ -1,0 +1,26 @@
+
+.siderStyle{
+    height: 100vh;
+}
+
+.rightLayout{
+    height: 100vh;
+    overflow: auto;
+}
+
+.mainHeader{
+    background: #fff ;
+    padding : 0;
+}
+
+.content{
+    overflow: auto;
+    minHeight: 70vh
+}
+
+.contentDiv{
+    padding: 24px;
+    background: #fff;
+    min-height:85vh;
+    position:relative
+}

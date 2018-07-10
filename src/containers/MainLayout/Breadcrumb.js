@@ -50,8 +50,8 @@ class MyBreadcrumb extends React.Component {
 
         })
         return (
-            <div className="demo">
-                <Breadcrumb>
+            <div >
+                <Breadcrumb style={{marginTop:'10px',marginBottom:'10px'}}>
                     {breadcrumbItems}
                 </Breadcrumb>
             </div>

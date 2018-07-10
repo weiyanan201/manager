@@ -46,14 +46,14 @@ let database = {
                 pid: '5',
                 icon: 'idcard',
                 name: '用户浏览',
-                route: '/consumer'
+                route: '/apiManage'
             },
             {
                 id: '7',
                 pid: '5',
                 icon: 'user-add',
                 name: '用户添加',
-                route: '/consumer/detail'
+                route: '/consumerlist'
             },
             {
                 id: '8',
