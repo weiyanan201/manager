@@ -4,6 +4,8 @@ import {Select, Radio, Input, Row, Col, Button,Table,Pagination} from 'antd';
 
 import { getApiList } from "../../reducers/api.redux";
 
+import style from './test.less';
+
 const Option = Select.Option;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
@@ -80,7 +82,7 @@ class ApiList extends React.Component {
     }
     render() {
         return (
-            <div>
+            <div className={style.test}>
                 <Row gutter={24} >
                     <Col xxl={3} xl={3} lg={4} md={5} sm={6}>
                         <Select defaultValue={this.state.apiType} value={this.state.apiType} style={{width: 120}} onChange={(v)=>{this.handleChange("apiType",v)}}>
@@ -114,6 +116,7 @@ class ApiList extends React.Component {
                     dataSource={this.props.dataList}
                     rowKey="id"
                     pagination={{total:100}}
+                    className={style["ant-table-thead"]}
                 />
             </div>
         )

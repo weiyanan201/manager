@@ -176,7 +176,7 @@ module.exports = {
           // use the "style" loader inside the async code so CSS from them won't be
           // in the main CSS file.
             {
-                test: /\.css$/,
+                test: /\.(css|less)$/,
                 exclude: /node_modules|antd\.css/,
                 use: [
                     require.resolve('style-loader'),
@@ -208,6 +208,8 @@ module.exports = {
                                 }),
                             ],
                         },
+                    },{
+                        loader: require.resolve('less-loader') // compiles Less to CSS
                     },
                 ],
             },
