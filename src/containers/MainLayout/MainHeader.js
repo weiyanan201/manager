@@ -5,6 +5,8 @@
 import React from 'react';
 import {Layout, Menu, Icon} from 'antd';
 
+import style from './layout.less';
+
 const {Header} = Layout;
 const {SubMenu} = Menu;
 
@@ -13,8 +15,8 @@ class MainHeader extends React.Component {
     render() {
         return (
             //
-            <Header style={{background: '#fff',
-                padding: 0}}>
+            // style={{background: '#fff', padding: 0}}
+            <Header className={style.mainHeader}>
                     <Menu mode="horizontal" >
                         <SubMenu
                             style={{

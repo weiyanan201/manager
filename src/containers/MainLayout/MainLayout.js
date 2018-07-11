@@ -15,12 +15,13 @@ import MainSider from './MainSider';
 
 import { getAuth } from "../../reducers/auth.redux";
 
+import style from './layout.less';
+
 @connect(
     status=>status.auth,
     {getAuth}
 )
 class MainLayout extends Component {
-
 
     componentDidMount() {
         console.log(this.props);
@@ -31,8 +32,8 @@ class MainLayout extends Component {
         return (
             <Layout >
                 <MainSider />
-                {/**/}
-                <Layout style={{height: '100vh', overflow: 'auto'}}>
+                {/*style={{height: '100vh', overflow: 'auto'}}*/}
+                <Layout className={style.rightLayout}>
                     <MainHeader/>
                     <MainContent/>
                 </Layout>

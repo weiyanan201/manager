@@ -38,28 +38,28 @@ let database = {
             {
                 id: '5',
                 pid:'-1',
-                name: '用户管理',
+                name: '表管理',
                 icon: 'user',
             },
             {
                 id: '6',
                 pid: '5',
                 icon: 'idcard',
-                name: '用户浏览',
-                route: '/apiManage'
+                name: '表信息',
+                route: '/table/groupList'
             },
             {
                 id: '7',
                 pid: '5',
                 icon: 'user-add',
-                name: '用户添加',
+                name: '新建Table',
                 route: '/consumerlist'
             },
             {
                 id: '8',
-                pid:'-1',
-                name: '操作日志',
-                icon: 'inbox',
+                pid:'5',
+                icon: 'user-add',
+                name: '新建View',
                 route: '/log',
             },
             {
