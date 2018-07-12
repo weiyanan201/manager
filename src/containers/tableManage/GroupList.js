@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-
 import {Table, Pagination} from 'antd';
 
-import {getGroupList} from "../../reducers/table.redux";
+import GroupSelect from '../../components/groupSelect/GroupSelect';
+import NavLink from '../../components/NavLink/NavLink';
+
+import { getGroupList , getGroupAll } from "../../reducers/table.redux";
+
+import style from './table.less';
 
 
 const columns = [
@@ -19,12 +23,17 @@ const columns = [
     }, {
         title: '权限',
         dataIndex: 'authority',
-    }
+    }, {
+        title: 'Action',
+        dataIndex: '',
+        key: 'x',
+        render: () => <NavLink target={"/consumerManage"} linkText={"详情"} />  //跳转页面  rout
+    },
 ];
 
 @connect(
     state => state.group,
-    {getGroupList}
+    {getGroupList,getGroupAll}
 )
 export default class GroupList extends Component {
 
@@ -32,6 +41,9 @@ export default class GroupList extends Component {
         super(props);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeSize = this.handleChangeSize.bind(this);
+        this.handleDclick = this.handleDclick.bind(this);
+        GroupList.handleSelectChange = GroupList.handleSelectChange.bind(this);
+        this.props.getGroupAll();
     }
 
     componentDidMount() {
@@ -47,10 +59,19 @@ export default class GroupList extends Component {
         console.log(current, pageSize);
         this.props.getGroupList(current,pageSize);
     }
+    
+    handleDclick(){
+        console.log("onRowDoubleClick");
+    }
+
+    static handleSelectChange(e, f){
+        this.props.getGroupList(e);
+    }
 
     render() {
         return (
             <div>
+                <GroupSelect groupData={this.props.allGroup} handleChange={GroupList.handleSelectChange} />
                 <Table
                     bordered
                     columns={columns}
@@ -59,10 +80,12 @@ export default class GroupList extends Component {
                     loading={this.props.groupLoading}
                     // pagination={this.props.total}
                     pagination = {false}
+                    onRowDoubleClick = {this.handleDclick}
                 />
                 <Pagination  total={this.props.total} showSizeChanger showQuickJumper
                              onChange = {(page, pageSize)=>{this.handleChange(page, pageSize)}}
                              onShowSizeChange = {(current, size)=>{this.handleChangeSize(current, size)}}
+                             className={style.groupList}
                 />
             </div>
         );

@@ -1,14 +1,19 @@
-import React, {Component} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom'
 
-import {Link} from 'react-router-dom'
 
 const NavLink = ({target, linkText})=>{
-
-    alert({target});
     return(
         <div>
+            <Link to={target}>{linkText}</Link>
         </div>
     );
 };
+
+NavLink.propTypes = {
+    target : PropTypes.string,
+    linkText : PropTypes.string
+}
 
 export default NavLink;

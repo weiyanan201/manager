@@ -15,7 +15,7 @@ class AuthRoute extends React.Component{
 
     render(){
         return (
-            <div>{this.props.username}</div>
+            <div></div>
         )
     }
 }
