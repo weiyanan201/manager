@@ -7,6 +7,7 @@ import registerServiceWorker from './registerServiceWorker';
 import './mock/auth';
 import './mock/api';
 import './mock/groupList';
+import './mock/tableList';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();

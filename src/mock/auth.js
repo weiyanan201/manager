@@ -27,6 +27,7 @@ let database = {
                 name: '接口浏览',
                 icon: 'laptop',
                 route: '/api',
+                bread: '接口浏览'
             },
             {
                 id: '4',
@@ -34,6 +35,7 @@ let database = {
                 icon: 'file-add',
                 name: '接口添加',
                 route: '/api/detail',
+                bread:'添加接口'
             },
             {
                 id: '5',
@@ -46,14 +48,16 @@ let database = {
                 pid: '5',
                 icon: 'idcard',
                 name: '表信息',
-                route: '/table/groupList'
+                route: '/table/groups',
+                bread: 'group列表'
             },
             {
                 id: '7',
                 pid: '5',
                 icon: 'user-add',
                 name: '新建Table',
-                route: '/consumerlist'
+                route: '/consumerlist',
+                bread:'新建Table'
             },
             {
                 id: '8',
@@ -61,6 +65,7 @@ let database = {
                 icon: 'user-add',
                 name: '新建View',
                 route: '/log',
+                bread:'新建View'
             },
             {
                 id: '9',
@@ -68,14 +73,17 @@ let database = {
                 name: '报表统计',
                 icon: 'pie-chart',
                 route: '/chart',
+                bread:'报表统计'
             }
         ],
         username: '魏亚楠.yannis',
         isAdmin: true,
     }
 
-}
+};
+
 // Mock.setup({
 //     timeout: '2200-2600'
-// })
+// });
+
 Mock.mock('/getAuth', database);

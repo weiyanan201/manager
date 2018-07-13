@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {Table, Pagination} from 'antd';
+import { Table, Pagination } from 'antd';
+import { Route } from 'react-router-dom';
 
 import GroupSelect from '../../components/groupSelect/GroupSelect';
 import NavLink from '../../components/NavLink/NavLink';
@@ -8,7 +9,6 @@ import NavLink from '../../components/NavLink/NavLink';
 import { getGroupList , getGroupAll } from "../../reducers/table.redux";
 
 import style from './table.less';
-
 
 const columns = [
     {
@@ -25,9 +25,8 @@ const columns = [
         dataIndex: 'authority',
     }, {
         title: 'Action',
-        dataIndex: '',
-        key: 'x',
-        render: () => <NavLink target={"/consumerManage"} linkText={"详情"} />  //跳转页面  rout
+        dataIndex: 'groupId',
+        render: (groupId) => <NavLink target={`/table/groups/${groupId}`} linkText={"详情"} />  //跳转页面  rout
     },
 ];
 
@@ -78,7 +77,6 @@ export default class GroupList extends Component {
                     dataSource={this.props.data}
                     rowKey="groupId"
                     loading={this.props.groupLoading}
-                    // pagination={this.props.total}
                     pagination = {false}
                     onRowDoubleClick = {this.handleDclick}
                 />

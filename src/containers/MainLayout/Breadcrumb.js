@@ -8,18 +8,20 @@ import { Link, withRouter} from 'react-router-dom';
 import {Breadcrumb} from 'antd';
 import {is} from 'immutable';
 
+import style from './layout.less';
+
 const routeMap = new Map();
 
 @withRouter
 @connect(
-    state => state.auth,
-    {}
+    state => {return {auth:state.auth,bread:state.bread}},
+    { }
 )
 class MyBreadcrumb extends React.Component {
 
     componentWillUpdate(nextProps) {
-        if (!is(this.props.menus, nextProps.menus)) {
-            genRouteMap(nextProps.menus)
+        if (!is(this.props.auth.menus, nextProps.auth.menus)) {
+            genRouteMap(nextProps.auth.menus)
         }
     }
 
@@ -27,12 +29,10 @@ class MyBreadcrumb extends React.Component {
         const url = this.props.location.pathname;
         let tempUrl = [];
         let tempPrx = '/';
-        let breadcrumbItems = [(
-            <Breadcrumb.Item key='homeinit'>
-                <Link to='/' />
-            </Breadcrumb.Item>)
+        let breadcrumbItems = [
         ];
         url.split('/').filter(v => {
+            const paths = this.props.bread.path;
             if (v !== '') {
                 tempUrl.push(v);
                 let routeUrl = tempPrx + tempUrl.join("/");
@@ -41,17 +41,30 @@ class MyBreadcrumb extends React.Component {
                     breadcrumbItems = breadcrumbItems.concat(
                         <Breadcrumb.Item key={item.id}>
                             <Link to={item.route}>
-                                {item.name}
+                                {item.bread}
                             </Link>
                         </Breadcrumb.Item>
                     );
+                }else {
+                    if(routeUrl in paths){
+                        if(paths[routeUrl]!==undefined && paths[routeUrl]!==''){
+                            const name = paths[routeUrl];
+                            breadcrumbItems = breadcrumbItems.concat(
+                                <Breadcrumb.Item key={routeUrl}>
+                                    <Link to={routeUrl}>
+                                        {name}
+                                    </Link>
+                                </Breadcrumb.Item>
+                            );
+                        }
+                    }
                 }
             }
 
         })
         return (
-            <div >
-                <Breadcrumb style={{marginTop:'10px',marginBottom:'10px'}}>
+            <div className={style.breadCrumb}>
+                <Breadcrumb >
                     {breadcrumbItems}
                 </Breadcrumb>
             </div>
