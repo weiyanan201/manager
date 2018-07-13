@@ -1,0 +1,32 @@
+
+/table/groups
+    分组列表页面
+/table/groups/:groupId
+    某个分组下的表列表页面
+/table/groups/:groupId/:tableId
+    表详情页面
+
+/table/groups
+/table/groups/12
+/table/groups/12/32
+
+面包屑：
+    group列表
+    group列表/热血传奇
+    group列表/热血传奇/tableA
+
+解决思路：
+    1.添加bread状态管理
+    2.在需要特殊处理页面请求时修改bread的状态
+    3.返回结果中捎带bread信息
+
+
+菜单数据结构：
+    {
+    id,
+    pid,
+    name,//菜单名称
+    icon
+    route,
+    bread //面包屑名称
+    }
