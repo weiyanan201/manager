@@ -30,6 +30,12 @@ function authSuccess(data) {
 }
 
 function _arrayToTree(menus){
+
+    //antd 的组件只识别字符串
+    menus.map(v=>{
+        v.id=v.id+"";
+        v.pid = v.pid+"";
+    })
     menus.sort((a,b)=>(a.id-b.id));
     let data = List(menus);
     let result = [];
@@ -51,12 +57,11 @@ function _arrayToTree(menus){
     })
     return result;
 
-
 }
 
 export function getAuth() {
     return dispatch=>{
-        axios.get('/getAuth')
+        axios.get('/login/getMenus')
             .then(res=>{
                 if(res.status===200 && res.data.returnCode===0){
                     dispatch(authSuccess(res.data.data));

@@ -11,7 +11,8 @@ import HomePage from "../HomePage";
 import ApiList from '../apiList/ApiList';
 import GroupList from '../tableManage/GroupList';
 import TableList from '../tableManage/TableList';
-import ConsumerManage from '../consumerManage/ConsumerManage';
+import TableInfo from '../tableManage/TableInfo';
+
 import NotPage from '../NotPage';
 
 import style from './layout.less';
@@ -33,6 +34,7 @@ class MainContent extends React.Component{
                         <Route path="/api" exact component={ApiList}/>
                         <Route path="/table/groups" exact component={GroupList}/>
                         <Route path="/table/groups/:groupId" exact component={TableList}/>
+                        <Route path="/table/tableInfo/:tableId" exact component={TableInfo}/>
                         <Route component={NotPage} />
                         </Switch>
                     </div>

@@ -5,12 +5,12 @@ import {Select} from 'antd';
 
 const {Option} = Select;
 
-const GroupSelect = ({groupData=[],handleChange}) => {
+const GroupSelect = ({groupData=[],handleChange,handleSearch}) => {
 
     const children = [];
 
     groupData.map(group=>{
-        children.push(<Option key={group.groupId}>{group.groupName}</Option>);
+        children.push(<Option key={group.id}>{group.name}</Option>);
     });
 
     return (
@@ -19,6 +19,7 @@ const GroupSelect = ({groupData=[],handleChange}) => {
                 placeholder="Select a person"
                 optionFilterProp="children"
                 onSelect={handleChange}
+                onSearch={handleSearch}
                 optionLabelProp={children.groupName}
                 showArrow={true}
                 allowClear = {true}
@@ -33,6 +34,7 @@ const GroupSelect = ({groupData=[],handleChange}) => {
 GroupSelect.propTypes = {
     groupData:PropTypes.array,
     handleChange:PropTypes.func,
+    handleSearch:PropTypes.func
 }
 
 export default GroupSelect;

@@ -140,20 +140,20 @@ let database = {
     groupName:'热血传奇',
 };
 
-Mock.mock(/getTableLsit*/,options=>{
-
-    const param = getParams(options.url);
-    const page = param.get("page")===undefined?0:param.get("page");
-    const size = param.get("size")===undefined?10:param.get("size");
-    const data = paging(database.data,page,size);
-
-    let res = {
-        returnCode: 0,
-        data:data,
-        totalCount:database.totalCount,
-        groupName:database.groupName,
-    };
-
-    return res;
-
-});
+// Mock.mock(/getTableLsit*/,options=>{
+//
+//     const param = getParams(options.url);
+//     const page = param.get("page")===undefined?0:param.get("page");
+//     const size = param.get("size")===undefined?10:param.get("size");
+//     const data = paging(database.data,page,size);
+//
+//     let res = {
+//         returnCode: 0,
+//         data:data,
+//         totalCount:database.totalCount,
+//         groupName:database.groupName,
+//     };
+//
+//     return res;
+//
+// });

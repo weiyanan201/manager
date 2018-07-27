@@ -3,20 +3,22 @@ import { connect } from 'react-redux';
 import { Table, Pagination } from 'antd';
 import { Route } from 'react-router-dom';
 
+import BaseTable from '../../components/BaseTable';
+
 import GroupSelect from '../../components/groupSelect/GroupSelect';
 import NavLink from '../../components/NavLink/NavLink';
 
-import { getGroupList , getGroupAll } from "../../reducers/table.redux";
+import { getGroupList,getShowGroup,getShowGroupById } from "../../reducers/table.redux";
 
 import style from './table.less';
 
 const columns = [
     {
         title: 'groupID',
-        dataIndex: 'groupId',
+        dataIndex: 'id',
     }, {
         title: '组名',
-        dataIndex: 'groupName',
+        dataIndex: 'name',
     }, {
         title: '对应游戏',
         dataIndex: "app.appName"
@@ -24,61 +26,73 @@ const columns = [
         title: '权限',
         dataIndex: 'authority',
     }, {
-        title: 'Action',
-        dataIndex: 'groupId',
-        render: (groupId) => <NavLink target={`/table/groups/${groupId}`} linkText={"详情"} />  //跳转页面  rout
+        render: (item) => <NavLink target={`/table/groups/${item.id}`} linkText={"详情"} />  //跳转页面  rout
     },
 ];
 
 @connect(
     state => state.group,
-    {getGroupList,getGroupAll}
+    {getGroupList,getShowGroup,getShowGroupById}
 )
 export default class GroupList extends Component {
+
+    state={
+
+    };
 
     constructor(props){
         super(props);
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeSize = this.handleChangeSize.bind(this);
-        this.handleDclick = this.handleDclick.bind(this);
         GroupList.handleSelectChange = GroupList.handleSelectChange.bind(this);
-        this.props.getGroupAll();
-    }
-
-    componentDidMount() {
-        this.props.getGroupList();
+        this.handleSelectSearch = this.handleSelectSearch.bind(this);
+        if (!this.props.allGroup || this.props.allGroup.length===0 ){
+            this.props.getGroupList();
+        }
     }
 
     handleChange(page, pageSize){
-        console.log(page,pageSize);
-        this.props.getGroupList(page,pageSize);
+        this.props.getShowGroup(page,pageSize);
     }
     
     handleChangeSize(current, pageSize){
-        console.log(current, pageSize);
-        this.props.getGroupList(current,pageSize);
-    }
-    
-    handleDclick(){
-        console.log("onRowDoubleClick");
+        this.props.getShowGroup(current,pageSize);
     }
 
-    static handleSelectChange(e, f){
-        this.props.getGroupList(e);
+    static handleSelectChange(e){
+        this.props.getShowGroupById(e);
+    }
+
+    handleSelectSearch(e){
+        if (e===""){
+            this.props.getShowGroup()
+        }
+    }
+
+
+    selection = {
+        type:"checkbox",
+        rows:"rows",
+        rowKeys:"rowKeys",
+        _self : this
     }
 
     render() {
         return (
             <div>
-                <GroupSelect groupData={this.props.allGroup} handleChange={GroupList.handleSelectChange} />
-                <Table
+                请选择group名称：<GroupSelect
+                                    groupData={this.props.allGroup}
+                                    handleChange={GroupList.handleSelectChange}
+                                    handleSearch={this.handleSelectSearch}
+                                />
+                <BaseTable
                     bordered
                     columns={columns}
                     dataSource={this.props.data}
-                    rowKey="groupId"
+                    rowKey="id"
                     loading={this.props.groupLoading}
                     pagination = {false}
-                    onRowDoubleClick = {this.handleDclick}
+                    // selection={this.selection}
                 />
                 <Pagination  total={this.props.total} showSizeChanger showQuickJumper
                              onChange = {(page, pageSize)=>{this.handleChange(page, pageSize)}}

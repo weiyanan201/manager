@@ -22,19 +22,12 @@ function put(data) {
     return {type:PUSH_BREAD,payload:data};
 }
 
-function get() {
-    return {type:GET_BREAD};
-}
-
 
 export function pushBread(data) {
-    console.log(data);
     return {type:PUSH_BREAD,payload:data};
 }
 
-export function getBread() {
-    get();
-}
+
 
 
 

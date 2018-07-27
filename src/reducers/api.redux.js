@@ -27,7 +27,8 @@ function apiList(data) {
 
 export function getApiList(data){
     return dispatch=>{
-        axios.get('/searchApi')
+        // axios.get('/searchApi')
+        axios.get('/test/tenants/2')
             .then(res=>{
                 if(res.status===200 && res.data.returnCode===0){
                     dispatch(apiList(res.data.data))

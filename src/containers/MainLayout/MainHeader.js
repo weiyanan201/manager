@@ -5,11 +5,17 @@
 import React from 'react';
 import {Layout, Menu, Icon} from 'antd';
 
+import { connect } from 'react-redux';
+
 import style from './layout.less';
 
 const {Header} = Layout;
 const {SubMenu} = Menu;
 
+@connect(
+    state => state.auth,
+    { }
+)
 class MainHeader extends React.Component {
 
     render() {
@@ -26,7 +32,7 @@ class MainHeader extends React.Component {
                             title={
                                 <span>
                                     <Icon type="user"/>
-                                        魏亚楠.yannis
+                                    {this.props.username}
                                 </span>
                             }
                         >
