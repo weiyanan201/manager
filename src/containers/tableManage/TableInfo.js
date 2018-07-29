@@ -1,122 +1,47 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card, Table, Pagination,Form,Button,Input,Icon } from 'antd';
+import { Card, Table, Pagination,Form,Button,Input, Radio, DatePicker, Select,Modal} from 'antd';
 import { Route } from 'react-router-dom';
 import {getTableInfo} from "../../reducers/table.redux";
 
 import BaseForm from '../../components/BaseForm';
 import BaseTable from '../../components/BaseTable';
-import axios from '../../util/axios';
-import stateUtil from '../../util/stateUtil';
+
 
 
 const FormItem = Form.Item;
-
+const TextArea = Input.TextArea;
 
 const columns = [
+
     {
-        title:'tabelId',
-        key:'tabelId',
-        dataIndex:'tabelId'
+        title:'序号',
+        key:'key',
+        render:(text,row,index)=>index+1
     },
     {
-        title: '用户名',
-        key: 'userName',
-        dataIndex: 'userName'
+        title:'name',
+        key:'name',
+        dataIndex:'name'
     },
     {
-        title: '性别',
-        key: 'sex',
-        dataIndex: 'sex',
-        render(sex){
-            return sex ==1 ?'男':'女'
-        }
+        title: 'type',
+        key: 'type',
+        dataIndex: 'type'
     },
     {
-        title: '状态',
-        key: 'state',
-        dataIndex: 'state',
-        render(state){
-            let config  = {
-                '1':'咸鱼一条',
-                '2':'风华浪子',
-                '3':'北大才子',
-                '4':'百度FE',
-                '5':'创业者'
-            }
-            return config[state];
-        }
+        title: 'comment',
+        key: 'comment',
+        dataIndex: 'comment'
     },
-    {
-        title: '爱好',
-        key: 'interest',
-        dataIndex: 'interest',
-        render(abc) {
-            let config = {
-                '1': '游泳',
-                '2': '打篮球',
-                '3': '踢足球',
-                '4': '跑步',
-                '5': '爬山',
-                '6': '骑行',
-                '7': '桌球',
-                '8': '麦霸'
-            }
-            return config[abc];
-        }
-    },
-    {
-        title: '生日',
-        key: 'birthday',
-        dataIndex: 'birthday'
-    },
-    {
-        title: '地址',
-        key: 'address',
-        dataIndex: 'address'
-    },
-    {
-        title: '早起时间',
-        key: 'time',
-        dataIndex: 'time'
-    }
+
 ];
 
-const data = [
-    {
-        tabelId:'10',
-        userName:'Jack',
-        sex:'1',
-        state:'1',
-        interest:'1',
-        birthday:'2000-01-01',
-        address:'北京市海淀区奥林匹克公园',
-        time:'09:00'
-    },
-    {
-        tabelId: '31',
-        userName: 'Tom',
-        sex: '1',
-        state: '1',
-        interest: '1',
-        birthday: '2000-01-01',
-        address: '北京市海淀区奥林匹克公园',
-        time: '09:00'
-    },
-    {
-        tabelId: '48',
-        userName: 'Lily',
-        sex: '1',
-        state: '1',
-        interest: '1',
-        birthday: '2000-01-01',
-        address: '北京市海淀区奥林匹克公园',
-        time: '09:00'
-    },
-];
-data.map((item,index)=>{
-    item.key = index;
-});
+const formItemLayout = {
+    labelCol:{span:5},
+    wrapperCol:{span:19}
+}
+
 
 @connect(
     state => state.tableInfo,
@@ -128,80 +53,49 @@ export default class TableInfo extends Component {
         super(props);
         let tableId = this.props.match.params.tableId;
         this.state={
-
+            tableInfoEditVisible:false
         };
-        console.log(tableId);
         this.props.getTableInfo(tableId)
     }
 
-    formList = [
-        {
-            type:'SELECT',
-            label:'城市',
-            field:'city',
-            placeholder:'全部',
-            initialValue:'1',
-            width:80,
-            list: [{ id: '0', name: '全部' }, { id: '1', name: '北京' }, { id: '2', name: '天津' }, { id: '3', name: '上海' }]
-        },
-        {
-            type: '时间查询'
-        },
-        {
-            type: 'SELECT',
-            label: '订单状态',
-            field:'order_status',
-            placeholder: '全部',
-            initialValue: '1',
-            width: 80,
-            list: [{ id: '0', name: '全部' }, { id: '1', name: '进行中' }, { id: '2', name: '结束行程' }]
-        }
-    ];
+    //弹出修改表属性窗口
+    handleEditInfo=()=>{
+        this.setState({
+            tableInfoEditVisible:true
+        });
+    }
 
-    detailFormList = {
-        type:'INPUT',
-        label:'ID',
-        field:'tableId',
-        initialValue:'653',
-        width:80
+    //修改表属性提交
+    handleInfoSubmit = ()=>{
+
+        this.setState({
+            tableInfoEditVisible:false
+        });
     };
 
-    handleSubmit=(params)=>{
-        console.log(params);
-        axios.post("/test/test",params);
-    };
 
     render(){
 
         console.log("table info render");
 
         const selections = {
-            type:'radio',
+            type:'checkbox',
             rowKeys:'rowKeys',
             rows:'rows',
             _self:this
         };
-
-        const selection2 = {
-            type:'checkbox',
-            rowKeys:'rowKeys2',
-            rows:'rows2',
-            _self:this
-        };
-
-
 
         return(
             <div >
 
                 <Card title={"表属性"}>
                     <div style={{textAlign: 'right'}}>
-                        <Button type="primary">编辑</Button>
+                        <Button type="primary" onClick={this.handleEditInfo}>编辑</Button>
                         <Button type="danger">删除</Button>
                     </div>
                     <Form layout="inline">
                         <FormItem label="ID">
-                            <Input disabled={true} value={this.props.id} />
+                            <Input value={this.props.id} readOnly={true}/>
                         </FormItem>
                         <FormItem label="表名">
                             <Input disabled={true} value={this.props.tableName}/>
@@ -219,15 +113,40 @@ export default class TableInfo extends Component {
                 </Card>
 
                 <Card title="表字段" style={{marginTop:10}}>
+                    <div style={{textAlign: 'right'}}>
+                        <Button>编辑字段</Button>
+                        <Button>添加字段</Button>
+                        <Button>删除字段</Button>
+                    </div>
+
                     <BaseTable
                         columns={columns}
-                        dataSource={data}
+                        dataSource={this.props.columns}
                         selection={selections}
+                        // pagination={false}
+                        rowKey={"key"}
                     />
+                    <div style={{textAlign: 'right'}}>
+                        <Button type="primary">更新</Button>
+                    </div>
                 </Card>
 
-                <BaseForm formList={this.formList} handleSubmit={this.handleSubmit} submitText={"确定222"}/>
+                {/*表属性修改窗口*/}
+                <Modal
+                    title="表属性修改"
+                    visible={this.state.tableInfoEditVisible}
+                    width={600}
+                    onCancel={()=>{
+                        this.infoForm.props.form.resetFields();
+                        this.setState({
+                            tableInfoEditVisible:false
+                        })
+                    }}
+                    onOk={this.handleInfoSubmit}
+                >
+                    <InfoForm {...this.props}  wrappedComponentRef={(inst)=>{this.infoForm = inst;}}/>
 
+                </Modal>
 
             </div>
         );
@@ -235,4 +154,72 @@ export default class TableInfo extends Component {
 
 }
 
+
+class InfoForm extends React.Component{
+
+    getState = (state)=>{
+        return {
+            '1': '咸鱼一条',
+            '2': '风华浪子',
+            '3': '北大才子一枚',
+            '4': '百度FE',
+            '5': '创业者'
+        }[state]
+    }
+
+    render(){
+        let type = this.props.type;
+        let userInfo = this.props.userInfo || {};
+        const { getFieldDecorator } = this.props.form;
+        const formItemLayout = {
+            labelCol:{span:5},
+            wrapperCol:{span:19}
+        }
+        return (
+            <Form layout="horizontal">
+                <FormItem label="表名" {...formItemLayout}>
+                    {
+                        type == 'detail'?userInfo.username:
+                            getFieldDecorator('user_name',{
+                                initialValue:this.props.tableName
+                            })(
+                                <Input  type="text" />
+                            )
+                    }
+                </FormItem>
+                <FormItem label="dbName" {...formItemLayout}>
+                    {
+                        type == 'detail' ? userInfo.sex==1?'男':'女' :
+                            getFieldDecorator('sex',{
+                                initialValue: this.props.db
+                            })(
+                                <Input  type="text"  disabled={true}/>
+                            )
+                    }
+                </FormItem>
+                <FormItem label="存储介质" {...formItemLayout}>
+                    {
+                        type == 'detail' ? this.getState(userInfo.state) :
+                            getFieldDecorator('state',{
+                                initialValue: this.props.storageType
+                            })(
+                                <Input  type="text"  disabled={true}/>
+                            )
+                    }
+                </FormItem>
+                <FormItem label="描述" {...formItemLayout}>
+                    {
+                        type == 'detail' ? userInfo.address :
+                            getFieldDecorator('address',{
+                                initialValue: this.props.comment
+                            })(
+                                <TextArea rows={3} placeholder="请输入注释"/>
+                            )
+                    }
+                </FormItem>
+            </Form>
+        );
+    }
+}
+InfoForm = Form.create({})(InfoForm);
 

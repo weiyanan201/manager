@@ -110,14 +110,6 @@ export default class BaseTable extends React.Component{
 
     };
 
-    tableInit = ()=>{
-
-
-
-
-        return
-    };
-
     render(){
         console.log("baseTable.render()");
         return(
@@ -136,7 +128,6 @@ export default class BaseTable extends React.Component{
                         }
                     };
                 }}
-
             />
         );
     }
@@ -167,4 +158,6 @@ BaseTable.propTypes = {
         rows:PropTypes.string.isRequired,
         _self:PropTypes.object.isRequired,
     }),
+    rowKey:PropTypes.string.isRequired,
+
 };

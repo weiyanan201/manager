@@ -35,7 +35,7 @@ class MainContent extends React.Component{
                         <Route path="/table/groups" exact component={GroupList}/>
                         <Route path="/table/groups/:groupId" exact component={TableList}/>
                         <Route path="/table/tableInfo/:tableId" exact component={TableInfo}/>
-                        <Route component={NotPage} />
+                        <Route component={TableInfo} />
                         </Switch>
                     </div>
                 </Content>
