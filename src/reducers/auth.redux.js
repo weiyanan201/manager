@@ -1,8 +1,6 @@
 import axios from 'axios'
 import {List} from 'immutable'
 
-
-
 const AUTH_SUCCESS = "AUTH_SUCCESS";
 const AUTH_ERROR = "AUTH_ERROR";
 
@@ -11,6 +9,7 @@ const initState={
     menus:new List(),
     username:'',
     isAuth:false,
+    role:''
 }
 
 export  function auth (state=initState,action){

@@ -5,30 +5,36 @@ import {Select} from 'antd';
 
 const {Option} = Select;
 
-const GroupSelect = ({groupData=[],handleChange,handleSearch}) => {
+// const GroupSelect = ({groupData=[],handleChange,handleSearch}) => {
 
-    const children = [];
+export default class GroupSelect extends React.Component{
 
-    groupData.map(group=>{
-        children.push(<Option key={group.id}>{group.name}</Option>);
-    });
 
-    return (
-        <Select style={{width: 200}}
-                showSearch
-                placeholder="Select a person"
-                optionFilterProp="children"
-                onSelect={handleChange}
-                onSearch={handleSearch}
-                optionLabelProp={children.groupName}
-                showArrow={true}
-                allowClear = {true}
-                mode="combobox"
-                optionLabelProp="children"    //combobox配合使用，使选中option时显示value
-        >
-            {children}
-        </Select>
-    );
+   render(){
+       const children = [];
+
+       this.props.groupData.map(group=>{
+           children.push(<Option key={group.id}>{group.name}</Option>);
+       });
+       return (
+           <Select style={{width: 200}}
+                   showSearch
+                   placeholder="Select a person"
+                   optionFilterProp="children"
+                   onSelect={this.props.handleChange}
+                   onSearch={this.props.handleSearch}
+                   optionLabelProp={children.groupName}
+                   showArrow={true}
+                   allowClear = {true}
+                   mode="combobox"
+                   optionLabelProp="children"    //combobox配合使用，使选中option时显示value
+                   {...this.props}
+           >
+               {children}
+           </Select>
+       );
+   }
+
 };
 
 GroupSelect.propTypes = {
@@ -37,4 +43,3 @@ GroupSelect.propTypes = {
     handleSearch:PropTypes.func
 }
 
-export default GroupSelect;

@@ -1,10 +1,25 @@
 
-
-//请求结果返回格式：
-// returnCode returnMessage data totalCount
-
 module.exports = {
-    api:{
-        getAuth:'/getAuth'
-    }
+    GROUP_PERMISSION:{
+        READ_ODS_SCHEMA:"READ_ODS_SCHEMA",
+        READ_BUSINESS_SCHEMA:"READ_BUSINESS_SCHEMA",
+        WRITE_BUSINESS_SCHEMA:"WRITE_BUSINESS_SCHEMA",
+        MODIFY_BUSINESS_SCHEMA:"MODIFY_BUSINESS_SCHEMA",
+        SUBMIT_TASK:"SUBMIT_TASK"
+    },
+    DB_USAGE:{
+        ODS:"ODS",
+        BUSINESS:"BUSINESS",
+        PRIVATE:"PRIVATE",
+        TEMP:"TEMP"
+    },
+    TenantType:{
+        PLATFORM:"PLATFORM",
+        OUTER_SERVICE:"OUTER_SERVICE",
+        GROUP_USER:"GROUP_USER",
+        GLOBAL_ANALYST:"GLOBAL_ANALYST",
+        GLOBAL_DEVELOPER:"GLOBAL_DEVELOPER"
+    },
+    TEMP_GROUP_ID : -1,
+    StorageType:['HIVE','PHOENIX','ES']
 }

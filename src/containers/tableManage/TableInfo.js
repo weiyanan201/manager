@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card, Table, Pagination,Form,Button,Input, Radio, DatePicker, Select,Modal} from 'antd';
+import { Card, Table, Pagination,Form,Button,Input, Radio, DatePicker, Select,Modal,Cascader} from 'antd';
 import { Route } from 'react-router-dom';
 import {getTableInfo} from "../../reducers/table.redux";
 
@@ -11,6 +11,20 @@ import BaseTable from '../../components/BaseTable';
 
 const FormItem = Form.Item;
 const TextArea = Input.TextArea;
+
+
+
+const options = [{
+    value: 'zhejiang',
+    label: 'Zhejiang',
+    children: [{
+        value: 'hangzhou',
+        label: 'Hangzhou'
+    }],
+}, {
+    value: 'jiangsu',
+    label: 'Jiangsu',
+}];
 
 const columns = [
 
@@ -53,33 +67,30 @@ export default class TableInfo extends Component {
         super(props);
         let tableId = this.props.match.params.tableId;
         this.state={
-            tableInfoEditVisible:false
+            tableInfoEditVisible:false,
+            columnEditVisible:false,
         };
         this.props.getTableInfo(tableId)
     }
 
-    //弹出修改表属性窗口
-    handleEditInfo=()=>{
-        this.setState({
-            tableInfoEditVisible:true
-        });
-    }
-
     //修改表属性提交
     handleInfoSubmit = ()=>{
-
         this.setState({
             tableInfoEditVisible:false
         });
     };
 
+    //修改字段
+    handleColumnSubmit=()=>{
+
+    };
 
     render(){
 
         console.log("table info render");
 
         const selections = {
-            type:'checkbox',
+            type:'radio',
             rowKeys:'rowKeys',
             rows:'rows',
             _self:this
@@ -87,10 +98,9 @@ export default class TableInfo extends Component {
 
         return(
             <div >
-
                 <Card title={"表属性"}>
                     <div style={{textAlign: 'right'}}>
-                        <Button type="primary" onClick={this.handleEditInfo}>编辑</Button>
+                        <Button type="primary" onClick={()=>{this.setState({tableInfoEditVisible:true})}}>编辑</Button>
                         <Button type="danger">删除</Button>
                     </div>
                     <Form layout="inline">
@@ -114,16 +124,16 @@ export default class TableInfo extends Component {
 
                 <Card title="表字段" style={{marginTop:10}}>
                     <div style={{textAlign: 'right'}}>
-                        <Button>编辑字段</Button>
-                        <Button>添加字段</Button>
-                        <Button>删除字段</Button>
+                        <Button onClick={()=>this.setState({columnEditVisible:true})}>编辑字段</Button>
+                        <Button >添加字段</Button>
+                        <Button >删除字段</Button>
                     </div>
 
                     <BaseTable
                         columns={columns}
                         dataSource={this.props.columns}
                         selection={selections}
-                        // pagination={false}
+                        pagination={false}
                         rowKey={"key"}
                     />
                     <div style={{textAlign: 'right'}}>
@@ -145,6 +155,26 @@ export default class TableInfo extends Component {
                     onOk={this.handleInfoSubmit}
                 >
                     <InfoForm {...this.props}  wrappedComponentRef={(inst)=>{this.infoForm = inst;}}/>
+                </Modal>
+
+                {/*添加、修改字段窗口*/}
+                <Modal
+                    title="编辑字段"
+                    visible={this.state.columnEditVisible}
+                    width={600}
+                    onCancel={()=>{
+                        // this.columnForm.props.form.resetFields();
+                        this.setState({
+                            columnEditVisible:false
+                        })
+                    }}
+                    onOk={this.handleColumnSubmit}
+                >
+                    <CloumnForm wrappedComponentRef={(inst)=>{this.columnForm = inst;}} />
+                </Modal>
+
+                {/*字段删除窗口*/}
+                <Modal>
 
                 </Modal>
 
@@ -156,16 +186,6 @@ export default class TableInfo extends Component {
 
 
 class InfoForm extends React.Component{
-
-    getState = (state)=>{
-        return {
-            '1': '咸鱼一条',
-            '2': '风华浪子',
-            '3': '北大才子一枚',
-            '4': '百度FE',
-            '5': '创业者'
-        }[state]
-    }
 
     render(){
         let type = this.props.type;
@@ -223,3 +243,53 @@ class InfoForm extends React.Component{
 }
 InfoForm = Form.create({})(InfoForm);
 
+class CloumnForm extends  React.Component{
+    render(){
+        let type = this.props.type;
+        let userInfo = this.props.userInfo || {};
+        const { getFieldDecorator } = this.props.form;
+        const formItemLayout = {
+            labelCol:{span:5},
+            wrapperCol:{span:19}
+        }
+        return (
+            <Form layout="horizontal">
+                <FormItem label="字段名称" {...formItemLayout}>
+                    {
+                            getFieldDecorator('name',{
+                                initialValue:this.props.name
+                            })(
+                                <Input  type="text" />
+                            )
+                    }
+                </FormItem>
+                <FormItem label="type" {...formItemLayout}>
+                    {
+                            getFieldDecorator('type',{
+                                initialValue: this.props.db
+                            })(
+                                <Cascader options={options}
+                                    // displayRender={(label)=>{
+                                    //     //修改展示文字
+                                    // }}
+                                          size={"large"}
+                                />
+                            )
+                    }
+                </FormItem>
+
+                <FormItem label="注释" {...formItemLayout}>
+                    {
+                            getFieldDecorator('comment',{
+                                initialValue: this.props.comment
+                            })(
+                                <TextArea rows={3} placeholder="请输入注释"/>
+                            )
+                    }
+                </FormItem>
+            </Form>
+        );
+    }
+}
+
+CloumnForm = Form.create({})(CloumnForm);

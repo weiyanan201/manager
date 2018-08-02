@@ -95,10 +95,7 @@ export function tableInfo(state=tableInfoInitState,action) {
             if (detail.tableInfo!==undefined && detail.tableInfo.parameters!==undefined && detail.tableInfo.parameters.comment!==undefined){
                 comment = detail.tableInfo.parameters.comment;
             }
-            // const columns = detail.columns.map((item,index)=>{
-            //     item.key = index;
-            //     return item;
-            // })
+
             return {...state,tableName,id,storageType,db,comment,columns:detail.columns};
         default:
             return state;

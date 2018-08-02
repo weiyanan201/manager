@@ -1,12 +1,18 @@
+/**
+ * 手动建表页面
+ */
+
 import React from 'react';
-import {Button , Card,Spin,Table,Cascader,Form,InputNumber,Input,Popconfirm,Select} from 'antd';
-import Axios from '../util/axios';
+import { getGroupList} from "../../reducers/table.redux";
 
-
+import {Button , Card,Spin,Table,Cascader,Form,InputNumber,Input,Popconfirm,Select,Row} from 'antd';
+import GroupSelect  from '../../components/groupSelect/GroupSelect';
+import tableUtil from '../../util/tableUtil';
+import {TEMP_GROUP_ID} from '../../util/config';
 
 const Option = Select.Option;
 const data = [];
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 0; i++) {
     data.push({
         key: i.toString(),
         name: `Edrward ${i}`,
@@ -31,11 +37,11 @@ function handleChange(value) {
 
 class EditableCell extends React.Component {
     getInput = () => {
+        console.log(this.props);
         if (this.props.inputType === 'number') {
-            return <Select defaultValue="lucy" style={{ width: 120 }} onChange={handleChange}>
+            return <Select defaultValue="aaa" style={{ width: 120 }} onChange={handleChange}>
                 <Option value="jack">Jack</Option>
                 <Option value="lucy">Lucy</Option>
-                <Option value="disabled" disabled>Disabled</Option>
                 <Option value="Yiminghe">yiminghe</Option>
             </Select>;
         }
@@ -80,6 +86,7 @@ class EditableCell extends React.Component {
 class EditableTable extends React.Component {
     constructor(props) {
         super(props);
+        console.log(props);
         this.state = { data, editingKey: '' };
         this.columns = [
             {
@@ -175,7 +182,6 @@ class EditableTable extends React.Component {
 
 
     handleAdd = () => {
-        console.log("add row ");
         const newData = {
             // key: '11111',
             // name: `weiyanan`,
@@ -193,6 +199,7 @@ class EditableTable extends React.Component {
             body: {
                 row: EditableFormRow,
                 cell: EditableCell,
+                type:this.props.type
             },
         };
 
@@ -209,6 +216,7 @@ class EditableTable extends React.Component {
                     dataIndex: col.dataIndex,
                     title: col.title,
                     editing: this.isEditing(record),
+                    type:this.props.type
                 }),
             };
         });
@@ -232,27 +240,86 @@ class EditableTable extends React.Component {
 }
 
 
+export default class CreateTable extends React.Component{
+    constructor(props){
+        super(props);
+        this.state={
+            tableName:'',
+            comment:'',
+            groupId:'',
+            storageType:'',
+            db:''
+        };
+    }
+    //联动数据库选择
+    handleChangeGroup = (index)=>{
+        let oldIsTmp = this.state.groupId===TEMP_GROUP_ID.toString();
+        let newIsTmp = index === TEMP_GROUP_ID.toString();
+        let change = (oldIsTmp&&!newIsTmp) || (!oldIsTmp&&newIsTmp);
+        console.log("change,",change);
+        this.setState({
+            groupId:index,
+            db:change?'':this.state.db
+        })
+    };
+    //联动数据库选择
+    handleSelectStorageType=(item)=>{
+        this.setState({
+            storageType:item,
+            db:''
+        })
+    };
 
+    handleSelectDb=(item)=>{
+        console.log("handleSelectDb",item);
+        this.setState({
+            db:item
+        })
+    };
 
-
-
-
-export default class NotPage extends React.Component{
-
-
-
-
-
+    displayRender=(label)=>{
+        if (label && label.length===2){
+            return `${label[0]}<${label[1]}>`
+        }else if(label){
+            return label;
+        }
+    };
 
     render(){
-
         return (
             <div>
-                <h3>NOT PAGE!</h3>
-                <EditableTable/>
+                <Card title={"表信息"}>
+                    <Form layout="inline">
+                        <Row>
+                            <FormItem label="表名" >
+                                <Input rows={3} placeholder="请输入表名" />
+                            </FormItem>
+                            <FormItem label="描述" >
+                                <Input rows={3} placeholder="请输入注释"/>
+                            </FormItem>
+                            <FormItem label="组名" >
+                                <GroupSelect groupData={tableUtil.filterGroup(this.props.group.allGroup,this.props.auth)} handleChange={this.handleChangeGroup} />
+                            </FormItem>
+                            <FormItem label="存储介质" >
+                                <Select style={{ width: 150 }} onChange={this.handleSelectStorageType}>
+                                    {tableUtil.getStorageType().map((item)=><Option value={item} key={item}>{item}</Option>)}
+                                </Select>
+                            </FormItem>
+                            <FormItem label="数据库" >
+                                <Select style={{ width: 180 }}  onSelect={this.handleSelectDb} value={this.state.db}>
+                                    {tableUtil.fiterDbs(this.props.config.dbs,this.state.groupId,this.state.storageType,this.props.auth.role).map((item)=><Option value={item.id} key={item.id}>{item.name}</Option>)}
+
+                                </Select>
+                            </FormItem>
+                            {/*<Cascader options={tableUtil.getFieldType(this.props.config.fieldTypes,'ES')}  placeholder="Please select" displayRender={this.displayRender}/>*/}
+                        </Row>
+                    </Form>
+                </Card>
+                <Card title={"字段详情"}>
+                    <EditableTable type="es"/>
+                </Card>
+                <Button type={"primary"}>创建</Button>
             </div>
         )
     }
-
-
 }
