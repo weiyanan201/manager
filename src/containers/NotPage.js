@@ -1,19 +1,38 @@
 import React from 'react';
 import {Button , Card,Spin,Table,Cascader,Form,InputNumber,Input,Popconfirm,Select} from 'antd';
-import Axios from '../util/axios';
+import tableUtil from "../util/tableUtil";
+import { connect } from 'react-redux';
+import {getFieldsType} from "../reducers/config.redux";
 
 
+const options = [{
+    value:'sh',
+    label:'shanghai'
+},{
+    value: 'zhejiang',
+    label: 'Zhejiang',
+    children: [{
+        value: 'hangzhou',
+        label: 'Hangzhou',
+        children: [{
+            value: 'xihu',
+            label: 'West Lake',
+        }],
+    }],
+}, {
+    value: 'jiangsu',
+    label: 'Jiangsu',
+    children: [{
+        value: 'nanjing',
+        label: 'Nanjing',
+        children: [{
+            value: 'zhonghuamen',
+            label: 'Zhong Hua Men',
+        }],
+    }],
+}];
 
-const Option = Select.Option;
-const data = [];
-for (let i = 0; i < 100; i++) {
-    data.push({
-        key: i.toString(),
-        name: `Edrward ${i}`,
-        age: 32,
-        address: `London Park no. ${i}`,
-    });
-}
+
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
 
@@ -25,177 +44,218 @@ const EditableRow = ({ form, index, ...props }) => (
 
 const EditableFormRow = Form.create()(EditableRow);
 
-function handleChange(value) {
-    console.log(`selected ${value}`);
-}
-
+@connect(
+    state => state.config,
+    {}
+)
 class EditableCell extends React.Component {
-    getInput = () => {
-        if (this.props.inputType === 'number') {
-            return <Select defaultValue="lucy" style={{ width: 120 }} onChange={handleChange}>
-                <Option value="jack">Jack</Option>
-                <Option value="lucy">Lucy</Option>
-                <Option value="disabled" disabled>Disabled</Option>
-                <Option value="Yiminghe">yiminghe</Option>
-            </Select>;
+    state = {
+        editing: false,
+    }
+
+    componentDidMount() {
+        if (this.props.editable) {
+            document.addEventListener('click', this.handleClickOutside, true);
         }
-        return <Input />;
-    };
+    }
+
+    componentWillUnmount() {
+        if (this.props.editable) {
+            document.removeEventListener('click', this.handleClickOutside, true);
+        }
+    }
+
+    toggleEdit = () => {
+        const editing = !this.state.editing;
+        this.setState({ editing }, () => {
+            if (editing) {
+                this.input.focus();
+            }
+        });
+    }
+
+    handleClickOutside = (e) => {
+        const { editing } = this.state;
+        if (editing && this.cell !== e.target && !this.cell.contains(e.target)) {
+            this.save();
+        }
+    }
+
+    save = () => {
+        const { record, handleSave ,columnType,dataIndex} = this.props;
+        this.form.validateFields((error, values) => {
+            if (error) {
+                return;
+            }
+            if(columnType==='fieldType'){
+                let tmpVal = values[dataIndex].join(",");
+                values[dataIndex]=tmpVal;
+            }
+            this.toggleEdit();
+            handleSave({ ...record, ...values ,columnType});
+        });
+    }
+
+    onChange=(a,b,c)=>{
+        console.log(a,b,c);
+        a=a.join(",");
+    }
+    
+    getInput= ()=>{
+        if (this.props.columnType === 'fieldType') {
+                return <Cascader
+                            options={tableUtil.getFieldType(this.props.fieldTypes,this.props.storageType)}
+                            placeholder="请选择类型" ref={node => (this.input = node)}
+                            onPressEnter={this.save}
+                    />
+        }
+        return <Input ref={node => (this.input = node)}
+                      onPressEnter={this.save}/>;
+    }
 
     render() {
+        const { editing } = this.state;
         const {
-            editing,
+            editable,
             dataIndex,
+            columnType,
             title,
-            inputType,
             record,
             index,
+            handleSave,
             ...restProps
         } = this.props;
         return (
-            <EditableContext.Consumer>
-                {(form) => {
-                    const { getFieldDecorator } = form;
-                    return (
-                        <td {...restProps}>
-                            {editing ? (
-                                <FormItem style={{ margin: 0 }}>
-                                    {getFieldDecorator(dataIndex, {
-                                        rules: [{
-                                            required: true,
-                                            message: `Please Input ${title}!`,
-                                        }],
-                                        initialValue: record[dataIndex],
-                                    })(this.getInput())}
-                                </FormItem>
-                            ) : restProps.children}
-                        </td>
-                    );
-                }}
-            </EditableContext.Consumer>
+            <td ref={node => (this.cell = node)} {...restProps}>
+                {editable ? (
+                    <EditableContext.Consumer>
+                        {(form) => {
+                            this.form = form;
+                            return (
+                                editing ? (
+                                    <FormItem style={{ margin: 0 }}>
+                                        {form.getFieldDecorator(dataIndex, {
+                                            rules: [{
+                                                required: true,
+                                                message: `${title} is required.`,
+                                            }],
+                                            // initialValue: record[dataIndex],
+                                        })(
+                                            this.getInput()
+                                        )}
+                                    </FormItem>
+                                ) : (
+                                    <div
+                                        className="editable-cell-value-wrap"
+                                        style={{ paddingRight: 24 }}
+                                        onClick={this.toggleEdit}
+                                    >
+                                        {restProps.children}
+                                    </div>
+                                )
+                            );
+                        }}
+                    </EditableContext.Consumer>
+                ) : restProps.children}
+            </td>
         );
     }
 }
 
+@connect(
+    state => state.config,
+    {getFieldsType}
+)
 class EditableTable extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { data, editingKey: '' };
-        this.columns = [
-            {
-                title: 'name',
-                dataIndex: 'name',
-                width: '25%',
-                editable: true,
+        this.props.getFieldsType();
+        this.columns = [{
+            title: 'name',
+            dataIndex: 'name',
+            width: '30%',
+            editable: true,
+            columnType:'input'
+        }, {
+            title: 'age',
+            dataIndex: 'age',
+            editable: true,
+            columnType:'fieldType',
+            storageType:'HIVE'
+        }, {
+            title: 'address',
+            dataIndex: 'address',
+            editable: true,
+            columnType:'input',
+        }, {
+            title: 'operation',
+            dataIndex: 'operation',
+            render: (text, record) => {
+                return (
+                    this.state.dataSource.length > 1
+                        ? (
+                            <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.key)}>
+                                <a href="javascript:;">Delete</a>
+                            </Popconfirm>
+                        ) : null
+                );
             },
-            {
-                title: 'age',
-                dataIndex: 'age',
-                width: '15%',
-                editable: true,
-            },
-            {
-                title: 'address',
-                dataIndex: 'address',
-                width: '40%',
-                editable: true,
-            },
-            {
-                title: 'operation',
-                dataIndex: 'operation',
-                render: (text, record) => {
-                    const editable = this.isEditing(record);
-                    return (
-                        <div>
-                            {editable ? (
-                                <span>
-                  <EditableContext.Consumer>
-                    {form => (
-                        <a
-                            href="javascript:;"
-                            onClick={() => this.save(form, record.key)}
-                            style={{ marginRight: 8 }}
-                        >
-                            Save
-                        </a>
-                    )}
-                  </EditableContext.Consumer>
-                  <Popconfirm
-                      title="Sure to cancel?"
-                      onConfirm={() => this.cancel(record.key)}
-                  >
-                    <a>Cancel</a>
-                  </Popconfirm>
-                </span>
-                            ) : (
-                                <span>
-                                    <a onClick={() => this.edit(record.key)} style={{ marginRight: 8 }}>Edit</a>
-                                    <a onClick={() => this.edit(record.key)} style={{ marginRight: 8 }}>Delete</a>
-                                </span>
-                            )}
-                        </div>
-                    );
-                },
-            },
-        ];
+        }];
+
+        this.state = {
+            dataSource: [{
+                key: '0',
+                name: 'Edward King 0',
+                age: '32',
+                address: 'London, Park Lane no. 0',
+            }, {
+                key: '1',
+                name: 'Edward King 1',
+                age: '32',
+                address: 'London, Park Lane no. 1',
+            }],
+            count: 2,
+        };
     }
 
-    isEditing = (record) => {
-        return record.key === this.state.editingKey;
-    };
-
-    edit(key) {
-        this.setState({ editingKey: key });
+    handleDelete = (key) => {
+        const dataSource = [...this.state.dataSource];
+        this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
     }
-
-    save(form, key) {
-        form.validateFields((error, row) => {
-            if (error) {
-                return;
-            }
-            const newData = [...this.state.data];
-            const index = newData.findIndex(item => key === item.key);
-            if (index > -1) {
-                const item = newData[index];
-                newData.splice(index, 1, {
-                    ...item,
-                    ...row,
-                });
-                this.setState({ data: newData, editingKey: '' });
-            } else {
-                newData.push(row);
-                this.setState({ data: newData, editingKey: '' });
-            }
-        });
-    }
-
-    cancel = () => {
-        this.setState({ editingKey: '' });
-    };
-
 
     handleAdd = () => {
-        console.log("add row ");
+        const { count, dataSource } = this.state;
         const newData = {
-            // key: '11111',
-            // name: `weiyanan`,
-            // age: 32,
-            // address: `London Park no. weiyanan`,
+            key: count,
+            name: `Edward King ${count}`,
+            age: 32,
+            address: `London, Park Lane no. ${count}`,
         };
         this.setState({
-            data: [...this.state.data, newData],
+            dataSource: [...dataSource, newData],
+            count: count + 1,
         });
+    }
 
-    };
+        handleSave = (row) => {
+        const newData = [...this.state.dataSource];
+        const index = newData.findIndex(item => row.key === item.key);
+        const item = newData[index];
+        newData.splice(index, 1, {
+            ...item,
+            ...row,
+        });
+        this.setState({ dataSource: newData });
+    }
 
     render() {
+        const { dataSource } = this.state;
         const components = {
             body: {
                 row: EditableFormRow,
                 cell: EditableCell,
             },
         };
-
         const columns = this.columns.map((col) => {
             if (!col.editable) {
                 return col;
@@ -204,16 +264,15 @@ class EditableTable extends React.Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    inputType: col.dataIndex === 'age' ? 'number' : 'text',
-                    // inputType:'text',
+                    editable: col.editable,
                     dataIndex: col.dataIndex,
                     title: col.title,
-                    editing: this.isEditing(record),
+                    columnType:col.columnType,
+                    handleSave: this.handleSave,
+                    ...col
                 }),
             };
         });
-
-
         return (
             <div>
                 <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
@@ -221,10 +280,10 @@ class EditableTable extends React.Component {
                 </Button>
                 <Table
                     components={components}
+                    rowClassName={() => 'editable-row'}
                     bordered
-                    dataSource={this.state.data}
+                    dataSource={dataSource}
                     columns={columns}
-                    rowClassName="editable-row"
                 />
             </div>
         );
@@ -232,27 +291,12 @@ class EditableTable extends React.Component {
 }
 
 
-
-
-
-
-
 export default class NotPage extends React.Component{
-
-
-
-
-
-
     render(){
-
         return (
             <div>
-                <h3>NOT PAGE!</h3>
                 <EditableTable/>
             </div>
         )
     }
-
-
 }

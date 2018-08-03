@@ -47,27 +47,28 @@ export default {
     getFieldType(fields,type){
         let resutl = [];
         let children = [];
-        fields.map(item=>{
-            if (item.type.includes(type) && item.elementary){
-                resutl.push({
-                    value:item.name,
-                    label:item.name
-                });
-                children.push({
-                    value:item.name,
-                    label:item.name
-                });
+        if (fields && fields.length>0){
+            fields.map(item=>{
+                if (item.type.includes(type) && item.elementary){
+                    resutl.push({
+                        value:item.name,
+                        label:item.name
+                    });
+                    children.push({
+                        value:item.name,
+                        label:item.name
+                    });
 
-            }else if(item.type.includes(type) ){
-                let combination = {
-                    value:item.name,
-                    label:item.name,
-                    children:children
+                }else if(item.type.includes(type) ){
+                    let combination = {
+                        value:item.name,
+                        label:item.name,
+                        children:children
+                    }
+                    resutl.push(combination)
                 }
-                resutl.push(combination)
-            }
-        });
-        console.log(resutl);
+            });
+        }
         return resutl;
     }
 }

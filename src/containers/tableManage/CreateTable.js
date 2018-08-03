@@ -311,7 +311,7 @@ export default class CreateTable extends React.Component{
 
                                 </Select>
                             </FormItem>
-                            {/*<Cascader options={tableUtil.getFieldType(this.props.config.fieldTypes,'ES')}  placeholder="Please select" displayRender={this.displayRender}/>*/}
+                            <Cascader options={tableUtil.getFieldType(this.props.config.fieldTypes,'ES')}  placeholder="Please select" displayRender={this.displayRender}/>
                         </Row>
                     </Form>
                 </Card>
