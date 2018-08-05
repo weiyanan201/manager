@@ -5,33 +5,6 @@ import { connect } from 'react-redux';
 import {getFieldsType} from "../reducers/config.redux";
 
 
-const options = [{
-    value:'sh',
-    label:'shanghai'
-},{
-    value: 'zhejiang',
-    label: 'Zhejiang',
-    children: [{
-        value: 'hangzhou',
-        label: 'Hangzhou',
-        children: [{
-            value: 'xihu',
-            label: 'West Lake',
-        }],
-    }],
-}, {
-    value: 'jiangsu',
-    label: 'Jiangsu',
-    children: [{
-        value: 'nanjing',
-        label: 'Nanjing',
-        children: [{
-            value: 'zhonghuamen',
-            label: 'Zhong Hua Men',
-        }],
-    }],
-}];
-
 
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
@@ -68,10 +41,19 @@ class EditableCell extends React.Component {
     toggleEdit = () => {
         const editing = !this.state.editing;
         this.setState({ editing }, () => {
-            if (editing) {
+            if (editing && this.props.editable) {
                 this.input.focus();
             }
         });
+    }
+
+    handleTdClick=()=>{
+        const editing = this.state.editing;
+        if (editing){
+            return ;
+        }else{
+            this.toggleEdit();
+        }
     }
 
     handleClickOutside = (e) => {
@@ -84,6 +66,7 @@ class EditableCell extends React.Component {
     save = () => {
         const { record, handleSave ,columnType,dataIndex} = this.props;
         this.form.validateFields((error, values) => {
+            //TODO 下拉框没有
             if (error) {
                 return;
             }
@@ -98,20 +81,22 @@ class EditableCell extends React.Component {
 
     onChange=(a,b,c)=>{
         console.log(a,b,c);
-        a=a.join(",");
     }
-    
+
     getInput= ()=>{
         if (this.props.columnType === 'fieldType') {
                 return <Cascader
                             options={tableUtil.getFieldType(this.props.fieldTypes,this.props.storageType)}
                             placeholder="请选择类型" ref={node => (this.input = node)}
                             onPressEnter={this.save}
+                            onChange={this.onChange}
                     />
         }
         return <Input ref={node => (this.input = node)}
                       onPressEnter={this.save}/>;
     }
+
+
 
     render() {
         const { editing } = this.state;
@@ -126,7 +111,7 @@ class EditableCell extends React.Component {
             ...restProps
         } = this.props;
         return (
-            <td ref={node => (this.cell = node)} {...restProps}>
+            <td ref={node => (this.cell = node)} {...restProps} onClick={this.handleTdClick}>
                 {editable ? (
                     <EditableContext.Consumer>
                         {(form) => {
@@ -139,7 +124,7 @@ class EditableCell extends React.Component {
                                                 required: true,
                                                 message: `${title} is required.`,
                                             }],
-                                            // initialValue: record[dataIndex],
+                                            initialValue: columnType==='input'?record[dataIndex]:[],
                                         })(
                                             this.getInput()
                                         )}
@@ -177,14 +162,14 @@ class EditableTable extends React.Component {
             editable: true,
             columnType:'input'
         }, {
-            title: 'age',
-            dataIndex: 'age',
+            title: '类型',
+            dataIndex: 'type',
             editable: true,
             columnType:'fieldType',
             storageType:'HIVE'
         }, {
-            title: 'address',
-            dataIndex: 'address',
+            title: '注释',
+            dataIndex: 'comment',
             editable: true,
             columnType:'input',
         }, {
@@ -206,13 +191,13 @@ class EditableTable extends React.Component {
             dataSource: [{
                 key: '0',
                 name: 'Edward King 0',
-                age: '32',
-                address: 'London, Park Lane no. 0',
+                type: 'FLOAT',
+                comment: 'London, Park Lane no. 0',
             }, {
                 key: '1',
                 name: 'Edward King 1',
-                age: '32',
-                address: 'London, Park Lane no. 1',
+                type: 'INT',
+                comment: 'London, Park Lane no. 1',
             }],
             count: 2,
         };
@@ -227,9 +212,9 @@ class EditableTable extends React.Component {
         const { count, dataSource } = this.state;
         const newData = {
             key: count,
-            name: `Edward King ${count}`,
-            age: 32,
-            address: `London, Park Lane no. ${count}`,
+            name: '',
+            type: '',
+            comment: '',
         };
         this.setState({
             dataSource: [...dataSource, newData],
@@ -261,6 +246,7 @@ class EditableTable extends React.Component {
                 return col;
             }
             return {
+
                 ...col,
                 onCell: record => ({
                     record,
@@ -269,14 +255,15 @@ class EditableTable extends React.Component {
                     title: col.title,
                     columnType:col.columnType,
                     handleSave: this.handleSave,
-                    ...col
+                    ...col,
                 }),
+
             };
         });
         return (
             <div>
                 <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
-                    Add a row
+                    添加字段
                 </Button>
                 <Table
                     components={components}
