@@ -1,6 +1,6 @@
 // import axios from 'axios';
 import axios from '../util/axios'
-import { paging } from '../util/util';
+import util from '../util/util';
 
 
 const GET_GROUP_LIST = "GET_GROUP_LIST";
@@ -46,7 +46,7 @@ export function group(state = groupInitState, action) {
             return {...state, allGroup: action.payload.data, total: action.payload.totalCount,groupLoading:false};
         case SHOW_GROUP:
             const {page,size} = {...action.payload};
-            const datas = paging(state.allGroup,page,size);
+            const datas = util.paging(state.allGroup,page,size);
             const total = state.allGroup.length;
             return {...state, data: datas,total:total};
         case SHOW_GROUP_BY_ID:
@@ -69,7 +69,7 @@ export function table(state = tableInitState, action) {
             };
         case SHOW_TABLE_PAGE:
             const {page,size} = {...action.payload};
-            const datas = paging(state.allTable,page,size);
+            const datas = util.paging(state.allTable,page,size);
             const total = state.allTable.length;
             return {...state, data: datas,total:total};
         case INIT_TABLE_LIST:

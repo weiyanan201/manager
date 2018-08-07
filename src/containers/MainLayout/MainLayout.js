@@ -24,7 +24,6 @@ import style from './layout.less';
 class MainLayout extends Component {
 
     componentDidMount() {
-        console.log(this.props);
         this.props.getAuth();
     }
 

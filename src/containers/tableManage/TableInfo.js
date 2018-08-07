@@ -4,15 +4,10 @@ import { Card, Table, Pagination,Form,Button,Input, Radio, DatePicker, Select,Mo
 import { Route } from 'react-router-dom';
 import {getTableInfo} from "../../reducers/table.redux";
 
-import BaseForm from '../../components/BaseForm';
 import BaseTable from '../../components/BaseTable';
-
-
 
 const FormItem = Form.Item;
 const TextArea = Input.TextArea;
-
-
 
 const options = [{
     value: 'zhejiang',

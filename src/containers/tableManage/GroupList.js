@@ -60,10 +60,12 @@ export default class GroupList extends Component {
     }
 
     static handleSelectChange(e){
+        console.log("handleSelectChange");
         this.props.getShowGroupById(e);
     }
 
     handleSelectSearch(e){
+        console.log("handleSelectSearch");
         if (e===""){
             this.props.getShowGroup()
         }

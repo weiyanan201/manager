@@ -10,10 +10,8 @@ const configInitState = {
 export function config (state = configInitState, action){
     switch (action.type){
         case GET_DBS:
-            console.log(action.payload.data);
             return {...state,dbs:action.payload.data};
         case GET_FIELDS_TYPE:
-            console.log(action.payload.data);
             return {...state,fieldTypes:action.payload.data};
         default:
             return state;

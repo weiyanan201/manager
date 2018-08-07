@@ -8,7 +8,6 @@ import {getFieldsType} from "../reducers/config.redux";
 
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
-
 const EditableRow = ({ form, index, ...props }) => (
     <EditableContext.Provider value={form}>
         <tr {...props} />
@@ -95,8 +94,6 @@ class EditableCell extends React.Component {
         return <Input ref={node => (this.input = node)}
                       onPressEnter={this.save}/>;
     }
-
-
 
     render() {
         const { editing } = this.state;

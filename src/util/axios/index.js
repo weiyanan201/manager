@@ -47,7 +47,18 @@ export default class Axios {
         let options = {
             url:url,
             method:'post',
-            data:qs.stringify(data)
+            data:qs.stringify(data),
+        };
+        return packPromise(options);
+    }
+
+    static postByJson(url,data={}){
+        let header = {'Content-Type': 'application/json;charset=utf-8'};
+        let options = {
+            url:url,
+            method:'post',
+            data:data,
+            headers:header
         };
         return packPromise(options);
     }
