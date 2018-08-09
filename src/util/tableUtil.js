@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { TenantType,GROUP_PERMISSION,TEMP_GROUP_ID,StorageType ,DB_USAGE} from './config';
+import { TenantType,GROUP_PERMISSION,TEMP_GROUP_ID,StorageType ,DB_USAGE,HIVE_STORAGE_FORMAT} from './config';
 
 export default {
 
@@ -21,6 +21,9 @@ export default {
     },
     getStorageType(){
         return StorageType;
+    },
+    getStorageFormat(){
+        return HIVE_STORAGE_FORMAT;
     },
     fiterDbs(dbs,group,storageType,role){
         if (!dbs || !storageType || !role){

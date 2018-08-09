@@ -21,5 +21,6 @@ module.exports = {
         GLOBAL_DEVELOPER:"GLOBAL_DEVELOPER"
     },
     TEMP_GROUP_ID : -1,
-    StorageType:['HIVE','PHOENIX','ES']
+    StorageType:['HIVE','PHOENIX','ES'],
+    HIVE_STORAGE_FORMAT:['ORC','TEXTFILE']
 }

@@ -6,6 +6,12 @@ import qs from 'qs';
 //     console.log("axios.interceptors.request.use");
 // });
 
+/**
+ * group 下来框
+ * @param options
+ * @returns {Promise<any>}
+ */
+
 function packPromise(options){
     return new Promise((resolve, reject) => {
         axios({...options}).then((response) => {
@@ -27,7 +33,8 @@ function packPromise(options){
             Modal.error({
                 title: "错误提示",
                 content: "系统异常，请联系管理员"
-            })
+            });
+            reject(error);
         })
     });
 }

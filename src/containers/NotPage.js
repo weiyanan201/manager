@@ -72,7 +72,10 @@ class EditableCell extends React.Component {
             if(columnType==='fieldType'){
                 let tmpVal = values[dataIndex].join(",");
                 values[dataIndex]=tmpVal;
+            }else if(columnType==='checkbox'){
+
             }
+
             this.toggleEdit();
             handleSave({ ...record, ...values ,columnType});
         });
