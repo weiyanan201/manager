@@ -1,7 +1,3 @@
-/**
- * 可编辑table
- *
- */
 
 import React from 'react';
 import { connect } from 'react-redux';
@@ -10,10 +6,18 @@ import {Button , Card,Spin,Table,Cascader,Form,InputNumber,Input,Popconfirm,Sele
 import tableUtil from '../../util/tableUtil';
 import util from "../../util/util";
 
-
+const data = [];
+for (let i = 0; i < 100; i++) {
+    data.push({
+        key: i.toString(),
+        name: `Edrward ${i}`,
+        age: 32,
+        address: `London Park no. ${i}`,
+    });
+}
 const FormItem = Form.Item;
-
 const EditableContext = React.createContext();
+
 const EditableRow = ({ form, index, ...props }) => (
     <EditableContext.Provider value={form}>
         <tr {...props} />
@@ -27,263 +31,191 @@ const EditableFormRow = Form.create()(EditableRow);
     {}
 )
 class EditableCell extends React.Component {
-    state = {
-        editing: false,
-        fieldValue : []
-    }
-
-    componentDidMount() {
-        if (this.props.editable) {
-            document.addEventListener('click', this.handleClickOutside, true);
+    getInput = () => {
+        if (this.props.inputType === 'number') {
+            return <InputNumber />;
         }
-    }
-
-    componentWillUnmount() {
-        if (this.props.editable) {
-            document.removeEventListener('click', this.handleClickOutside, true);
-        }
-    }
-
-    toggleEdit = () => {
-        const editing = !this.state.editing;
-        this.setState({ editing }, () => {
-            if (editing && this.props.editable) {
-                this.input.focus();
-            }
-        });
-    }
-
-    handleTdClick=()=>{
-        const editing = this.state.editing;
-        if (editing){
-            return ;
-        }else{
-            this.toggleEdit();
-        }
-    }
-
-    handleClickOutside = (e) => {
-        const { editing } = this.state;
-        if (editing && this.cell !== e.target && !this.cell.contains(e.target)) {
-            // console.log("e.target : ",e.target);
-            // console.log("this.cell : " , this.cell);
-            this.save();
-        }
-    }
-
-    onChange=(e)=>{
-        console.log("change :" ,e);
-        this.setState({
-            fieldValue : e
-        })
-    }
-
-    onBlur=()=>{
-        console.log("onBlur");
-    }
-
-    save = () => {
-        const { record, handleSave ,columnType,dataIndex} = this.props;
-        let resetValue ;
-        this.form.validateFields((error, values) => {
-            let tmpValue ;
-            //级联选项特殊处理
-            //选中选项时会触发一个点击事件
-
-            if (columnType==='fieldType') {
-                // if (error && !util.isEmpty(error[dataIndex]) && util.isEmpty(record[dataIndex]) && util.isEmpty(values[dataIndex])){
-                //     return ;
-                // }
-                // if (util.isEmpty(values[dataIndex])){
-                //     resetValue = true;
-                //     return ;
-                // }else{
-                //     tmpValue = values[dataIndex];
-                // }
-                return ;
-            }else if(columnType==='checkbox'){
-                // if (error && !util.isEmpty(error[dataIndex])){
-                //     return null;
-                // }
-                // if (util.isEmpty(values[dataIndex])){
-                //     if (util.isEmpty(record[dataIndex])) {
-                //         tmpValue = 'false';
-                //     }else{
-                //         tmpValue = record[dataIndex];
-                //     }
-                // }else{
-                //     tmpValue = values[dataIndex]+"";
-                // }
-                return ;
-            }else {
-                //input
-                if (error && !util.isEmpty(error[dataIndex])){
-                    return null;
-                }
-                tmpValue = values[dataIndex];
-            }
-
-            this.toggleEdit();
-            handleSave({ ...record ,columnType,[dataIndex]:tmpValue});
-        });
-
-        // if (resetValue){
-        //     console.log("resetValue is true");
-        //     console.log(resetValue.object);
-        //     this.form.setFieldsValue({
-        //         [dataIndex]: record[dataIndex],
-        //     });
-        // }
-    }
-
-    getInput= ()=>{
-        if (this.props.columnType === 'fieldType') {
-            return <Cascader
-                options={tableUtil.getFieldType(this.props.fieldTypes,this.props.storageType)}
-                placeholder="请选择类型"
-                ref={node => (this.input = node)}
-                defaultValue={[this.props.record[this.props.dataIndex]]}
-                onChange={this.onChange}
-                onBlur={this.onBlur}
-            />
-        }else if (this.props.columnType === 'checkbox'){
-            return <Checkbox ref={node => (this.input = node)} defaultChecked={this.props.record[this.props.dataIndex]==='true'}
-                             onPressEnter={this.save} />
-        }
-        return <Input ref={node => (this.input = node)}
-                      onPressEnter={this.save}/>;
-    }
+        return <Input />;
+    };
 
     render() {
-        const { editing } = this.state;
         const {
-            editable,
+            editing,
             dataIndex,
-            columnType,
             title,
+            inputType,
             record,
-            required,
             index,
-            handleSave,
+            columnType,
+            required,
             ...restProps
         } = this.props;
         return (
-            <td ref={node => (this.cell = node)} {...restProps} onClick={this.handleTdClick}>
-                {editable ? (
-                    <EditableContext.Consumer>
-                        {(form) => {
-                            this.form = form;
-                            let formItem = null;
-                            if (columnType==='fieldType'){
-                                formItem = <FormItem style={{ margin: 0 }}>
-                                    {form.getFieldDecorator(dataIndex, {
-                                        rules: [{
-                                            required: required,
-                                            message: `${title} is required.`,
-                                        }],
-                                        // valuePropName: 'checked',
-                                        // initialValue: [record[dataIndex]],
-                                    })(
-                                        this.getInput()
-                                    )}
-                                </FormItem>
-                            }else {
-                                formItem = <FormItem style={{ margin: 0 }}>
-                                    {form.getFieldDecorator(dataIndex, {
-                                        rules: [{
-                                            required: required,
-                                            message: `${title} is required.`,
-                                        }],
-                                        initialValue: record[dataIndex],
-                                    })(
-                                        this.getInput()
-                                    )}
-                                </FormItem>
-                            }
-
-                            return (
+            <EditableContext.Consumer>
+                {(form) => {
+                    const { getFieldDecorator } = form;
+                    let formItem = null;
+                    if (columnType==='number'){
+                        formItem = <FormItem style={{ margin: 0 }}>
+                            {getFieldDecorator(dataIndex, {
+                                rules: [{
+                                    required: true,
+                                    message: `Please Input ${title}!`,
+                                }],
+                                initialValue: record[dataIndex],
+                            })(<InputNumber />)}
+                        </FormItem>
+                    }else if(columnType==='input'){
+                        formItem = <FormItem style={{ margin: 0 }}>
+                            {getFieldDecorator(dataIndex, {
+                                rules: [{
+                                    required: true,
+                                    message: `Please Input ${title}!`,
+                                }],
+                                initialValue: record[dataIndex],
+                            })(<Input />)}
+                        </FormItem>
+                    }else if(columnType==='fieldType'){
+                        formItem = <FormItem style={{ margin: 0 }}>
+                            {getFieldDecorator(dataIndex, {
+                                rules: [{
+                                    required: true,
+                                    message: `Please Input ${title}!`,
+                                }],
+                                // initialValue: record[dataIndex],
+                            })(
+                                <Cascader
+                                    options={tableUtil.getFieldType(this.props.fieldTypes,this.props.storageType)}
+                                    placeholder="请选择类型"
+                                    // defaultValue={[this.props.record[this.props.dataIndex]]}
+                                />
+                            )}
+                        </FormItem>
+                    }else {
+                        formItem = null;
+                    }
+                    return (
+                        <td {...restProps}>
+                            {editing ? (
                                 formItem
-                                // editing ? formItem : (
-                                //     <div
-                                //         className="editable-cell-value-wrap"
-                                //         style={{ paddingRight: 24 }}
-                                //         onClick={this.toggleEdit}
-                                //     >
-                                //         {restProps.children}
-                                //     </div>
-                                // )
-                            );
-                        }}
-                    </EditableContext.Consumer>
-                ) : restProps.children}
-            </td>
+                            ) : restProps.children}
+                        </td>
+                    );
+                }}
+            </EditableContext.Consumer>
         );
     }
 }
 
-@connect(
-    state => state.config,
-    {}
-)
 export default class EditableTable extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            dataSource: [],
-            count: 0,
-            columnArray:[]
-        };
+        this.state = { data, editingKey: '' };
+        this.columns = [
+            {
+                title: 'name',
+                dataIndex: 'name',
+                width: '25%',
+                editable: true,
+                required:true,
+                columnType:'input'
+            },
+            {
+                title: 'age',
+                dataIndex: 'age',
+                width: '15%',
+                editable: true,
+                required:true,
+                columnType:'number'
+            },
+            {
+                title: 'address',
+                dataIndex: 'address',
+                width: '40%',
+                editable: true,
+                required:true,
+                storageType:'HIVE',
+                columnType:'fieldType'
+            },
+            {
+                title: 'operation',
+                dataIndex: 'operation',
+                render: (text, record) => {
+                    const editable = this.isEditing(record);
+                    return (
+                        <div>
+                            {editable ? (
+                                <span>
+                  <EditableContext.Consumer>
+                    {form => (
+                        <a
+                            href="javascript:;"
+                            onClick={() => this.save(form, record.key)}
+                            style={{ marginRight: 8 }}
+                        >
+                            Save
+                        </a>
+                    )}
+                  </EditableContext.Consumer>
+                  <Popconfirm
+                      title="Sure to cancel?"
+                      onConfirm={() => this.cancel(record.key)}
+                  >
+                    <a>Cancel</a>
+                  </Popconfirm>
+                </span>
+                            ) : (
+                                <a onClick={() => this.edit(record.key)}>Edit</a>
+                            )}
+                        </div>
+                    );
+                },
+            },
+        ];
     }
 
-    handleDelete = (key) => {
-        const dataSource = [...this.state.dataSource];
-        this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
+    isEditing = (record) => {
+        return record.key === this.state.editingKey;
+    };
 
-        this.props.handeModifyColumn(dataSource.filter(item => item.key !== key));
+    edit(key) {
+        this.setState({ editingKey: key });
     }
 
-    handleAdd = () => {
-        let {storageType} = this.props;
-        if (!storageType){
-            message.error("请先选择存储介质");
-            return ;
-        }
-
-        const { count, dataSource } = this.state;
-        const newData = {
-            key: count,
-        };
-        this.setState({
-            dataSource: [...dataSource, newData],
-            count: count + 1,
+    save(form, key) {
+        form.validateFields((error, row) => {
+            if (error) {
+                return;
+            }
+            const newData = [...this.state.data];
+            const index = newData.findIndex(item => key === item.key);
+            if (index > -1) {
+                const item = newData[index];
+                newData.splice(index, 1, {
+                    ...item,
+                    ...row,
+                });
+                this.setState({ data: newData, editingKey: '' });
+            } else {
+                newData.push(row);
+                this.setState({ data: newData, editingKey: '' });
+            }
         });
-        this.props.handeModifyColumn([...dataSource, newData]);
     }
 
-    handleSave = (row) => {
-        const newData = [...this.state.dataSource];
-        const index = newData.findIndex(item => row.key === item.key);
-        const item = newData[index];
-        newData.splice(index, 1, {
-            ...item,
-            ...row,
-        });
-        this.setState({ dataSource: newData });
-        this.props.handeModifyColumn(newData);
-    }
+    cancel = () => {
+        this.setState({ editingKey: '' });
+    };
 
     render() {
-
-        const { dataSource } = this.state;
         const components = {
             body: {
                 row: EditableFormRow,
                 cell: EditableCell,
             },
         };
-        let {tableColumns} = this.props;
 
-        const columns = tableColumns.map((col) => {
+        const columns = this.columns.map((col) => {
             if (!col.editable) {
                 return col;
             }
@@ -291,40 +223,26 @@ export default class EditableTable extends React.Component {
                 ...col,
                 onCell: record => ({
                     record,
-                    editable: col.editable,
+                    inputType: col.dataIndex === 'age' ? 'number' : 'text',
                     dataIndex: col.dataIndex,
                     title: col.title,
                     required:col.required,
                     columnType:col.columnType,
-                    handleSave: this.handleSave,
+                    editing: this.isEditing(record),
                     ...col,
                 }),
             };
-        }).concat({
-            title: 'operation',
-            dataIndex: 'operation',
-            render: (text, record) => {
-                return (
-                    <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.key)}>
-                        <a href="javascript:;">Delete</a>
-                    </Popconfirm>
-                );
-            },
         });
+
         return (
-            <div>
-                <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
-                    添加字段
-                </Button>
-                <Table
-                    components={components}
-                    rowClassName={() => 'editable-row'}
-                    bordered
-                    dataSource={dataSource}
-                    columns={columns}
-                />
-            </div>
+            <Table
+                components={components}
+                bordered
+                dataSource={this.state.data}
+                columns={columns}
+                rowClassName="editable-row"
+
+            />
         );
     }
 }
-
