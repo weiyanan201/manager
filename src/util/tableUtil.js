@@ -73,5 +73,33 @@ export default {
             });
         }
         return resutl;
-    }
+    },
+
+    fieldTypeRender(label){
+        if (label && label.length===2){
+            return `${label[0]}<${label[1]}>`
+        }else if(label){
+            return label[0];
+        }
+    },
+    /**
+     * @param legalTypes  合法的类型（getFieldType中获取）
+     * @param type 待校验的字段类型 []
+     */
+    checkoutFieldType(legalTypes,type){
+        if (legalTypes===undefined || legalTypes===null || legalTypes.length===0){
+            return false;
+        }
+        if (type  && type.length===1){
+            return legalTypes.filter(item=>item.value===type[0]).length > 0;
+        }else if(type  && type.length===2){
+            let fi = type[0];
+            let si = type[1];
+            if (legalTypes.filter(item=>item.value===fi).length > 0){
+                let second = legalTypes.filter(item=>item.value===fi)[0].children;
+                return second && second.filter(i=>i.value===si).length>0;
+            }
+        }
+        return false;
+    },
 }
