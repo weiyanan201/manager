@@ -7,7 +7,6 @@ import qs from 'qs';
 // });
 
 /**
- * group 下来框
  * @param options
  * @returns {Promise<any>}
  */

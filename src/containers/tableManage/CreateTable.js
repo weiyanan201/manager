@@ -5,9 +5,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import {Button , Card,Spin,Table,Cascader,Form,InputNumber,Input,Popconfirm,Select,Row,message,Modal,Collapse,Checkbox } from 'antd';
+import {Button , Card,Spin,Table,Cascader,Form,Input,Select,Row,message,Modal,Collapse,Checkbox } from 'antd';
 import GroupSelect  from '../../components/groupSelect/GroupSelect';
 import EditableTable from '../../components/BaseTable/EditableTable';
+import TableSelect from '../../components/TableSelect';
 import tableUtil from '../../util/tableUtil';
 import config from '../../util/config';
 import axios from '../../util/axios';
@@ -129,6 +130,7 @@ class CreateTable extends React.Component{
             db:'',
             dbName:'',
             columns:[],
+            keyCount:0,
             loading : false,
             advancedKey:[],
             replicas:1,
@@ -181,6 +183,48 @@ class CreateTable extends React.Component{
             dbName:object.props.children
         })
     };
+
+    /**
+     * 选取模板表
+     */
+    handleSelectTemplate = (key)=>{
+        if (!util.isEmpty(key)){
+            let tableId = key;
+            axios.get("/table/getTableColumns",{tableId})
+                .then(res=>{
+                    const rdata = res.data.data;
+                    const tempStorageType = rdata.storageType;
+                    let columns = [];
+                    let count = 1;
+                    rdata.columns.map(item=>{
+                        console.log(item);
+                        item.type = tableUtil.fieldTypeDeser(item.type);
+                        item.key = count;
+                        count++;
+                        columns.push(item);
+                    });
+                    if (tempStorageType==='HIVE'){
+                        let keys = rdata.keys;
+                        keys.map(item=>{
+                            item['isPartition']=true;
+                            item.key = count;
+                            item.type = tableUtil.fieldTypeDeser(item.type);
+                            count++;
+                            columns.push(item);
+                        });
+                    } else if (tempStorageType==='ES'){
+
+                    } else if(tempStorageType==='PHOENIX'){
+                        //TODO 处理key
+                    }
+                    this.setState({
+                        columns:columns,
+                        keyCount:columns.length+1
+                    })
+                })
+        }
+    }
+    
     //提交建表请求
     handleSubmit=()=>{
         console.log(this.state);
@@ -189,10 +233,8 @@ class CreateTable extends React.Component{
 
         this.props.form.validateFields((err, values) => {
             if (!err) {
-
                 let filterColumns ;
                 let repColumns = [];
-
                 let legalType = tableUtil.getFieldType(this.props.fieldTypes,this.state.storageType);
 
                 //检查字段 过滤空行
@@ -227,38 +269,37 @@ class CreateTable extends React.Component{
                     Modal.error({
                         title: "错误提示",
                         content: util.getWordwrapContent(errorMessage)
-                    })
+                    });
                     return ;
                 }
                 this.setState({
                     loading:true
-                })
+                });
                 const result = axios.postByJson("/table/createTable",{...this.state,columns:repColumns});
                 result.then(()=>{
                     this.setState({
                         loading:false
-                    })
+                    });
                     message.success("创建成功!")
                 }).catch(()=>{
                     this.setState({
                         loading:false
-                    })
+                    });
                     console.log("error");
                 })
             }
         });
+    };
 
-
-
-
-    }
-
-    //传入子组件的回调函数
-    handleModifyColumn=(dataSource)=>{
+    //传入可编辑表的回调函数
+    //dataSource : 表格中的记录
+    //keyCount ： 下一个key值
+    handleModifyColumn=(dataSource,keyCount=this.state.keyCount)=>{
         this.setState({
-            columns:dataSource
+            columns:dataSource,
+            keyCount:keyCount
         })
-    }
+    };
 
     //高级属性开关
     handleToggleAdvanced=()=>{
@@ -266,7 +307,7 @@ class CreateTable extends React.Component{
         this.setState({
             advancedKey:this.state.advancedKey.length>0?[]:['1']
         })
-    }
+    };
 
     render(){
         const customPanelStyle = {
@@ -277,10 +318,8 @@ class CreateTable extends React.Component{
             overflow: 'hidden',
         };
 
-
         //高级属性对象
         let advancedPro ;
-        //TODO  暂时写死
         if (this.state.storageType==='HIVE'){
             advancedPro= <Panel  key="1" style={customPanelStyle} showArrow={false} >
                 <FormItem label="存储格式" >
@@ -303,13 +342,11 @@ class CreateTable extends React.Component{
             </Panel>;
         }else{
             advancedPro=<Panel  key="1" style={customPanelStyle} showArrow={false} >
-
             </Panel>;
         }
-
-        console.log(this.props.form);
         const { getFieldDecorator } = this.props.form;
 
+        const tableSelect = <TableSelect handleSelect={this.handleSelectTemplate} storageType={this.state.storageType}/>;
         return (
             <div>
                 <Spin spinning={this.state.loading} >
@@ -335,10 +372,8 @@ class CreateTable extends React.Component{
                                 })(
                                     <Input rows={3} placeholder="请输入注释" onChange={(e)=>{this.handleChangeText("comment",e.target.value)}}/>
                                 )}
-
                             </FormItem>
                             <FormItem label="组名" >
-
                                 {getFieldDecorator('groupId', {
                                     rules: [{
                                         required: true,
@@ -347,10 +382,8 @@ class CreateTable extends React.Component{
                                 })(
                                     <GroupSelect groupData={tableUtil.filterGroup(this.props.group.allGroup,this.props.auth)} handleChange={this.handleChangeGroup} handleSearch={this.handleChangeGroup} />
                                 )}
-
                             </FormItem>
                             <FormItem label="存储介质" >
-
                                 {getFieldDecorator('storageType', {
                                     rules: [{
                                         required: true,
@@ -362,10 +395,8 @@ class CreateTable extends React.Component{
                                         {tableUtil.getStorageType().map((item)=><Option value={item} key={item}>{item}</Option>)}
                                     </Select>
                                 )}
-
                             </FormItem>
                             <FormItem label="数据库" >
-
                                 {getFieldDecorator('db', {
                                     rules: [{
                                         required: true,
@@ -376,7 +407,11 @@ class CreateTable extends React.Component{
                                         {tableUtil.fiterDbs(this.props.config.dbs,this.state.groupId,this.state.storageType,this.props.auth.role).map((item)=><Option value={item.id} key={item.id}>{item.name}</Option>)}
                                     </Select>
                                 )}
+                            </FormItem>
 
+                            {/*选取模板表*/}
+                            <FormItem>
+                                {tableSelect}
                             </FormItem>
 
                             <FormItem >
@@ -393,7 +428,7 @@ class CreateTable extends React.Component{
                     </Form>
                 </Card>
                 <Card title={"字段详情"} >
-                    <EditableTable storageType={this.state.storageType} handleModifyColumn={this.handleModifyColumn} tableColumns={tableColumns[this.state.storageType]}/>
+                    <EditableTable storageType={this.state.storageType} handleModifyColumn={this.handleModifyColumn} tableColumns={tableColumns[this.state.storageType]} dataSource={this.state.columns} keyCount={this.state.keyCount}/>
                 </Card>
                 <Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
                 </Spin>

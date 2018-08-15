@@ -96,7 +96,7 @@ class EditableCell extends React.Component {
 export default class EditableTable extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { dataSource:[], editingKey: '',count:0 };
+        this.state = { editingKey: ''};
     }
 
     isEditing = (record) => {
@@ -105,21 +105,16 @@ export default class EditableTable extends React.Component {
 
     //添加记录
     handleAdd=()=>{
-        const { count, dataSource } = this.state;
+        const { keyCount } = this.props;
         const newData = {
-            key: count,
+            key: keyCount,
         };
-        this.setState({
-            dataSource: [...dataSource, newData],
-            count: count + 1,
-        });
-        this.props.handleModifyColumn([...dataSource, newData]);
+        this.props.handleModifyColumn([...this.props.dataSource, newData],keyCount+1);
     }
 
     //删除记录
     handleDelete=(key)=>{
-        const dataSource = [...this.state.dataSource];
-        this.setState({ dataSource: dataSource.filter(item => item.key !== key) });
+        const dataSource = [...this.props.dataSource];
         this.props.handleModifyColumn(dataSource.filter(item => item.key !== key));
     }
 
@@ -133,11 +128,9 @@ export default class EditableTable extends React.Component {
             okType: 'danger',
             cancelText: '取消',
             onOk() {
-                _this.setState({dataSource:[]})
-                _this.props.handleModifyColumn([]);
+                _this.props.handleModifyColumn([],0);
             }
         });
-
     }
 
     edit(key) {
@@ -145,13 +138,11 @@ export default class EditableTable extends React.Component {
     }
 
     save(form, key) {
-        
-        console.log(form);
         form.validateFields((error, row) => {
             if (error) {
                 return;
             }
-            const newData = [...this.state.dataSource];
+            const newData = [...this.props.dataSource];
             const index = newData.findIndex(item => key === item.key);
             if (index > -1) {
                 const item = newData[index];
@@ -162,7 +153,7 @@ export default class EditableTable extends React.Component {
             } else {
                 newData.push(row);
             }
-            this.setState({ dataSource: newData, editingKey: '' });
+            this.setState({ editingKey: '' });
             this.props.handleModifyColumn(newData);
         });
     }
@@ -170,20 +161,6 @@ export default class EditableTable extends React.Component {
     cancel = () => {
         this.setState({ editingKey: '' });
     };
-
-    onDoubleClick=(record,index)=>{
-        console.log(record,index);
-        this.setState({ editingKey: record.key });
-    }
-
-    onMouseLeave=(record,index)=>{
-        console.log("onMouseLeave",record,index,"begin save");
-        if (record.form){
-            this.save(record.form,record.key);
-        }
-
-    }
-
 
     render() {
         const components = {
@@ -268,17 +245,12 @@ export default class EditableTable extends React.Component {
                 <Table
                     components={components}
                     bordered
-                    dataSource={this.state.dataSource}
+                    dataSource={this.props.dataSource}
                     columns={columns}
                     rowClassName={style["editable-row"]}
                     onRow={(record, index) => {
                         return {
-                            // onDoubleClick:()=>{
-                            //     this.onDoubleClick(record,index);
-                            // },
-                            // onMouseLeave:()=>{
-                            //     this.onMouseLeave(record,index);
-                            // }
+
                         };
                     }}
                 />

@@ -83,6 +83,23 @@ export default {
         }
     },
     /**
+     * @param type
+     * @return []
+     */
+    fieldTypeDeser(type){
+        if (type.includes("<")){
+            //复合类型
+            let beginIndex = type.indexOf("<");
+            let endIndex = type.indexOf(">");
+            let array = [];
+            array.push(type.substring(0,beginIndex));
+            array.push(type.substring(beginIndex+1,endIndex));
+            return array;
+        } else{
+            return [type];
+        }
+    },
+    /**
      * @param legalTypes  合法的类型（getFieldType中获取）
      * @param type 待校验的字段类型 []
      */

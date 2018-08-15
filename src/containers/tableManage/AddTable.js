@@ -1,10 +1,12 @@
-
+/**
+ * 建表总页面
+ */
 import React from 'react';
 import { connect } from 'react-redux';
 import { getGroupList} from "../../reducers/table.redux";
 import { getDBs,getFieldsType} from "../../reducers/config.redux";
 
-import { Tabs,Button,Card , Table, Input, Popconfirm, Form,InputNumber,Cascader,Row,Select} from 'antd';
+import { Tabs,Button,Card , Table, Input, Popconfirm, Form,InputNumber,Cascader,Row,Select,message} from 'antd';
 import GroupSelect from "../../components/groupSelect/GroupSelect";
 
 import CreateTable from './CreateTable';

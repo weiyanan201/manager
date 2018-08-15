@@ -1,21 +1,24 @@
 
 
+//取出滚动条与有边框的间隔
 
+.tmp {
 
-.tree{
-
-  :global{
-    .ant-tree .ant-tree-switcher{
-      margin-left: -24px;
+  :global {
+    .ant-modal .ant-modal-content .ant-modal-body {
+      padding-right: 0px;
     }
   }
+
 }
-
-
 
 .test{
 
   :global{
+
+    //.ant-tree .ant-tree-switcher{
+    //  margin-left: -24px;
+    //}
 
     .ant-tree.ant-tree-directory > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper:before, .ant-tree.ant-tree-directory .ant-tree-child-tree > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper:before{
       background-color: green;
