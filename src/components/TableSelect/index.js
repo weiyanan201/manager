@@ -5,7 +5,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {Button ,Input,Modal,Tree,Icon,message} from 'antd';
+import {Button ,Input,Modal,Tree,Icon,message,Row,Col} from 'antd';
 
 import axios from '../../util/axios'
 import util from "../../util/util";
@@ -29,11 +29,13 @@ export default class TableSelect extends React.Component{
         expandedKeys:['0'],
         selectedKeys:[],
         selectedId:'',
+        selectedName:'',
+        tmpName:'',
         tableMap:new Map(),
         searchText:'',
         searchTable:[],
         searchNoResult:false,
-        storageType:''
+        storageType:'',
     };
 
     //切换storageType充值状态
@@ -44,6 +46,8 @@ export default class TableSelect extends React.Component{
                 expandedKeys:['0'],
                 selectedKeys:[],
                 selectedId:'',
+                selectedName:'',
+                tmpName:'',
                 tableMap:new Map(),
                 searchText:'',
                 searchTable:[],
@@ -63,10 +67,10 @@ export default class TableSelect extends React.Component{
     };
 
     onSelect=(selectedKeys,e)=>{
-        console.log(e);
         this.setState({
             selectedKeys:selectedKeys,
-            selectedId:e.node.props.dataRef.id
+            selectedId:e.node.props.dataRef.id,
+            tmpName:e.node.props.dataRef.name
         })
     };
 
@@ -84,8 +88,10 @@ export default class TableSelect extends React.Component{
         }
     };
 
-    //TODO 手动触发查询
     onSearch=(value)=>{
+        if (util.isEmpty(value) || value.length<3){
+            return ;
+        }
         axios.get("/table/getTableByName",{tableName:value})
             .then(res=>{
                 if (res.data.data && res.data.data.length>0){
@@ -115,6 +121,9 @@ export default class TableSelect extends React.Component{
             visible: false,
         });
         this.props.handleSelect(this.state.selectedId);
+        this.setState({
+            selectedName:this.state.tmpName
+        })
     };
 
     handleCancel = () => {
@@ -177,7 +186,14 @@ export default class TableSelect extends React.Component{
 
         return (
             <div>
-                <Button type="primary" onClick={this.showModal}>模板</Button>
+                <Row>
+                    <Col span={16}>
+                        <Input value={this.state.selectedName} disabled={true}/>
+                    </Col>
+                    <Col span={8}>
+                        <Button type="primary" onClick={this.showModal} >模板</Button>
+                    </Col>
+                </Row>
                 <Modal
                     title="请选择模板表"
                     visible={this.state.visible}

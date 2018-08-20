@@ -126,7 +126,7 @@ class CreateTable extends React.Component{
             groupId:'',
             storageType:'HIVE',
             storageFormat:'ORC',
-            separator:'\\t',
+            separator:'',
             db:'',
             dbName:'',
             columns:[],
@@ -328,7 +328,7 @@ class CreateTable extends React.Component{
                     </Select>
                 </FormItem>
                 <FormItem label="列分割符" >
-                    <Input rows={3} placeholder="请输入表名" value={this.state.separator} onChange={(e)=>{this.handleChangeText("separator",e.target.value)}} />
+                    <Input rows={3} placeholder="请输入分隔符" value={this.state.separator} onChange={(e)=>{this.handleChangeText("separator",e.target.value)}} />
                 </FormItem>
             </Panel>;
         }else if(this.state.storageType==='ES'){
@@ -354,7 +354,7 @@ class CreateTable extends React.Component{
                     <Form layout="inline" >
                         <Row>
                             <FormItem label="表名" >
-                                {getFieldDecorator('username', {
+                                {getFieldDecorator('tableName', {
                                     rules: [{
                                         required: true,
                                         message: '表名不可为空',
@@ -409,8 +409,11 @@ class CreateTable extends React.Component{
                                 )}
                             </FormItem>
 
+
+                        </Row>
+                        <Row>
                             {/*选取模板表*/}
-                            <FormItem>
+                            <FormItem label="模板表">
                                 {tableSelect}
                             </FormItem>
 

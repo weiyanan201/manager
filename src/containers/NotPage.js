@@ -1,10 +1,11 @@
+/**
+ * 选取模板表
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
-import {Button ,Input,Modal,Tree,Icon,message} from 'antd';
-
-import {getGroupList} from "../reducers/table.redux";
+import {Button ,Input,Modal,Tree,Icon,message,Row,Col} from 'antd';
 
 import axios from '../util/axios'
 import util from "../util/util";
@@ -15,24 +16,40 @@ const DirectoryTree = Tree.DirectoryTree;
 
 @connect(
     state => {return {group:state.group}},
-    {getGroupList}
+    {}
 )
-export default class NotPage extends React.Component{
+export default class TableSelect extends React.Component{
 
-    //TODO 之后去掉
-    constructor(props){
-        super(props);
-        this.props.getGroupList();
+    componentDidMount(){
+        console.log("componentDidMount");
     }
 
     state = {
         visible: false,
         expandedKeys:['0'],
         selectedKeys:[],
+        selectedId:'',
         tableMap:new Map(),
         searchText:'',
         searchTable:[],
-        searchNoResult:false
+        searchNoResult:false,
+        storageType:'',
+    };
+
+    //切换storageType充值状态
+    componentWillUpdate(nextProps,nextState){
+        if (nextProps.storageType !==nextState.storageType){
+            this.setState({
+                storageType:nextProps.storageType,
+                expandedKeys:['0'],
+                selectedKeys:[],
+                selectedId:'',
+                tableMap:new Map(),
+                searchText:'',
+                searchTable:[],
+                searchNoResult:false,
+            })
+        }
     }
 
     showModal = () => {
@@ -43,15 +60,14 @@ export default class NotPage extends React.Component{
         this.setState({
             visible: true,
         });
+    };
 
-    }
-
-    onSelect=(selectedKeys)=>{
-        console.log("onSelect ",selectedKeys);
+    onSelect=(selectedKeys,e)=>{
         this.setState({
-            selectedKeys:selectedKeys
+            selectedKeys:selectedKeys,
+            selectedId:e.node.props.dataRef.id
         })
-    }
+    };
 
     onChange = (e) => {
         if (util.isEmpty(e.target.value)){
@@ -65,17 +81,19 @@ export default class NotPage extends React.Component{
                 searchText:e.target.value
             })
         }
-    }
+    };
 
-    //TODO 手动触发查询
     onSearch=(value)=>{
-        console.log('onSearch : ',value);
+        if (util.isEmpty(value) || value.length<3){
+            return ;
+        }
         axios.get("/table/getTableByName",{tableName:value})
             .then(res=>{
                 if (res.data.data && res.data.data.length>0){
                     let filterData = res.data.data.filter(item=>item.storageType===this.props.storageType);
                     this.setState({
-                        searchTable:filterData
+                        searchTable:filterData,
+                        searchNoResult:filterData.length <= 0
                     })
                 }else{
                     this.setState({
@@ -83,11 +101,10 @@ export default class NotPage extends React.Component{
                     })
                 }
             })
-    }
+    };
 
     //只显示一个文件下的内容
     onExpand = (expandedKeys,node) => {
-        console.log('Trigger Expand',expandedKeys,node,"state",this.state.expandedKeys);
         const key = expandedKeys.length===0?[]:node.node.props.dataRef.id+"";
         this.setState({
             expandedKeys:[key]
@@ -98,14 +115,14 @@ export default class NotPage extends React.Component{
         this.setState({
             visible: false,
         });
-        this.props.handleSelect(this.state.selectedKeys);
-    }
+        this.props.handleSelect(this.state.selectedId);
+    };
 
-    handleCancel = (e) => {
+    handleCancel = () => {
         this.setState({
             visible: false,
         });
-    }
+    };
 
     onLoadData=(treeNode)=>{
         const groupId = treeNode.props.dataRef.id;
@@ -119,13 +136,13 @@ export default class NotPage extends React.Component{
                 })
             }
         });
-    }
+    };
 
     renderTreeNodes = (data,isLeaf) => {
         return data.map((item) => {
             if (isLeaf){
                 //叶子节点
-                return <TreeNode icon={<Icon type="table" />} title={item.name} key={item.id} dataRef={item} isLeaf={true} />;
+                return <TreeNode icon={<Icon type="table" />} title={item.name} key={`1-${item.id}`} dataRef={item} isLeaf={true} />;
             }else{
                 //目录
                 if (this.state.tableMap.has(item.id)){
@@ -138,16 +155,14 @@ export default class NotPage extends React.Component{
                 return <TreeNode title={item.name} key={item.id} dataRef={item} selectable={false} />;
             }
         });
-    }
+    };
 
     render(){
-
         let result ;
         if (this.state.searchNoResult){
             result = <p>没有查询到结果</p>
         }else{
             result = <DirectoryTree
-                // expandedKeys={this.state.expandedKeys}
                 showIcon
                 loadData={this.onLoadData}
                 onExpand={this.onExpand}
@@ -161,11 +176,16 @@ export default class NotPage extends React.Component{
             </DirectoryTree>
         }
 
-
         return (
             <div>
-                <Button type="primary" onClick={this.showModal}>模板</Button>
-
+                <Row>
+                    <Col span={2}>
+                        <Input />
+                    </Col>
+                    <Col span={1}>
+                        <Button type="primary" onClick={this.showModal} >模板</Button>
+                    </Col>
+                </Row>
                 <Modal
                     title="请选择模板表"
                     visible={this.state.visible}
@@ -176,6 +196,7 @@ export default class NotPage extends React.Component{
                     maskClosable={false}
                     okText={"选择"}
                     cancelText={"取消"}
+                    destroyOnClose={true}
                 >
                     <div style={{height:600,width:'100%',overflowY:'auto',marginBottom:'-24px'}}>
                         <Search
@@ -187,18 +208,17 @@ export default class NotPage extends React.Component{
                         />
                         {result}
                     </div>
-
                 </Modal>
             </div>
         )
     }
 }
 
-NotPage.defaultProps = {
-    storageType:'HIVE',
+TableSelect.defaultProps = {
     handleSelect:()=>{}
 }
 
-NotPage.propTypes={
+TableSelect.propTypes={
+    storageType:PropTypes.string.isRequired,
     handleSelect:PropTypes.func.isRequired,
 }

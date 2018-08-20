@@ -83,7 +83,7 @@ export function tableInfo(state=tableInfoInitState,action) {
 
     switch (action.type){
         case GET_TABLE_INFO:
-            const detail = action.payload.data.detail;
+            const detail = action.payload.data;
             if (detail===null){
                 return state;
             }

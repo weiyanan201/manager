@@ -10,6 +10,7 @@ import { Tabs,Button,Card , Table, Input, Popconfirm, Form,InputNumber,Cascader,
 import GroupSelect from "../../components/groupSelect/GroupSelect";
 
 import CreateTable from './CreateTable';
+import CreateView from './CreateView';
 import CommandCreate from './CommandCreate';
 
 const FormItem = Form.Item;
@@ -75,7 +76,7 @@ export default class AddTable extends React.Component{
                         <CreateTable  {...this.props}/>
                     </TabPane>
                     <TabPane tab="图形建视图" key="2" >
-
+                        <CreateView {...this.props}/>
                     </TabPane>
                     <TabPane tab="命令行建表" key="3">
                         {/*<Card >*/}
