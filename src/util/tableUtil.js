@@ -4,6 +4,9 @@ import { TenantType,GROUP_PERMISSION,TEMP_GROUP_ID,StorageType ,DB_USAGE,HIVE_ST
 
 export default {
 
+    /**
+     *过滤有编辑权限的组
+     */
     filterGroup (group,role){
         if (TenantType.PLATFORM===role){
             return group ;

@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Select} from 'antd';
+import {Select,Input} from 'antd';
 
 
 const {Option} = Select;
+const Search = Input.Search;
 
 // const GroupSelect = ({groupData=[],handleChange,handleSearch}) => {
 

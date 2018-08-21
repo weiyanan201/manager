@@ -2,33 +2,20 @@ import React from 'react'
 
 
 export default {
-    getParams(getUrl){
-        // const getUrl = "/searchGroup?ID=12345&name=weiyanan";
-        ///searchGroup?ID=12345&name=weiyanan
 
-        const array = getUrl.split("?");
-        let m = new Map();
-
-        if(array.length==2){
-            const args = array[1];
-            args.split('&').map(x=>{
-                let ss = x.split("=");
-                m.set(ss[0],ss[1]);
-            })
+    filterData(datas,filterValue,field){
+        if (this.isEmpty(filterValue)){
+            return datas;
+        }else{
+            if (this.isEmpty(field)){
+                return datas.filter(val=>val.includes(filterValue));
+            }else{
+                return datas.filter(val=>val[field].includes(filterValue));
+            }
         }
-        return m;
-    },
-
-    postParams(body){
-        let m = new Map();
-        for(let key in body){
-            m.set(key,body[key]);
-        }
-        return m;
     },
 
     paging(datas,page=1,size=10){
-
         const start = (page-1)*size+1;
         const end = page*size;
         const newDatas = datas.filter((val,index)=>{
@@ -64,63 +51,19 @@ export default {
             });
             return <p>{tmp}</p>
         }
+    },
+    formatDate(ts){
+        if (this.isEmpty(ts)){
+            return "";
+        }
+        let date = new Date(ts);
+        let y = 1900+date.getYear();
+        let m = "0"+(date.getMonth()+1);
+        let d = "0"+date.getDate();
+        let hour = "0"+date.getHours();
+        let min = "0"+date.getMinutes();
+        let ss = "0"+date.getSeconds();
+        return y+"-"+m.substring(m.length-2,m.length)+"-"+d.substring(d.length-2,d.length)+" "+hour.substring(hour.length-2,hour.length)+":"+min.substring(min.length-2,min.length)+":"+ss.substring(ss.length-2,ss.length);
     }
 
-
 }
-
-
-// function getParams(getUrl){
-//     // const getUrl = "/searchGroup?ID=12345&name=weiyanan";
-//     ///searchGroup?ID=12345&name=weiyanan
-//
-//     const array = getUrl.split("?");
-//     let m = new Map();
-//
-//     if(array.length==2){
-//         const args = array[1];
-//         args.split('&').map(x=>{
-//             let ss = x.split("=");
-//             m.set(ss[0],ss[1]);
-//         })
-//     }
-//     return m;
-// }
-//
-// /**
-//  * return map;
-//  */
-// function postParams(body){
-//     let m = new Map();
-//     for(let key in body){
-//         m.set(key,body[key]);
-//     }
-//     return m;
-// }
-//
-// /**
-//  *
-//  * @param datas
-//  * @param page
-//  * @param size
-//  * @returns datas
-//  */
-// function paging(datas,page=1,size=10){
-//
-//     const start = (page-1)*size+1;
-//     const end = page*size;
-//     const newDatas = datas.filter((val,index)=>{
-//         if(index+1>=start && index+1<=end){
-//             return val;
-//         }
-//     })
-//     return newDatas;
-// }
-
-
-// module.exports = {
-//     getParams:getParams,
-//     postParams:postParams,
-//     paging:paging
-//
-// }

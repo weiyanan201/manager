@@ -20,10 +20,6 @@ const DirectoryTree = Tree.DirectoryTree;
 )
 export default class TableSelect extends React.Component{
 
-    componentDidMount(){
-        console.log("componentDidMount");
-    }
-    
     state = {
         visible: false,
         expandedKeys:['0'],

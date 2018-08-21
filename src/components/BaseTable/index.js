@@ -11,14 +11,7 @@ export default class BaseTable extends React.Component{
 
     };
 
-    constructor(){
-        super();
-        console.log("BaseTable.constructor");
-    }
-
     componentWillMount(){
-        console.log("BaseTable.componentWillMount");
-
         let row_selection = this.props.selection;
 
         //默认没有选择框
@@ -50,28 +43,11 @@ export default class BaseTable extends React.Component{
 
     }
 
-    componentDidMount(){
-        console.log("BaseTable.componentDidMount",this.props);
-    }
-
-    componentWillReceiveProps(){
-        console.log("BaseTable.componentWillReceiveProps");
-    }
-
     componentWillUpdate(){
         if (this.rowSelection!==null){
             const selection = this.props.selection;
             this.rowSelection.selectedRowKeys = selection._self.state[selection.rowKeys]
         }
-    }
-
-    componentDidUpdate(){
-        console.log("BaseTable.componentDidUpdate");
-    }
-
-    shouldComponentUpdate(){
-        console.log("BaseTable.shouldComponentUpdate");
-        return true;
     }
 
     onRowClick = (record,index)=>{
@@ -111,7 +87,6 @@ export default class BaseTable extends React.Component{
     };
 
     render(){
-        console.log("baseTable.render()");
         return(
             <Table
                 bordered

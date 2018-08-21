@@ -45,9 +45,10 @@ export function group(state = groupInitState, action) {
 
             return {...state, allGroup: action.payload.data, total: action.payload.totalCount,groupLoading:false};
         case SHOW_GROUP:
-            const {page,size} = {...action.payload};
-            const datas = util.paging(state.allGroup,page,size);
-            const total = state.allGroup.length;
+            const {page,size,search} = {...action.payload};
+            const filteDatas = util.filterData(state.allGroup,search,'name');
+            const datas = util.paging(filteDatas,page,size);
+            const total = filteDatas.length;
             return {...state, data: datas,total:total};
         case SHOW_GROUP_BY_ID:
             const data = state.allGroup.filter(v=>v.id===parseInt(action.payload));
@@ -68,9 +69,10 @@ export function table(state = tableInitState, action) {
                 tableLoading:false
             };
         case SHOW_TABLE_PAGE:
-            const {page,size} = {...action.payload};
-            const datas = util.paging(state.allTable,page,size);
-            const total = state.allTable.length;
+            const {page,size,search} = {...action.payload};
+            const filteDatas = util.filterData(state.allTable,search,'name');
+            const datas = util.paging(filteDatas,page,size);
+            const total = filteDatas.length;
             return {...state, data: datas,total:total};
         case INIT_TABLE_LIST:
             return tableInitState;
@@ -143,9 +145,9 @@ export function getGroupList() {
     }
 }
 
-export function getShowGroup(page=1,size=10) {
+export function getShowGroup(page=1,size=10,search) {
     return dispatch => {
-        dispatch(showGroup({page,size}));
+        dispatch(showGroup({page,size,search}));
     }
 }
 
@@ -166,9 +168,9 @@ export function getTableList({groupId:groupId}) {
     }
 }
 
-export function getShowTablePage(page=1,size=10) {
+export function getShowTablePage(page=1,size=10,search='') {
     return dispatch => {
-        dispatch(showTablePage({page,size}));
+        dispatch(showTablePage({page,size,search}));
     }
 }
 
@@ -177,7 +179,6 @@ export function getTableInfo(tableId) {
     return dispatch => {
         axios.get('/table/getTableInfo',{tableId})
             .then(res=>{
-                console.log(res);
                 dispatch(tableDetail(res.data));
             })
     }

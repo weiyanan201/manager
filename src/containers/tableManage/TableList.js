@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Table, Pagination } from 'antd';
+import { Table, Pagination,Input } from 'antd';
 import { Route } from 'react-router-dom';
 import NavLink from '../../components/NavLink/NavLink';
 
+import util from '../../util/util';
 
 import {getTableList,getShowTablePage} from "../../reducers/table.redux";
 import { pushBread } from "../../reducers/bread.redux";
-
+const Search = Input.Search;
 const columns = [
     {
         title: 'id',
@@ -32,10 +33,12 @@ const columns = [
         dataIndex: "comment"
     },{
         title: 'createTime',
-        dataIndex: "createTime"
+        dataIndex: "createTime",
+        render: createTime=>util.formatDate(createTime)
     },{
         title: 'updateTime',
-        dataIndex: "updateTime"
+        dataIndex: "updateTime",
+        render:updateTime=>util.formatDate(updateTime)
     },{
         title: 'permissions',
         dataIndex: "permissions"
@@ -58,15 +61,25 @@ export default class TableList extends Component {
         if (this.props.table.groupId!==groupId){
             this.props.getTableList({groupId:groupId});
         }
+        this.state={
+            searchText:'',
+            pageSize:10
+        }
 
     }
 
     handleChange(page, pageSize){
-        this.props.getShowTablePage(page,pageSize);
+        this.props.getShowTablePage(page,pageSize,this.state.searchText);
     }
 
     handleChangeSize(current, pageSize){
-        this.props.getShowTablePage(current,pageSize);
+        this.setState({pageSize:pageSize});
+        this.props.getShowTablePage(current,pageSize,this.state.searchText);
+    }
+
+    handleSearch=(search)=>{
+        this.setState({searchText:search});
+        this.props.getShowTablePage(1,this.state.pageSize,search);
     }
 
 
@@ -77,6 +90,13 @@ export default class TableList extends Component {
         this.props.pushBread(breadObj);
         return(
             <div>
+                table名称：
+                <Search
+                    placeholder="input search text"
+                    onSearch={value => this.handleSearch(value)}
+                    enterButton
+                    style={{ width: 200 }}
+                />
                 <Table
                     bordered
                     columns={columns}

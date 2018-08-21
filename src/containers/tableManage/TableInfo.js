@@ -82,8 +82,6 @@ export default class TableInfo extends Component {
 
     render(){
 
-        console.log("table info render");
-
         const selections = {
             type:'radio',
             rowKeys:'rowKeys',
@@ -96,12 +94,9 @@ export default class TableInfo extends Component {
                 <Card title={"表属性"}>
                     <div style={{textAlign: 'right'}}>
                         <Button type="primary" onClick={()=>{this.setState({tableInfoEditVisible:true})}}>编辑</Button>
-                        <Button type="danger">删除</Button>
+                        <Button type="danger">删除表</Button>
                     </div>
                     <Form layout="inline">
-                        <FormItem label="ID">
-                            <Input value={this.props.id} readOnly={true}/>
-                        </FormItem>
                         <FormItem label="表名">
                             <Input disabled={true} value={this.props.tableName}/>
                         </FormItem>
@@ -121,7 +116,6 @@ export default class TableInfo extends Component {
                     <div style={{textAlign: 'right'}}>
                         <Button onClick={()=>this.setState({columnEditVisible:true})}>编辑字段</Button>
                         <Button >添加字段</Button>
-                        <Button >删除字段</Button>
                     </div>
 
                     <BaseTable
@@ -166,11 +160,6 @@ export default class TableInfo extends Component {
                     onOk={this.handleColumnSubmit}
                 >
                     <CloumnForm wrappedComponentRef={(inst)=>{this.columnForm = inst;}} />
-                </Modal>
-
-                {/*字段删除窗口*/}
-                <Modal>
-
                 </Modal>
 
             </div>
