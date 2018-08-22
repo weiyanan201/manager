@@ -39,6 +39,7 @@ export default {
                 if (group==TEMP_GROUP_ID) {
                     return tempDBs.filter((item)=>item.usage===DB_USAGE.TEMP);
                 }else{
+                    console.log("test : db,storageType",dbs,storageType);
                     let tempDBs = dbs[storageType];
                     return tempDBs.filter((item)=>{
                         if (item.usage===DB_USAGE.BUSINESS){

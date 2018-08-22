@@ -8,6 +8,9 @@ import util from '../../util/util';
 
 import {getTableList,getShowTablePage} from "../../reducers/table.redux";
 import { pushBread } from "../../reducers/bread.redux";
+
+import style from './table.less'
+
 const Search = Input.Search;
 
 
@@ -110,7 +113,7 @@ export default class TableList extends Component {
                 <Pagination  total={this.props.table.total} showSizeChanger showQuickJumper
                              onChange = {(page, pageSize)=>{this.handleChange(page, pageSize)}}
                              onShowSizeChange = {(current, size)=>{this.handleChangeSize(current, size)}}
-
+                             className={style.tablePagination}
                 />
             </div>
         );

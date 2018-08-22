@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import {Route, BrowserRouter} from 'react-router-dom';
+import {Route, BrowserRouter,HashRouter} from 'react-router-dom';
 
 import MainLayout from './containers/MainLayout/MainLayout'
 import { Provider } from 'react-redux';
@@ -20,7 +20,7 @@ const store = createStore(
 
 const RouterList = () => (
 
-    <BrowserRouter>
+    <HashRouter>
         <Provider store={store}>
             <div>
                 {/*<AuthRoute/>*/}
@@ -32,7 +32,7 @@ const RouterList = () => (
                     </Route>
             </div>
         </Provider>
-    </BrowserRouter>
+    </HashRouter>
 
 );
 export default RouterList

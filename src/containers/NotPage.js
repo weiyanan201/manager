@@ -22,36 +22,14 @@ const Search = Input.Search;
 )
 export default class NotPage extends React.Component {
 
-    constructor(props){
-        super(props);
-        this.props.getGroupList();
-    }
 
-    handleSelect = (e)=>{
-        console.log("handleSelect",e);
-    }
-
-    handleSearch = (e)=>{
-        console.log("handleSearch",e);
-    }
-
-    handlePressEnter = (e)=>{
-        console.log("handlePressEnter",e.target.value);
-    }
 
     render() {
 
-        // const data = [];
-        // this.props.group.allGroup.map(item=>{
-        //     data.push(item.name);
-        // });
-
-        return (
-            <Search
-                placeholder="input search text"
-                onSearch={value => console.log(value)}
-                style={{ width: 200 }}
-            />
+        return(
+            <div>
+                <h3>页面不存在！</h3>
+            </div>
         )
     }
 }

@@ -52,7 +52,7 @@ export default class GroupList extends Component {
     handleChange(page, pageSize){
         this.props.getShowGroup(page,pageSize,this.state.searchText);
     }
-    
+
     handleChangeSize(current, pageSize){
         this.setState({pageSize:pageSize});
         this.props.getShowGroup(current,pageSize,this.state.searchText);
@@ -90,7 +90,7 @@ export default class GroupList extends Component {
                 <Pagination  total={this.props.total} showSizeChanger showQuickJumper
                              onChange = {(page, pageSize)=>{this.handleChange(page, pageSize)}}
                              onShowSizeChange = {(current, size)=>{this.handleChangeSize(current, size)}}
-                             className={style.groupList}
+                             className={style.tablePagination}
                 />
             </div>
         );
