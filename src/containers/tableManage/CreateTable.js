@@ -224,10 +224,9 @@ class CreateTable extends React.Component{
                 })
         }
     }
-    
+
     //提交建表请求
     handleSubmit=()=>{
-        console.log(this.state);
         let errorMessage = [];
         const {groupId,storageType,comment,tableName,db,columns} = this.state;
 
