@@ -13,28 +13,53 @@ export default class CommandCreate extends React.Component{
         loading:false,
         sql:'',
         log:''
-    }
+    };
 
     handleReset=()=>{
         this.setState({
             sql:''
         })
-    }
+    };
 
     handleSubmit=()=>{
-        console.log("submit");
-        console.log(this.state.sql);
+        const _this = this;
         if (util.isEmpty(this.state.sql)){
             message.error("请输入建表语句");
             return ;
         }
+        this.setState({
+            loading:true
+        });
         let result = axios.post("/table/commandCreate",{sql:this.state.sql});
-        result.then(()=>{
-            console.log("then");
-        }).catch(()=>{
-            console.log("catch");
+        result.then((res)=>{
+
+            const taskId = res.data.data.taskId;
+            if (util.isEmpty(taskId)){
+                //同步任务
+                this.setState({loading:false,log:'创建成功'})
+            } else{
+                _this.state.timer = setInterval(()=>{
+                    axios.get("/table/queryProgress",{taskId:taskId})
+                        .then(res=>{
+                            console.log(res);
+                            const state = res.data.data.state;
+                            const msg = res.data.data.msg;
+                            if (state!=='RUNNING') {
+                                clearInterval(_this.state.timer);
+                                this.setState({loading:false,log:msg})
+                            }
+                        })
+                },1000);
+            }
+
+        }).catch((res)=>{
+            console.log("catch",res);
+            this.setState({
+                loading:false,
+                log:res.data.returnMessage
+            })
         })
-    }
+    };
 
     handleChangeText(value) {
         this.setState({
@@ -44,15 +69,19 @@ export default class CommandCreate extends React.Component{
 
     render(){
         return (
-            <div>
-                <Button type={"primary"} onClick={this.handleReset}>清空</Button>
-                <Button type={"primary"} onClick={this.handleSubmit}>运行</Button>
-                <div >
+            <div >
+                <div className={style["button-right"]}>
+                    <Button type={"primary"} onClick={this.handleSubmit} style={{marginRight:10}} >运行</Button>
+                    <Button type={"primary"} onClick={this.handleReset}>清空</Button>
+                </div>
+                <div>
+                    <Spin spinning={this.state.loading} tip={'执行中...'}>
                         <TextArea placeholder="请输入建表语句" autosize={false} style={{height: 'calc(40vh)'}} value={this.state.sql} onChange={(e)=>{this.handleChangeText(e.target.value)}}/>
                         {/*<TextArea placeholder="日志信息" autosize={false} style={{height: 'calc(40vh)'}} />*/}
-                        <Card title={"日志"} style={{height: 'calc(35vh)'}}>
+                        <Card title={"日志"} style={{height: 'calc(30vh)'}}>
                             {this.state.log}
                         </Card>
+                    </Spin>
                 </div>
             </div>
         );

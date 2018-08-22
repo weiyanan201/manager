@@ -9,6 +9,7 @@ import BaseTable from '../../components/BaseTable';
 import axios from '../../util/axios';
 import tableUtil from "../../util/tableUtil";
 import util from "../../util/util";
+import {bread, pushBread} from "../../reducers/bread.redux";
 
 const FormItem = Form.Item;
 const TextArea = Input.TextArea;
@@ -47,14 +48,17 @@ const formItemLayout = {
 
 @connect(
     state => {return {config:state.config,auth:state.auth}},
-    {getTableInfo,getFieldsType}
+    {getFieldsType,pushBread}
 )
 export default class TableInfo extends Component {
 
     constructor(props){
         super(props);
+        let groupId = this.props.match.params.groupId;
         let tableId = this.props.match.params.tableId;
+
         this.state={
+            tableId:tableId,
             tableInfoEditVisible:false,
             columnEditVisible:false,
             dataSource:[],
@@ -66,11 +70,20 @@ export default class TableInfo extends Component {
             columnModalTitle:'',
             editColumn:false
         };
-        this.props.getTableInfo(tableId);
+
         this.props.getFieldsType();
-        axios.get("/table/getTableInfo")
+        axios.get("/table/getTableInfo",{tableId,groupId})
             .then(res=>{
-                const tableInfo = res.data.data;
+                const tableInfo = res.data.data.tableDetail;
+                const groupName = res.data.data.groupName;
+                const breadUrl = "/table/groups/"+groupId;
+                const breadObj = {[breadUrl]:groupName};
+                this.props.pushBread(breadObj);
+
+                const tableBreadUrl = "/table/groups/"+groupId+"/"+tableId;
+                const tableBreadUrlObj = {[tableBreadUrl]:tableInfo.name};
+                this.props.pushBread(tableBreadUrlObj);
+
                 const dataSource = [];
                 const existed = [];
                 let index = 0;
@@ -80,13 +93,15 @@ export default class TableInfo extends Component {
                     dataSource.push(item);
                     existed.push(item.name);
                 });
-                tableInfo.keys.map(item=>{
-                    item.key = index;
-                    index++;
-                    item.isKey = true;
-                    dataSource.push(item);
-                    existed.push(item.name);
-                });
+                if (tableInfo.keys){
+                    tableInfo.keys.map(item=>{
+                        item.key = index;
+                        index++;
+                        item.isKey = true;
+                        dataSource.push(item);
+                        existed.push(item.name);
+                    });
+                }
                 this.setState({
                     dataSource,existed,
                     storageType:tableInfo.storageType,
@@ -115,22 +130,28 @@ export default class TableInfo extends Component {
         }else if(title==="添加字段"){
             editColumn = false;
         }
-
-
         this.setState({columnEditVisible:true,columnModalTitle:title,editColumn})
     }
 
     //修改表属性提交
     handleInfoSubmit = ()=>{
-
         this.infoForm.props.form.validateFields((error, row) => {
             if(error){
                 return ;
             }
             const data = this.infoForm.props.form.getFieldsValue();
-            console.log(data);
-            console.log(this.infoForm.props.tableInfo);
-            //TODO 判断是否有变化 tableName，comment
+            const oldForm = this.infoForm.props.tableInfo;
+
+            if (data.tableName!==oldForm.tableName || data.comment!==oldForm.comment){
+                axios.postByJson("/table/modifyTableInfo",{...data,tableId:this.state.tableId})
+                    .then(res=>{
+                        message.success("修改成功");
+                        this.setState({
+                            tableName:data.tableName,
+                            comment:data.comment
+                        })
+                    })
+            }
             this.setState({
                 tableInfoEditVisible:false
             });
@@ -152,36 +173,104 @@ export default class TableInfo extends Component {
             }
             const oldName = this.columnForm.props.columnInfo===null?'':this.columnForm.props.columnInfo.name;
             const column = {...data,type:tableUtil.fieldTypeRender(data.type)};
-            //TODO
+
             if (this.state.existed.includes(oldName)){
-                //TODO 没有变化不调用接口
-                //修改接口 axios 修改existed中的item对象
+                //更新字段
+                let existedIndex = this.state.existed.indexOf(oldName);
+                console.log("existedIndex",existedIndex);
+                let oldItem = {};
+                let oldIndex = 0;
+                this.state.dataSource.forEach((item,index)=>{
+                    if (item.name===oldName){
+                        oldItem = item;
+                        oldIndex = index;
+                    }
+                });
+                if (oldItem===undefined){
+                    message.error("列不存在");
+                    return ;
+                }else{
+                    if (oldItem.name!==column.name || oldItem.type!==column.type || oldItem.comment!==column.comment){
+                        axios.postByJson("/table/modifyColumn",{...column,oldName:oldName,tableId:this.state.tableId})
+                            .then(res=>{
+                                message.success("字段更新成功");
+                                const dataSource = this.state.dataSource;
+                                column.key = oldItem.key;
+                                dataSource.splice(oldIndex,1,column);
+                                const existed = this.state.existed;
+                                existed.splice(existedIndex,1,column.name);
+                                this.setState({dataSource,columnEditVisible:false,rows:[column]});
+                            })
+                    }
+                    this.setState({columnEditVisible:false})
+                }
             } else{
                 //加入dataSource 批量提交
                 const news = this.state.news;
                 const dataSource = this.state.dataSource;
-                const index = this.state.index+1;
-                column.key = index;
-                news.push(column);
-                dataSource.push(column);
+                let index = this.state.index;
+                if (this.state.editColumn===true) {
+                    //更新未提交字段
+                    let newsIndex = 0;
+                    news.forEach((item,index)=>{
+                        if (item.name===oldName){
+                            newsIndex = index;
+                        }
+                    });
+                    news.splice(newsIndex,1,column);
+                    let dataIndex = 0;
+                    dataSource.forEach((item,index)=>{
+                        if (item.name===oldName){
+                            dataIndex = index;
+                        }
+                    });
+                    dataSource.splice(dataIndex,1,column);
+                }else{
+                    //新增字段
+                    column.key = index;
+                    index = index+1;
+                    news.push(column);
+                    dataSource.push(column);
+                }
+
+
                 this.setState({
-                    news,index,dataSource
+                    news,
+                    index,
+                    dataSource,
+                    columnEditVisible:false
                 });
             }
-            //TODO 关闭对话框
         });
 
     };
 
     //删除表
     handleDelete=()=>{
-        console.log("delete");
+        const _this = this;
+        const tableId = this.state.tableId;
         Modal.confirm({
             title: '删除',
             content: '是否要删除该表？',
             onOk() {
-                console.log('OK');
-                //TODO axios 调用接口
+                axios.post("/table/deleteTable",{tableId:tableId})
+                    .then(res=>{
+                        message.success("删除成功!");
+                        _this.setState({
+                            tableId:0,
+                            dataSource:[],
+                            existed:[],
+                            news:[],
+                            rows:[],
+                            index:0,
+                            columnModalTitle:'',
+                            editColumn:false,
+                            tableName:'',
+                            db:'',
+                            storageType:'',
+                            comment:''
+                        })
+                    })
             },
             onCancel() {
                 console.log('Cancel');
@@ -193,7 +282,16 @@ export default class TableInfo extends Component {
         //axios 批量添加字段
         const columns = this.state.news;
         console.log("columns",columns);
-        //TODO axios  成功之后初始化状态
+        axios.postByJson("/table/addColumns",{columns:columns,tableId:this.state.tableId})
+            .then(res=>{
+                message.success("更新成功！");
+                const existed = this.state.existed;
+                columns.forEach(item=>{
+                    existed.push(item.name);
+                })
+                this.setState({existed,columnEditVisible:false})
+            })
+
     }
 
     render(){
@@ -313,7 +411,7 @@ class InfoForm extends React.Component{
                                 }],
                                 initialValue:tableInfo.tableName
                             })(
-                                <Input  type="text" />
+                                <Input  type="text"  disabled={tableInfo.storageType !== "HIVE"}/>
                             )
                     }
                 </FormItem>

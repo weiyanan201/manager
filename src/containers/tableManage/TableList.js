@@ -9,43 +9,7 @@ import util from '../../util/util';
 import {getTableList,getShowTablePage} from "../../reducers/table.redux";
 import { pushBread } from "../../reducers/bread.redux";
 const Search = Input.Search;
-const columns = [
-    {
-        title: 'id',
-        dataIndex: 'id',
-    }, {
-        title: 'name',
-        dataIndex: 'name',
-    }, {
-        title: 'db',
-        dataIndex: "db"
-    },{
-        title: 'storageType',
-        dataIndex: "storageType"
-    },{
-        title: 'physicalType',
-        dataIndex: "physicalType"
-    },{
-        title: 'produceType',
-        dataIndex: "produceType"
-    },{
-        title: 'comment',
-        dataIndex: "comment"
-    },{
-        title: 'createTime',
-        dataIndex: "createTime",
-        render: createTime=>util.formatDate(createTime)
-    },{
-        title: 'updateTime',
-        dataIndex: "updateTime",
-        render:updateTime=>util.formatDate(updateTime)
-    },{
-        title: 'permissions',
-        dataIndex: "permissions"
-    }, {
-        render: (item) => <NavLink target={`/table/tableInfo/${item.id}`} linkText={"详情"} />  //跳转页面  rout
-    },
-];
+
 
 @connect(
     state => {return {table:state.table}},
@@ -63,9 +27,45 @@ export default class TableList extends Component {
         }
         this.state={
             searchText:'',
-            pageSize:10
+            pageSize:10,
+            columns : [
+                {
+                    title: 'id',
+                    dataIndex: 'id',
+                }, {
+                    title: 'name',
+                    dataIndex: 'name',
+                }, {
+                    title: 'db',
+                    dataIndex: "db"
+                },{
+                    title: 'storageType',
+                    dataIndex: "storageType"
+                },{
+                    title: 'physicalType',
+                    dataIndex: "physicalType"
+                },{
+                    title: 'produceType',
+                    dataIndex: "produceType"
+                },{
+                    title: 'comment',
+                    dataIndex: "comment"
+                },{
+                    title: 'createTime',
+                    dataIndex: "createTime",
+                    render: createTime=>util.formatDate(createTime)
+                },{
+                    title: 'updateTime',
+                    dataIndex: "updateTime",
+                    render:updateTime=>util.formatDate(updateTime)
+                },{
+                    title: 'permissions',
+                    dataIndex: "permissions"
+                }, {
+                    render: (item) => <NavLink target={`/table/groups/${groupId}/${item.id}`} linkText={"详情"} />  //跳转页面  rout
+                },
+            ]
         }
-
     }
 
     handleChange(page, pageSize){
@@ -99,7 +99,7 @@ export default class TableList extends Component {
                 />
                 <Table
                     bordered
-                    columns={columns}
+                    columns={this.state.columns}
                     dataSource={this.props.table.data}
                     rowKey="tableId"
                     // pagination={this.props.total}ConsumerManage

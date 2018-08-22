@@ -191,7 +191,7 @@ export default class EditableTable extends React.Component {
             };
         }).concat(
             [{
-                title: 'operation',
+                title: '操作',
                 dataIndex: 'operation',
                 render: (text, record) => {
                     const editable = this.isEditing(record);
@@ -209,7 +209,7 @@ export default class EditableTable extends React.Component {
                                                 onClick={() => this.save(form, record.key)}
                                                 style={{ marginRight: 8 }}
                                             >
-                                                Save
+                                                保存
                                             </a>
                                         )}}
                                   </EditableContext.Consumer>
@@ -217,14 +217,14 @@ export default class EditableTable extends React.Component {
                                       title="Sure to cancel?"
                                       onConfirm={() => this.cancel(record.key)}
                                   >
-                                    <a>Cancel</a>
+                                    <a>取消</a>
                                   </Popconfirm>
                                 </span>
                             ) : (
                                 <span>
-                                    <a onClick={() => this.edit(record.key)} style={{ marginRight: 8 }}>Edit</a>
+                                    <a onClick={() => this.edit(record.key)} style={{ marginRight: 8 }}>编辑</a>
                                     <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.key)}>
-                                        <a href="javascript:;">Delete</a>
+                                        <a href="javascript:;">删除</a>
                                     </Popconfirm>
                                 </span>
                             )}

@@ -10,7 +10,8 @@ export function bread(state = initState,action) {
 
     switch (action.type){
         case PUSH_BREAD:
-            return {...state,path:action.payload};
+            const paths = {...state.path,...action.payload};
+            return {...state,path:paths};
         case GET_BREAD:
             return state;
         default:

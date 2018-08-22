@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {List} from 'immutable'
+import menu from '../config/menu'
 
 const AUTH_SUCCESS = "AUTH_SUCCESS";
 const AUTH_ERROR = "AUTH_ERROR";
@@ -16,7 +17,11 @@ export  function auth (state=initState,action){
     switch (action.type){
         case AUTH_SUCCESS:
             const data = action.payload;
-            const menus = new List(_arrayToTree(data.menus));
+            const role = data.role;
+            const menusData = menu.filter(item=>{
+                return item.roles.includes(role);
+            });
+            const menus = new List(_arrayToTree(menusData));
             return {...state,...data,isAuth:true,menus:menus};
         case AUTH_ERROR:
         default:
@@ -60,7 +65,7 @@ function _arrayToTree(menus){
 
 export function getAuth() {
     return dispatch=>{
-        axios.get('/login/getMenus')
+        axios.get('/login')
             .then(res=>{
                 if(res.status===200 && res.data.returnCode===0){
                     dispatch(authSuccess(res.data.data));
