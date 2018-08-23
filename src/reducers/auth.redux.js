@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from '../util/axios'
 import {List} from 'immutable'
 import menu from '../config/menu'
 

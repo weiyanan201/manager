@@ -116,5 +116,6 @@
     "less": "^3.5.3",
     "less-loader": "^4.1.0"
   },
-  "proxy": "http://10.246.85.22:18200"
+  "homepage":".",
+  "proxy": "http://localhost:18200"
 }

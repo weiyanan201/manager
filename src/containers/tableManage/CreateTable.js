@@ -205,13 +205,15 @@ class CreateTable extends React.Component{
                     });
                     if (tempStorageType==='HIVE'){
                         let keys = rdata.keys;
-                        keys.map(item=>{
-                            item['isPartition']=true;
-                            item.key = count;
-                            item.type = tableUtil.fieldTypeDeser(item.type);
-                            count++;
-                            columns.push(item);
-                        });
+                        if (keys && keys.length>0){
+                            keys.map(item=>{
+                                item['isPartition']=true;
+                                item.key = count;
+                                item.type = tableUtil.fieldTypeDeser(item.type);
+                                count++;
+                                columns.push(item);
+                            });
+                        }
                     } else if (tempStorageType==='ES'){
 
                     } else if(tempStorageType==='PHOENIX'){

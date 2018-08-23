@@ -2,6 +2,10 @@ import {Modal} from 'antd';
 import axios from 'axios';
 import qs from 'qs';
 
+import host from '../../config/host';
+
+const baseUrl = host;
+
 // axios.interceptors.request.use(function (config) {
 //     console.log("axios.interceptors.request.use");
 // });
@@ -42,7 +46,7 @@ export default class Axios {
 
      static get(url,params={}) {
         let options = {
-            url:url,
+            url:baseUrl+url,
             method:'get',
             params:{...params}
         };
@@ -51,7 +55,7 @@ export default class Axios {
 
     static post(url,data={}){
         let options = {
-            url:url,
+            url:baseUrl+url,
             method:'post',
             data:qs.stringify(data),
         };
@@ -61,7 +65,7 @@ export default class Axios {
     static postByJson(url,data={}){
         let header = {'Content-Type': 'application/json;charset=utf-8'};
         let options = {
-            url:url,
+            url:baseUrl+url,
             method:'post',
             data:data,
             headers:header
