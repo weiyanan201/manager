@@ -1,9 +1,10 @@
 import React from 'react';
+import {  Redirect } from 'react-router'
 
 export default  () => {
     return (
         <div>
-            <h3>Home!</h3>
+            <Redirect to="/table/groups"/>
         </div>
     )
 }

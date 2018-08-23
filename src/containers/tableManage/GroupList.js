@@ -45,7 +45,7 @@ const columns = [
         render: updateTime=>util.formatDate(updateTime)
     }, {
         align: 'center',
-        render: (item) => <NavLink target={`/table/groups/${item.id}`} linkText={"详情"} />  //跳转页面  rout
+        render: (item) => <NavLink target={`/table/groups/${item.id}`} linkText={"详情"} />
     },
 ];
 
