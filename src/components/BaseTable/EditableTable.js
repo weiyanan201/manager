@@ -109,14 +109,15 @@ export default class EditableTable extends React.Component {
         const newData = {
             key: keyCount,
         };
+        this.edit(keyCount);
         this.props.handleModifyColumn([...this.props.dataSource, newData],keyCount+1);
-    }
+    };
 
     //删除记录
     handleDelete=(key)=>{
         const dataSource = [...this.props.dataSource];
         this.props.handleModifyColumn(dataSource.filter(item => item.key !== key));
-    }
+    };
 
     //清空记录
     handleClear=()=>{
@@ -131,13 +132,14 @@ export default class EditableTable extends React.Component {
                 _this.props.handleModifyColumn([],0);
             }
         });
-    }
+    };
 
     edit(key) {
         this.setState({ editingKey: key });
     }
 
-    save(form, key) {
+    save(form, record) {
+        const key = record.key;
         form.validateFields((error, row) => {
             if (error) {
                 return;
@@ -156,7 +158,7 @@ export default class EditableTable extends React.Component {
             this.setState({ editingKey: '' });
             this.props.handleModifyColumn(newData);
         });
-    }
+    };
 
     cancel = () => {
         this.setState({ editingKey: '' });
@@ -206,7 +208,7 @@ export default class EditableTable extends React.Component {
                                             return (
                                             <a
                                                 href="javascript:;"
-                                                onClick={() => this.save(form, record.key)}
+                                                onClick={() => this.save(form, record)}
                                                 style={{ marginRight: 8 }}
                                             >
                                                 保存
@@ -237,10 +239,10 @@ export default class EditableTable extends React.Component {
         return (
             <div>
                 <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
-                    添加记录
+                    添加字段
                 </Button>
                 <Button onClick={this.handleClear} type="danger" style={{ marginBottom: 16 }}>
-                    清空记录
+                    清空字段
                 </Button>
                 <Table
                     components={components}

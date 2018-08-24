@@ -29,25 +29,18 @@ export default {
         return HIVE_STORAGE_FORMAT;
     },
     fiterDbs(dbs,group,storageType,role){
-        if (!dbs || !storageType || !role){
+        if (!dbs || !group || !storageType || !role ){
             return [];
         }else{
-            if (TenantType.PLATFORM===role){
-                return dbs[storageType];
+            let tempDBs = dbs[storageType];
+            if (group.toString()===TEMP_GROUP_ID.toString()){
+                return tempDBs.filter((item)=>item.usage===DB_USAGE.TEMP);
             }else{
-                let tempDBs = dbs[storageType];
-                if (group==TEMP_GROUP_ID) {
-                    return tempDBs.filter((item)=>item.usage===DB_USAGE.TEMP);
+                if (TenantType.PLATFORM===role){
+                    return tempDBs.filter(item=>item.usage!==DB_USAGE.TEMP);
                 }else{
-                    console.log("test : db,storageType",dbs,storageType);
-                    let tempDBs = dbs[storageType];
-                    return tempDBs.filter((item)=>{
-                        if (item.usage===DB_USAGE.BUSINESS){
-                            return item;
-                        }
-                    });
+                    return tempDBs.filter(item=>item.usage===DB_USAGE.BUSINESS);
                 }
-
             }
         }
     },
@@ -71,7 +64,7 @@ export default {
                         value:item.name,
                         label:item.name,
                         children:children
-                    }
+                    };
                     resutl.push(combination)
                 }
             });

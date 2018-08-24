@@ -34,7 +34,8 @@ const tableColumns = {
         columnType:'fieldType',
         storageType:"HIVE",
         required:true,
-        render: (text) => tableUtil.fieldTypeRender(text)
+        render: (text) => tableUtil.fieldTypeRender(text),
+        width:'300',
     }, {
         title: '注释',
         dataIndex: 'comment',
@@ -48,7 +49,8 @@ const tableColumns = {
         editable: true,
         columnType:'checkbox',
         required:false,
-        render: (text) => <Checkbox checked={text===true} />
+        render: (text) => <Checkbox checked={text===true} />,
+        width:'300px'
     },],
     "PHOENIX":[
         {
@@ -77,8 +79,17 @@ const tableColumns = {
             editable: true,
             columnType:'checkbox',
             required:false,
-            render: (text) => <Checkbox checked={text===true} />
-        },
+            render: (text) => <Checkbox checked={text===true} />,
+            width:'200px'
+        }, {
+            title: '可为空',
+            dataIndex: 'beNull',
+            editable: true,
+            columnType:'checkbox',
+            required:false,
+            render: (text) => <Checkbox checked={text===true} />,
+            width:'200px'
+        }
     ],
     "ES":[
         {
@@ -101,13 +112,7 @@ const tableColumns = {
             editable: true,
             columnType:'input',
             required:true,
-        }, {
-            title: '可为空',
-            dataIndex: 'isNull',
-            editable: true,
-            columnType:'checkbox',
-            required:false,
-            render: (text) => <Checkbox checked={text===true} />
+            width:'500px'
         },
     ],
     "":[]
@@ -126,7 +131,8 @@ class CreateTable extends React.Component{
             groupId:'',
             storageType:'HIVE',
             storageFormat:'ORC',
-            separator:'',
+            separator:'\\t',
+            separatorHidden:true,
             db:'',
             dbName:'',
             columns:[],
@@ -151,9 +157,23 @@ class CreateTable extends React.Component{
         let oldIsTmp = this.state.groupId===config.TEMP_GROUP_ID.toString();
         let newIsTmp = index === config.TEMP_GROUP_ID.toString();
         let change = (oldIsTmp&&!newIsTmp) || (!oldIsTmp&&newIsTmp);
+
+        let andvanced = {};
+        if(this.state.storageType==="HIVE" && newIsTmp){
+            //hive 私有组，默认TEXTFILE
+            andvanced.storageFormat='TEXTFILE';
+            andvanced.separatorHidden=false;
+            andvanced.separator = "\\t";
+        }else if(this.state.storageType==="HIVE"){
+            andvanced.storageFormat='ORC';
+            andvanced.separatorHidden=true;
+            andvanced.separator = "";
+        }
+
         this.setState({
             groupId:index,
-            db:change?'':this.state.db
+            db:change?'':this.state.db,
+            ...andvanced
         });
         this.props.form.setFieldsValue({
             db:change?'':this.state.db,
@@ -171,10 +191,20 @@ class CreateTable extends React.Component{
         });
     };
     //选取Format
+    //ORC 隐藏 分隔符
     handleSelectStorageFormat=(item)=>{
-        this.setState({
-            storageFormat:item,
-        })
+        if (item==='TEXTFILE') {
+            this.setState({
+                storageFormat:item,
+                separatorHidden:false,
+            })
+        }else{
+            this.setState({
+                storageFormat:item,
+                separatorHidden:true,
+            })
+        }
+
     }
     //切换数据库
     handleSelectDb=(item,object)=>{
@@ -245,6 +275,10 @@ class CreateTable extends React.Component{
                     });
                     if (filterColumns && filterColumns.length>0){
                         //检查字是否 name、type、comment
+                        //hive:必须有一个普通列
+                        //es:必须有一列
+                        //phoenix:必须有一个主键列，并且可为空字段不能为true
+                        let blankRows = true;
                         filterColumns.map(item=>{
                             const en = util.isEmpty(item.name);
                             const et = util.isEmpty(item.type);
@@ -256,9 +290,43 @@ class CreateTable extends React.Component{
                                 if(!tableUtil.checkoutFieldType(legalType,item.type)){
                                     errorMessage.push(`字段:${item.name}的类型错误`);
                                 }
+                                repColumns.push({...item,type:tableUtil.fieldTypeRender(item.type)});
+                                switch (this.state.storageType) {
+                                    case config.STORAGE_TYPE_OBJ.HIVE:
+                                        if (item.isPartition===undefined || item.isPartition===false){
+                                            blankRows = false;
+                                        }
+                                        break;
+                                    case config.STORAGE_TYPE_OBJ.ES:
+                                        blankRows = false;
+                                        break;
+                                    case config.STORAGE_TYPE_OBJ.PHOENIX:
+                                        if (item.primaryKey===true){
+                                            blankRows = false;
+                                        } 
+                                        if (item.primaryKey===true && item.beNull===true){
+                                            errorMessage.push(`字段:${item.name}为主键，不能可为空`);
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
-                            repColumns.push({...item,type:tableUtil.fieldTypeRender(item.type)})
                         })
+                        if (blankRows){
+                            //验证失败
+                            switch (this.state.storageType) {
+                                case config.STORAGE_TYPE_OBJ.HIVE:
+                                    errorMessage.push(`hive建表必须有一个非分区列`);
+                                    break;
+                                case config.STORAGE_TYPE_OBJ.ES:
+                                    errorMessage.push(`es建表必须有一列`);
+                                    break;
+                                case config.STORAGE_TYPE_OBJ.PHOENIX:
+                                    errorMessage.push(`phoenix建表必须有一个主键，且该主键不能可为空`);
+                                    break;
+                            }
+                        }
                     }else{
                         errorMessage.push("字段列表不能为空!");
                     }
@@ -328,9 +396,15 @@ class CreateTable extends React.Component{
                         {tableUtil.getStorageFormat().map((item)=><Option value={item} key={item}>{item}</Option>)}
                     </Select>
                 </FormItem>
-                <FormItem label="列分割符" >
-                    <Input rows={3} placeholder="请输入分隔符" value={this.state.separator} onChange={(e)=>{this.handleChangeText("separator",e.target.value)}} />
-                </FormItem>
+                {this.state.separatorHidden===true?null
+                    :<FormItem label="列分割符" >
+                        <Input rows={3} placeholder="请输入分隔符"
+                           value={this.state.separator}
+                           onChange={(e)=>{this.handleChangeText("separator",e.target.value)}}
+                        />
+                    </FormItem>
+                }
+
             </Panel>;
         }else if(this.state.storageType==='ES'){
             advancedPro = <Panel  key="1" style={customPanelStyle} showArrow={false} >

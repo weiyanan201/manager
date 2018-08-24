@@ -41,12 +41,12 @@ class MainHeader extends React.Component {
                             </Menu.Item>
                         </SubMenu>
 
-                        <Menu.Item key="mail" style={{
-                            float: 'right',
-                            marginTop:'7px'
-                        }}>
-                            <Icon type="mail" size='larger'/>消息
-                        </Menu.Item>
+                        {/*<Menu.Item key="mail" style={{*/}
+                            {/*float: 'right',*/}
+                            {/*marginTop:'7px'*/}
+                        {/*}}>*/}
+                            {/*<Icon type="mail" size='larger'/>消息*/}
+                        {/*</Menu.Item>*/}
                     </Menu>
 
             </Header>

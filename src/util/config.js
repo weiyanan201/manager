@@ -22,5 +22,10 @@ module.exports = {
     },
     TEMP_GROUP_ID : -1,
     StorageType:['HIVE','PHOENIX','ES'],
-    HIVE_STORAGE_FORMAT:['ORC','TEXTFILE']
+    HIVE_STORAGE_FORMAT:['ORC','TEXTFILE'],
+    STORAGE_TYPE_OBJ:{
+        "HIVE":"HIVE",
+        "PHOENIX":"PHOENIX",
+        "ES":"ES"
+    }
 }

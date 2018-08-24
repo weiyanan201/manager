@@ -5,16 +5,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getGroupList} from "../../reducers/table.redux";
 import { getDBs,getFieldsType} from "../../reducers/config.redux";
-
-import { Tabs,Button,Card , Table, Input, Popconfirm, Form,InputNumber,Cascader,Row,Select,message} from 'antd';
-import GroupSelect from "../../components/groupSelect/GroupSelect";
+import { Tabs} from 'antd';
 
 import CreateTable from './CreateTable';
 import CreateView from './CreateView';
 import CommandCreate from './CommandCreate';
 
-const FormItem = Form.Item;
-const Option = Select.Option;
+
 const TabPane = Tabs.TabPane;
 
 @connect(
@@ -42,16 +39,16 @@ export default class AddTable extends React.Component{
 
     onChange = (activeKey) => {
         this.setState({ activeKey });
-    }
+    };
     onEdit = (targetKey, action) => {
         this[action](targetKey);
-    }
+    };
     add = () => {
         const panes = this.state.panes;
         const activeKey = `newTab${this.newTabIndex++}`;
         panes.push({ title: 'New Tab', content: 'Content of new Tab', key: activeKey });
         this.setState({ panes, activeKey });
-    }
+    };
     remove = (targetKey) => {
         let activeKey = this.state.activeKey;
         let lastIndex;
