@@ -20,11 +20,17 @@ const Panel = Collapse.Panel;
 const TextArea  = Input.TextArea;
 
 const tableColunms = [{
-    title: 'name',
+    title: '字段名称',
     dataIndex: 'name',
     editable: true,
     columnType:'input',
     required:true
+}, {
+    title: '别名',
+    dataIndex: 'expression',
+    editable: true,
+    columnType:'input',
+    required:false,
 }, {
     title: '类型',
     dataIndex: 'type',
@@ -38,14 +44,8 @@ const tableColunms = [{
     dataIndex: 'comment',
     editable: true,
     columnType:'input',
-    required:false,
+    required:true,
     width: '500px',
-}, {
-    title: '表达式',
-    dataIndex: 'expression',
-    editable: true,
-    columnType:'input',
-    required:false,
 },]
 
 class CreateView extends React.Component{
@@ -60,7 +60,8 @@ class CreateView extends React.Component{
             columns:[],
             keyCount:0,
             condition:'',
-            tableId:''
+            tableId:'',
+            createAgain:false
         };
     }
 
@@ -151,7 +152,8 @@ class CreateView extends React.Component{
                 const result = axios.postByJson("/table/createView",{...this.state,columns:repColumns});
                 result.then(()=>{
                     this.setState({
-                        loading:false
+                        loading:false,
+                        createAgain:true
                     });
                     message.success("创建成功!")
                 }).catch(()=>{
@@ -162,6 +164,21 @@ class CreateView extends React.Component{
             }
         });
     };
+
+    handleCreateMore=()=>{
+        this.props.form.resetFields();
+        this.setState({
+            tableName:'',
+            comment:'',
+            storageType:'HIVE',
+            groupId:'',
+            columns:[],
+            keyCount:0,
+            condition:'',
+            tableId:'',
+            createAgain:false
+        })
+    }
 
     /**
      * 选取模板表
@@ -270,7 +287,10 @@ class CreateView extends React.Component{
                             {/*选取模板表*/}
                             <FormItem label="模板表">
                                 {getFieldDecorator('template', {
-
+                                    rules: [{
+                                        required: true,
+                                        message: '请选择源表',
+                                    }],
                                 })(
                                     <TableSelect handleSelect={this.handleSelectTemplate} storageType='HIVE'/>
                                 )}
@@ -288,7 +308,7 @@ class CreateView extends React.Component{
                             {/*</FormItem>*/}
 
                             <FormItem label="筛选条件" >
-                                    <TextArea placeholder={`请填写筛选条件(如"game_id=1 and id=2")`}
+                                    <TextArea placeholder={`可以留空或写带where的condition,聚合其他语句会被忽略`}
                                               autosize style={{width:"600px"}}
                                               value={this.state.condition}
                                               onChange={(e)=>{this.handleChangeText("condition",e.target.value)}}
@@ -301,7 +321,14 @@ class CreateView extends React.Component{
                 <Card title={"字段详情"}>
                     <EditableTable storageType={this.state.storageType} handleModifyColumn={this.handleModifyColumn} tableColumns={tableColunms} dataSource={this.state.columns} keyCount={this.state.keyCount}/>
                 </Card>
-                <Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
+                <div style={{textAlign: 'right'}}>
+                    {
+                        this.state.createAgain?
+                            <Button type={"primary"} onClick={this.handleCreateMore} >再来一张</Button>
+                            :<Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
+                    }
+                </div>
+
             </div>
         )
     }

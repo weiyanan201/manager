@@ -31,12 +31,21 @@ function packPromise(options){
                 }
             } else {
                 //TODO 其他status处理
+                reject(response);
             }
         }).catch((error) => {
-            Modal.error({
-                title: "错误提示",
-                content: "系统异常，请联系管理员"
-            });
+            console.error(error);
+            if (error.response.status===302){
+                Modal.error({
+                    title: "错误提示",
+                    content: "会话失效，请重新登录"
+                });
+            }else{
+                Modal.error({
+                    title: "错误提示",
+                    content: "系统异常，请联系管理员"
+                });
+            }
             reject(error);
         })
     });

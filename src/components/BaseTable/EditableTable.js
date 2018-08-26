@@ -105,12 +105,30 @@ export default class EditableTable extends React.Component {
 
     //添加记录
     handleAdd=()=>{
-        const { keyCount } = this.props;
-        const newData = {
-            key: keyCount,
-        };
-        this.edit(keyCount);
-        this.props.handleModifyColumn([...this.props.dataSource, newData],keyCount+1);
+        const { keyCount,dataSource} = this.props;
+        if (dataSource.length===0){
+            //添加新行
+            const newData = {
+                key: keyCount,
+            };
+            this.edit(keyCount);
+            this.props.handleModifyColumn([...this.props.dataSource, newData],keyCount+1);
+        }else{
+            //判断上一行是否为空，如果只有key和form两个属性则认为是空行
+            const item = dataSource[dataSource.length-1];
+            if (Object.keys(item).length===2){
+                //编辑上一行
+                this.edit(item.key)
+            }else{
+                //添加新行
+                const newData = {
+                    key: keyCount,
+                };
+                this.edit(keyCount);
+                this.props.handleModifyColumn([...this.props.dataSource, newData],keyCount+1);
+            }
+        }
+
     };
 
     //删除记录
@@ -238,12 +256,14 @@ export default class EditableTable extends React.Component {
 
         return (
             <div>
-                <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
-                    添加字段
-                </Button>
-                <Button onClick={this.handleClear} type="danger" style={{ marginBottom: 16 }}>
-                    清空字段
-                </Button>
+                <div style={{textAlign: 'right'}}>
+                    <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
+                        添加字段
+                    </Button>
+                    <Button onClick={this.handleClear} type="danger" style={{ marginBottom: 16 }}>
+                        清空字段
+                    </Button>
+                </div>
                 <Table
                     components={components}
                     bordered

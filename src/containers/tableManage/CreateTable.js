@@ -5,7 +5,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import {Button , Card,Spin,Table,Cascader,Form,Input,Select,Row,message,Modal,Collapse,Checkbox } from 'antd';
+import {Button , Card,Spin,Form,Input,Select,Row,message,Modal,Collapse,Checkbox } from 'antd';
 import GroupSelect  from '../../components/groupSelect/GroupSelect';
 import EditableTable from '../../components/BaseTable/EditableTable';
 import TableSelect from '../../components/TableSelect';
@@ -35,7 +35,7 @@ const tableColumns = {
         storageType:"HIVE",
         required:true,
         render: (text) => tableUtil.fieldTypeRender(text),
-        width:'300',
+        width:'300px',
     }, {
         title: '注释',
         dataIndex: 'comment',
@@ -141,6 +141,7 @@ class CreateTable extends React.Component{
             advancedKey:[],
             replicas:1,
             shards:5,
+            createAgain:false
         };
     }
 
@@ -303,7 +304,7 @@ class CreateTable extends React.Component{
                                     case config.STORAGE_TYPE_OBJ.PHOENIX:
                                         if (item.primaryKey===true){
                                             blankRows = false;
-                                        } 
+                                        }
                                         if (item.primaryKey===true && item.beNull===true){
                                             errorMessage.push(`字段:${item.name}为主键，不能可为空`);
                                         }
@@ -347,17 +348,39 @@ class CreateTable extends React.Component{
                 const result = axios.postByJson("/table/createTable",{...this.state,columns:repColumns});
                 result.then(()=>{
                     this.setState({
-                        loading:false
+                        loading:false,
+                        createAgain:true
                     });
-                    message.success("创建成功!")
+                    message.success("创建成功!");
                 }).catch(()=>{
                     this.setState({
                         loading:false
                     });
-                    console.log("error");
                 })
             }
         });
+    };
+
+    handleCreateMore=()=>{
+        this.props.form.resetFields();
+        this.setState({
+            tableName:'',
+            comment:'',
+            groupId:'',
+            storageType:'HIVE',
+            storageFormat:'ORC',
+            separator:'\\t',
+            separatorHidden:true,
+            db:'',
+            dbName:'',
+            columns:[],
+            keyCount:0,
+            loading : false,
+            advancedKey:[],
+            replicas:1,
+            shards:5,
+            createAgain:false
+        })
     };
 
     //传入可编辑表的回调函数
@@ -508,7 +531,13 @@ class CreateTable extends React.Component{
                 <Card title={"字段详情"} >
                     <EditableTable storageType={this.state.storageType} handleModifyColumn={this.handleModifyColumn} tableColumns={tableColumns[this.state.storageType]} dataSource={this.state.columns} keyCount={this.state.keyCount}/>
                 </Card>
-                <Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
+                    <div style={{textAlign: 'right'}}>
+                        {
+                            this.state.createAgain?
+                                <Button type={"primary"} onClick={this.handleCreateMore} >再来一张</Button>
+                                :<Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
+                        }
+                    </div>
                 </Spin>
             </div>
         )

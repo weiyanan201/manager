@@ -41,19 +41,23 @@ export default class CommandCreate extends React.Component{
                 _this.state.timer = setInterval(()=>{
                     axios.get("/table/queryProgress",{taskId:taskId})
                         .then(res=>{
-                            console.log(res);
                             const state = res.data.data.state;
                             const msg = res.data.data.msg;
                             if (state!=='RUNNING') {
                                 clearInterval(_this.state.timer);
                                 this.setState({loading:false,log:msg})
                             }
+                        }).catch(res=>{
+                            clearInterval(_this.state.timer);
+                            this.setState({
+                                loading:false,
+                            });
                         })
                 },1000);
             }
 
         }).catch((res)=>{
-            console.log("catch",res);
+            clearInterval(_this.state.timer);
             this.setState({
                 loading:false,
                 log:res.data.returnMessage
@@ -70,19 +74,19 @@ export default class CommandCreate extends React.Component{
     render(){
         return (
             <div >
-                <div className={style["button-right"]}>
-                    <Button type={"primary"} onClick={this.handleSubmit} style={{marginRight:10}} >运行</Button>
-                    <Button type={"primary"} onClick={this.handleReset}>清空</Button>
-                </div>
-                <div>
-                    <Spin spinning={this.state.loading} tip={'执行中...'}>
+                <Spin spinning={this.state.loading} tip={'执行中...'}>
+                    <div className={style["button-right"]}>
+                        <Button type={"primary"} onClick={this.handleSubmit} style={{marginRight:10}} >运行</Button>
+                        <Button type={"primary"} onClick={this.handleReset}>清空</Button>
+                    </div>
+                    <div>
                         <TextArea placeholder="请输入建表语句" autosize={false} style={{height: 'calc(40vh)'}} value={this.state.sql} onChange={(e)=>{this.handleChangeText(e.target.value)}}/>
                         {/*<TextArea placeholder="日志信息" autosize={false} style={{height: 'calc(40vh)'}} />*/}
                         <Card title={"日志"} style={{height: 'calc(30vh)'}}>
                             {this.state.log}
                         </Card>
-                    </Spin>
-                </div>
+                    </div>
+                </Spin>
             </div>
         );
     }

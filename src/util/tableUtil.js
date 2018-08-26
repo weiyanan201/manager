@@ -116,4 +116,15 @@ export default {
         }
         return false;
     },
+    /**
+     * 表权限
+     * "READ_DATA", "ALTER", "WRITE_DATA", "SUBMIT_TASK"
+     */
+    getTablePermission(permissions){
+        if (permissions.includes("ALTER")){
+            return "读写";
+        }else{
+            return "只读";
+        }
+    }
 }

@@ -10,6 +10,7 @@ import {getTableList,getShowTablePage} from "../../reducers/table.redux";
 import { pushBread } from "../../reducers/bread.redux";
 
 import style from './table.less'
+import tableUtil from "../../util/tableUtil";
 
 const Search = Input.Search;
 
@@ -63,7 +64,8 @@ export default class TableList extends Component {
                     render:updateTime=>util.formatDate(updateTime)
                 },{
                     title: 'permissions',
-                    dataIndex: "permissions"
+                    dataIndex: "permissions",
+                    render:permissions=>tableUtil.getTablePermission(permissions)
                 }, {
                     render: (item) => <NavLink target={`/table/groups/${groupId}/${item.id}`} linkText={"详情"} />  //跳转页面  rout
                 },

@@ -1,19 +1,95 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card, Table, Pagination,Form,Button,Input, Radio, DatePicker, Select,Modal,Cascader,message} from 'antd';
-import { Route } from 'react-router-dom';
-import {getTableInfo} from "../../reducers/table.redux";
+import { Card, Form,Button,Input, Checkbox,Modal,Cascader,message} from 'antd';
 import {getFieldsType} from "../../reducers/config.redux";
 
 import BaseTable from '../../components/BaseTable';
 import axios from '../../util/axios';
 import tableUtil from "../../util/tableUtil";
 import util from "../../util/util";
-import {bread, pushBread} from "../../reducers/bread.redux";
+import { pushBread} from "../../reducers/bread.redux";
 
 const FormItem = Form.Item;
 const TextArea = Input.TextArea;
 
+const tableColumns = {
+    "HIVE":[{
+        title:'序号',
+        key:'key',
+        render:(text,row,index)=>index+1,
+        width:85
+    },{
+        title: '字段名',
+        dataIndex: 'name',
+        width:290
+    }, {
+        title: '类型',
+        dataIndex: 'type',
+        width:300,
+    }, {
+        title: '注释',
+        dataIndex: 'comment',
+        width: 300,
+    }, {
+        title: '分区字段',
+        dataIndex: 'isPartition',
+        render: (text) => <Checkbox checked={text===true} />,
+        width:300
+    },],
+    "PHOENIX":[
+        {
+            title:'序号',
+            key:'key',
+            render:(text,row,index)=>index+1,
+            width:'100px'
+        },
+        {
+            title: 'name',
+            dataIndex: 'name',
+            width:'300px'
+        }, {
+            title: '类型',
+            dataIndex: 'type',
+            width:'300px'
+        }, {
+            title: '注释',
+            dataIndex: 'comment',
+            width:'300px'
+        },{
+            title:"主键",
+            dataIndex: 'primaryKey',
+            render: (text) => <Checkbox checked={text===true} />,
+            width:'200px'
+        }, {
+            title: '可为空',
+            dataIndex: 'nullable',
+            render: (text) => <Checkbox checked={text===true} />,
+            width:'200px'
+        }
+    ],
+    "ES":[
+        {
+            title:'序号',
+            key:'key',
+            render:(text,row,index)=>index+1,
+            width:'100px'
+        },
+        {
+            title: 'name',
+            dataIndex: 'name',
+            width:'300px'
+        }, {
+            title: '类型',
+            dataIndex: 'type',
+            width:'300px'
+        }, {
+            title: '注释',
+            dataIndex: 'comment',
+            width:'500px'
+        },
+    ],
+    "":[]
+};
 
 const columns = [
 
@@ -24,17 +100,14 @@ const columns = [
     },
     {
         title:'name',
-        key:'name',
         dataIndex:'name'
     },
     {
         title: 'type',
-        key: 'type',
         dataIndex: 'type'
     },
     {
         title: 'comment',
-        key: 'comment',
         dataIndex: 'comment'
     },
 
@@ -61,6 +134,7 @@ export default class TableInfo extends Component {
             tableId:tableId,
             tableInfoEditVisible:false,
             columnEditVisible:false,
+            columns:[],
             dataSource:[],
             existed:[],
             news:[],
@@ -68,7 +142,8 @@ export default class TableInfo extends Component {
             storageType:'HIVE',
             index:0,
             columnModalTitle:'',
-            editColumn:false
+            editColumn:false,
+            modifyPermission:false
         };
 
         this.props.getFieldsType();
@@ -76,6 +151,7 @@ export default class TableInfo extends Component {
             .then(res=>{
                 const tableInfo = res.data.data.tableDetail;
                 const groupName = res.data.data.groupName;
+                const modifyPermission = res.data.data.modifyPermission;
                 const breadUrl = "/table/groups/"+groupId;
                 const breadObj = {[breadUrl]:groupName};
                 this.props.pushBread(breadObj);
@@ -83,6 +159,7 @@ export default class TableInfo extends Component {
                 const tableBreadUrl = "/table/groups/"+groupId+"/"+tableId;
                 const tableBreadUrlObj = {[tableBreadUrl]:tableInfo.name};
                 this.props.pushBread(tableBreadUrlObj);
+
 
                 const dataSource = [];
                 const existed = [];
@@ -94,17 +171,29 @@ export default class TableInfo extends Component {
                     existed.push(item.name);
                 });
                 if (tableInfo.keys){
-                    tableInfo.keys.map(item=>{
-                        item.key = index;
-                        index++;
-                        item.isKey = true;
-                        dataSource.push(item);
-                        existed.push(item.name);
-                    });
+                    if (tableInfo.storageType==='HIVE'){
+                        tableInfo.keys.map(item=>{
+                            item.key = index;
+                            item.isPartition = true;
+                            index++;
+                            dataSource.push(item);
+                            existed.push(item.name);
+                        });
+                    }else if(tableInfo.storageType==='PHOENIX'){
+                        tableInfo.keys.map(item=>{
+                            item.key = index;
+                            item.primaryKey = true;
+                            index++;
+                            dataSource.push(item);
+                            existed.push(item.name);
+                        });
+                    }
+
                 }
                 this.setState({
-                    dataSource,existed,
+                    dataSource,existed,modifyPermission,
                     storageType:tableInfo.storageType,
+                    columns:tableColumns[tableInfo.storageType],
                     tableName:tableInfo.name,
                     db:tableInfo.db,
                     comment:tableInfo.comment,
@@ -122,8 +211,12 @@ export default class TableInfo extends Component {
                 message.error("请先选择一个字段");
                 return ;
             }
-            if (row && row.hasOwnProperty("isKey") && row.isKey){
-                message.error("无法编辑分区字段或主键");
+            if (row && row.hasOwnProperty("isPartition") && row.isPartition){
+                message.error("无法编辑分区字段");
+                return ;
+            }
+            if (row && row.hasOwnProperty("primaryKey") && row.primaryKey){
+                message.error("无法编辑主键字段");
                 return ;
             }
             editColumn = true;
@@ -190,7 +283,7 @@ export default class TableInfo extends Component {
                     message.error("列不存在");
                     return ;
                 }else{
-                    if (oldItem.name!==column.name || oldItem.type!==column.type || oldItem.comment!==column.comment){
+                    if (oldItem.name!==column.name || oldItem.type!==column.type || oldItem.comment!==column.comment || oldItem.nullable!==column.nullable){
                         axios.postByJson("/table/modifyColumn",{...column,oldName:oldName,tableId:this.state.tableId})
                             .then(res=>{
                                 message.success("字段更新成功");
@@ -281,7 +374,10 @@ export default class TableInfo extends Component {
     handleUpdate=()=>{
         //axios 批量添加字段
         const columns = this.state.news;
-        console.log("columns",columns);
+        if (columns.length===0){
+            message.success("更新成功！");
+            return;
+        }
         axios.postByJson("/table/addColumns",{columns:columns,tableId:this.state.tableId})
             .then(res=>{
                 message.success("更新成功！");
@@ -307,8 +403,17 @@ export default class TableInfo extends Component {
             <div >
                 <Card title={"表属性"}>
                     <div style={{textAlign: 'right'}}>
-                        <Button type="primary" onClick={()=>{this.setState({tableInfoEditVisible:true})}}>编辑</Button>
-                        <Button type="danger" onClick={this.handleDelete}>删除表</Button>
+                        {
+                            this.state.modifyPermission?
+                                <Button type="primary" onClick={()=>{this.setState({tableInfoEditVisible:true})}}>编辑</Button>
+                                :null
+                        }
+                        {
+                            this.state.modifyPermission?
+                                <Button type="danger" onClick={this.handleDelete}>删除表</Button>
+                                :null
+                        }
+
                     </div>
                     <Form layout="inline">
                         <FormItem label="表名">
@@ -328,20 +433,35 @@ export default class TableInfo extends Component {
 
                 <Card title="表字段" style={{marginTop:10}}>
                     <div style={{textAlign: 'right'}}>
-                        <Button onClick={()=>this.handelModalColumn('编辑字段')}>编辑字段</Button>
-                        <Button onClick={()=>this.handelModalColumn('添加字段')}>添加字段</Button>
+                        {
+                            this.state.modifyPermission?
+                                <Button onClick={()=>this.handelModalColumn('编辑字段')}>编辑字段</Button>
+                                :null
+                        }
+                        {
+                            this.state.modifyPermission?
+                                <Button onClick={()=>this.handelModalColumn('添加字段')}>添加字段</Button>
+                                :null
+                        }
+
                     </div>
 
                     <BaseTable
-                        columns={columns}
+                        columns={this.state.columns}
                         dataSource={this.state.dataSource}
                         selection={selections}
                         pagination={false}
                         rowKey={"key"}
+                        scroll={{ y: 500 }}
                     />
-                    <div style={{textAlign: 'right'}}>
-                        <Button type="primary" onClick={this.handleUpdate}>更新</Button>
-                    </div>
+                    {
+                        this.state.modifyPermission?
+                            <div style={{textAlign: 'right'}}>
+                                <Button type="primary" onClick={this.handleUpdate}>更新</Button>
+                            </div>
+                            :null
+                    }
+
                 </Card>
 
                 {/*表属性修改窗口*/}
@@ -515,6 +635,22 @@ class CloumnForm extends  React.Component{
                             )
                     }
                 </FormItem>
+
+                {
+                    this.props.storageType==="PHOENIX"?
+                        <FormItem label="可为空" {...formItemLayout}>
+                            {
+                                getFieldDecorator('nullable',{
+                                    valuePropName: 'checked',
+                                    initialValue: columnInfo.nullable,
+                                })(
+                                    <Checkbox defaultChecked={columnInfo.nullable==='true'} />
+                                )
+                            }
+                        </FormItem>
+                        :null
+
+                }
             </Form>
         );
     }
