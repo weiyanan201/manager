@@ -64,6 +64,6 @@ export default {
         let min = "0"+date.getMinutes();
         let ss = "0"+date.getSeconds();
         return y+"-"+m.substring(m.length-2,m.length)+"-"+d.substring(d.length-2,d.length)+" "+hour.substring(hour.length-2,hour.length)+":"+min.substring(min.length-2,min.length)+":"+ss.substring(ss.length-2,ss.length);
-    }
+    },
 
 }

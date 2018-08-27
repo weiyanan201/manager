@@ -27,5 +27,5 @@ module.exports = {
         "HIVE":"HIVE",
         "PHOENIX":"PHOENIX",
         "ES":"ES"
-    }
+    },
 }
