@@ -11,6 +11,7 @@ import config from '../../util/config';
 import axios from '../../util/axios';
 import util from '../../util/util';
 
+import style from './table.less';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -20,6 +21,7 @@ const tableColunms = [
     {
         title:'序号',
         key:'key',
+        align:'center',
         render:(text,row,index)=>index+1,
         width:'80px'
     },
@@ -317,7 +319,7 @@ class CreateView extends React.Component{
                     </Form>
                 </Card>
 
-                <Card title={"字段详情"}>
+                <Card title={"字段详情"} className={style["roll-table"]}>
                     <EditableTable storageType={this.state.storageType}
                                    handleModifyColumn={this.handleModifyColumn}
                                    tableColumns={tableColunms}

@@ -1,4 +1,7 @@
 
+/**
+分页居中
+ */
 .tablePagination{
   text-align: center;
   margin-top: 20px;
@@ -8,10 +11,16 @@
   height: calc(30vh);
 }
 
+/*
+按钮右排列
+ */
 .button-right {
   text-align: right;
 }
 
+/**
+高级属性样式
+ */
 .advanced{
 
   :global{
@@ -28,7 +37,22 @@
   }
 }
 
-//command
+/**
+消除表的滚动条
+ */
+.roll-table{
+
+  :global{
+    .ant-table-fixed-header .ant-table-scroll .ant-table-header{
+      overflow: hidden;
+      height: 72px;
+    }
+
+    .ant-table-fixed-header > .ant-table-content > .ant-table-scroll > .ant-table-body{
+      overflow-y: auto !important;
+    }
+  }
+}
 
 
 

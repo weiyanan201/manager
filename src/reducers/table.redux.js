@@ -61,9 +61,10 @@ export function group(state = groupInitState, action) {
 export function table(state = tableInitState, action) {
     switch (action.type) {
         case GET_TABLE_LIST :
+            let ds = action.payload.data.data;
             return {
                 ...state,
-                allTable: action.payload.data.data,
+                allTable: ds,
                 groupName: action.payload.data.groupName,
                 groupId:action.payload.groupId,
                 tableLoading:false

@@ -212,6 +212,7 @@ export default class EditableTable extends React.Component {
         }).concat(
             [{
                 title: '操作',
+                align:'center',
                 dataIndex: 'operation',
                 render: (text, record) => {
                     const editable = this.isEditing(record);

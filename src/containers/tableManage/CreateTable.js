@@ -24,6 +24,7 @@ const tableColumns = {
     "HIVE":[{
         title:'序号',
         key:'key',
+        align:'center',
         render:(text,row,index)=>index+1,
         width:'80px'
     },{
@@ -60,6 +61,7 @@ const tableColumns = {
     "PHOENIX":[
         {
             title:'序号',
+            align:'center',
             key:'key',
             render:(text,row,index)=>index+1,
             width:'80px'
@@ -106,6 +108,7 @@ const tableColumns = {
         {
             title:'序号',
             key:'key',
+            align:'center',
             render:(text,row,index)=>index+1,
             width:'100px'
         },
@@ -540,7 +543,7 @@ class CreateTable extends React.Component{
                         </Row>
                     </Form>
                 </Card>
-                <Card title={"字段详情"} >
+                <Card title={"字段详情"} className={style["roll-table"]}>
                     <EditableTable storageType={this.state.storageType}
                                    handleModifyColumn={this.handleModifyColumn}
                                    tableColumns={tableColumns[this.state.storageType]}

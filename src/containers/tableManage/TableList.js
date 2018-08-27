@@ -20,12 +20,9 @@ export default class TableList extends Component {
 
     constructor(props) {
         super(props);
-        let groupId = this.props.match.params.groupId;
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeSize = this.handleChangeSize.bind(this);
-        if (this.props.table.groupId!==groupId){
-            this.props.getTableList({groupId:groupId});
-        }
+        let groupId = this.props.match.params.groupId;
         this.state={
             searchText:'',
             pageSize:10,
@@ -33,41 +30,58 @@ export default class TableList extends Component {
                 {
                     title: 'id',
                     dataIndex: 'id',
+                    align:'center',
                 }, {
                     title: 'name',
                     dataIndex: 'name',
+                    align:'center',
                 }, {
                     title: 'db',
-                    dataIndex: "db"
+                    dataIndex: "db",
+                    align:'center',
                 },{
                     title: 'storageType',
-                    dataIndex: "storageType"
+                    dataIndex: "storageType",
+                    align:'center',
                 },{
                     title: 'physicalType',
-                    dataIndex: "physicalType"
+                    dataIndex: "physicalType",
+                    align:'center',
                 },{
                     title: 'produceType',
-                    dataIndex: "produceType"
+                    dataIndex: "produceType",
+                    align:'center',
                 },{
                     title: 'comment',
-                    dataIndex: "comment"
+                    dataIndex: "comment",
+                    align:'center',
                 },{
                     title: 'createTime',
                     dataIndex: "createTime",
-                    render: createTime=>util.formatDate(createTime)
+                    render: createTime=>util.formatDate(createTime),
+                    align:'center',
                 },{
                     title: 'updateTime',
                     dataIndex: "updateTime",
-                    render:updateTime=>util.formatDate(updateTime)
+                    render:updateTime=>util.formatDate(updateTime),
+                    align:'center',
                 },{
                     title: 'permissions',
                     dataIndex: "permissions",
-                    render:permissions=>tableUtil.getTablePermission(permissions)
+                    render:permissions=>tableUtil.getTablePermission(permissions),
+                    align:'center',
                 }, {
+                    align:'center',
                     render: (item) => <NavLink target={`/table/groups/${groupId}/${item.id}`} linkText={"详情"} />  //跳转页面  rout
                 },
             ]
         }
+    }
+
+    componentDidMount(){
+        let groupId = this.props.match.params.groupId;
+        this.props.getTableList({groupId:groupId});
+        
     }
 
     //搜索框为空时自动刷新
