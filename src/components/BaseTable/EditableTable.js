@@ -275,7 +275,8 @@ export default class EditableTable extends React.Component {
 
                         };
                     }}
-                    pagination={{style:{textAlign:'center',width:'100%'}}}
+                    {...this.props}
+                    // pagination={{style:{textAlign:'center',width:'100%'}}}
                 />
             </div>
         );

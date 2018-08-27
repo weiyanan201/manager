@@ -22,6 +22,11 @@ const Panel = Collapse.Panel;
 
 const tableColumns = {
     "HIVE":[{
+        title:'序号',
+        key:'key',
+        render:(text,row,index)=>index+1,
+        width:'80px'
+    },{
         title: 'name',
         dataIndex: 'name',
         editable: true,
@@ -50,9 +55,15 @@ const tableColumns = {
         columnType:'checkbox',
         required:false,
         render: (text) => <Checkbox checked={text===true} />,
-        width:'300px'
+        width:'200px'
     },],
     "PHOENIX":[
+        {
+            title:'序号',
+            key:'key',
+            render:(text,row,index)=>index+1,
+            width:'80px'
+        },
         {
             title: 'name',
             dataIndex: 'name',
@@ -92,6 +103,12 @@ const tableColumns = {
         }
     ],
     "ES":[
+        {
+            title:'序号',
+            key:'key',
+            render:(text,row,index)=>index+1,
+            width:'100px'
+        },
         {
             title: 'name',
             dataIndex: 'name',
@@ -529,7 +546,14 @@ class CreateTable extends React.Component{
                     </Form>
                 </Card>
                 <Card title={"字段详情"} >
-                    <EditableTable storageType={this.state.storageType} handleModifyColumn={this.handleModifyColumn} tableColumns={tableColumns[this.state.storageType]} dataSource={this.state.columns} keyCount={this.state.keyCount}/>
+                    <EditableTable storageType={this.state.storageType}
+                                   handleModifyColumn={this.handleModifyColumn}
+                                   tableColumns={tableColumns[this.state.storageType]}
+                                   dataSource={this.state.columns}
+                                   keyCount={this.state.keyCount}
+                                   scroll={{ y: 500 }}
+                                   pagination = {false}
+                    />
                 </Card>
                     <div style={{textAlign: 'right'}}>
                         {

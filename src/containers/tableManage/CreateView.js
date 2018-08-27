@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { connect } from 'react-redux';
-import {Button , Card,Spin,Table,Cascader,Form,Input,Select,Row,message,Modal,Collapse,Checkbox } from 'antd';
+import {Button ,Card,Form,Input,Select,Row,message,Modal } from 'antd';
 
 import GroupSelect  from '../../components/groupSelect/GroupSelect';
 import TableSelect from '../../components/TableSelect';
@@ -15,11 +14,16 @@ import util from '../../util/util';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
-const Panel = Collapse.Panel;
-
 const TextArea  = Input.TextArea;
 
-const tableColunms = [{
+const tableColunms = [
+    {
+        title:'序号',
+        key:'key',
+        render:(text,row,index)=>index+1,
+        width:'80px'
+    },
+    {
     title: '字段名称',
     dataIndex: 'name',
     editable: true,
@@ -186,6 +190,9 @@ class CreateView extends React.Component{
     handleSelectTemplate = (key)=>{
         if (!util.isEmpty(key)){
             let tableId = key;
+            this.props.form.setFieldsValue({
+                template:key
+            });
             this.setState({
                 tableId:tableId
             });
@@ -196,7 +203,6 @@ class CreateView extends React.Component{
                     let columns = [];
                     let count = 1;
                     rdata.columns.map(item=>{
-                        console.log(item);
                         item.type = tableUtil.fieldTypeDeser(item.type);
                         item.key = count;
                         count++;
@@ -222,7 +228,6 @@ class CreateView extends React.Component{
 
     render(){
         const { getFieldDecorator } = this.props.form;
-        const tableSelect = <TableSelect handleSelect={this.handleSelectTemplate} storageType='HIVE'/>;
         return (
             <div>
                 <Card title={"视图信息"}>
@@ -266,8 +271,7 @@ class CreateView extends React.Component{
                                     }],
                                     initialValue:this.state.storageType
                                 })(
-                                    <Select style={{ width: 150 }} value={this.state.storageType} onChange={this.handleSelectStorageType} disabled >
-                                        {tableUtil.getStorageType().map((item)=><Option value={item} key={item}>{item}</Option>)}
+                                    <Select style={{ width: 150 }} value={this.state.storageType}  disabled >
                                     </Select>
                                 )}
                             </FormItem>
@@ -286,11 +290,11 @@ class CreateView extends React.Component{
 
                             {/*选取模板表*/}
                             <FormItem label="模板表">
-                                {getFieldDecorator('template', {
+                                {getFieldDecorator('template',{
                                     rules: [{
-                                        required: true,
-                                        message: '请选择源表',
-                                    }],
+                                    required: true,
+                                    message: '请选择源表',
+                                }],
                                 })(
                                     <TableSelect handleSelect={this.handleSelectTemplate} storageType='HIVE'/>
                                 )}
@@ -319,7 +323,14 @@ class CreateView extends React.Component{
                 </Card>
 
                 <Card title={"字段详情"}>
-                    <EditableTable storageType={this.state.storageType} handleModifyColumn={this.handleModifyColumn} tableColumns={tableColunms} dataSource={this.state.columns} keyCount={this.state.keyCount}/>
+                    <EditableTable storageType={this.state.storageType}
+                                   handleModifyColumn={this.handleModifyColumn}
+                                   tableColumns={tableColunms}
+                                   dataSource={this.state.columns}
+                                   keyCount={this.state.keyCount}
+                                   scroll={{ y: 500 }}
+                                   pagination = {false}
+                    />
                 </Card>
                 <div style={{textAlign: 'right'}}>
                     {

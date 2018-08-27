@@ -3,17 +3,14 @@ import { connect } from 'react-redux';
 import { Table, Pagination,Input } from 'antd';
 import { Route } from 'react-router-dom';
 import NavLink from '../../components/NavLink/NavLink';
-
 import util from '../../util/util';
-
 import {getTableList,getShowTablePage} from "../../reducers/table.redux";
 import { pushBread } from "../../reducers/bread.redux";
-
-import style from './table.less'
 import tableUtil from "../../util/tableUtil";
 
-const Search = Input.Search;
+import style from './table.less'
 
+const Search = Input.Search;
 
 @connect(
     state => {return {table:state.table}},
@@ -73,6 +70,14 @@ export default class TableList extends Component {
         }
     }
 
+    //搜索框为空时自动刷新
+    handleChangeText(value) {
+        this.handleSearch(value);
+        this.setState({
+            textValue:value
+        });
+    }
+
     handleChange(page, pageSize){
         this.props.getShowTablePage(page,pageSize,this.state.searchText);
     }
@@ -101,6 +106,7 @@ export default class TableList extends Component {
                     onSearch={value => this.handleSearch(value)}
                     enterButton
                     style={{ width: 200 }}
+                    onChange={(e)=>{this.handleChangeText(e.target.value)}}
                 />
                 <Table
                     bordered

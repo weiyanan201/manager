@@ -70,7 +70,6 @@ export default class GroupList extends Component {
 
     //初始化状态
     componentDidMount(){
-        console.log("componentDidMount",this.state.current);
         this.props.getShowGroup(1,10,"");
         this.setState({
             searchText:'',

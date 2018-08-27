@@ -91,27 +91,6 @@ const tableColumns = {
     "":[]
 };
 
-const columns = [
-
-    {
-        title:'序号',
-        key:'key',
-        render:(text,row,index)=>index+1
-    },
-    {
-        title:'name',
-        dataIndex:'name'
-    },
-    {
-        title: 'type',
-        dataIndex: 'type'
-    },
-    {
-        title: 'comment',
-        dataIndex: 'comment'
-    },
-
-];
 
 const formItemLayout = {
     labelCol:{span:5},
@@ -164,12 +143,14 @@ export default class TableInfo extends Component {
                 const dataSource = [];
                 const existed = [];
                 let index = 0;
-                tableInfo.columns.map(item=>{
-                    item.key = index;
-                    index++;
-                    dataSource.push(item);
-                    existed.push(item.name);
-                });
+                if(tableInfo.columns){
+                    tableInfo.columns.map(item=>{
+                        item.key = index;
+                        index++;
+                        dataSource.push(item);
+                        existed.push(item.name);
+                    });
+                }
                 if (tableInfo.keys){
                     if (tableInfo.storageType==='HIVE'){
                         tableInfo.keys.map(item=>{
@@ -224,7 +205,7 @@ export default class TableInfo extends Component {
             editColumn = false;
         }
         this.setState({columnEditVisible:true,columnModalTitle:title,editColumn})
-    }
+    };
 
     //修改表属性提交
     handleInfoSubmit = ()=>{
@@ -384,11 +365,11 @@ export default class TableInfo extends Component {
                 const existed = this.state.existed;
                 columns.forEach(item=>{
                     existed.push(item.name);
-                })
+                });
                 this.setState({existed,columnEditVisible:false})
             })
 
-    }
+    };
 
     render(){
 
