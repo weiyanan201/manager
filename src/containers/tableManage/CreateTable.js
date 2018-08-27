@@ -158,7 +158,6 @@ class CreateTable extends React.Component{
             advancedKey:[],
             replicas:1,
             shards:5,
-            createAgain:false
         };
     }
 
@@ -278,7 +277,7 @@ class CreateTable extends React.Component{
     //提交建表请求
     handleSubmit=()=>{
         let errorMessage = [];
-        const {groupId,storageType,comment,tableName,db,columns} = this.state;
+        const {columns} = this.state;
 
         this.props.form.validateFields((err, values) => {
             if (!err) {
@@ -330,7 +329,7 @@ class CreateTable extends React.Component{
                                         break;
                                 }
                             }
-                        })
+                        });
                         if (blankRows){
                             //验证失败
                             switch (this.state.storageType) {
@@ -366,9 +365,27 @@ class CreateTable extends React.Component{
                 result.then(()=>{
                     this.setState({
                         loading:false,
-                        createAgain:true
                     });
                     message.success("创建成功!");
+                    this.props.form.resetFields();
+                    this.setState({
+                        tableName:'',
+                        comment:'',
+                        groupId:'',
+                        storageType:'HIVE',
+                        storageFormat:'ORC',
+                        separator:'\\t',
+                        separatorHidden:true,
+                        db:'',
+                        dbName:'',
+                        columns:[],
+                        keyCount:0,
+                        loading : false,
+                        advancedKey:[],
+                        replicas:1,
+                        shards:5,
+                        createAgain:false
+                    });
                 }).catch(()=>{
                     this.setState({
                         loading:false
@@ -376,28 +393,6 @@ class CreateTable extends React.Component{
                 })
             }
         });
-    };
-
-    handleCreateMore=()=>{
-        this.props.form.resetFields();
-        this.setState({
-            tableName:'',
-            comment:'',
-            groupId:'',
-            storageType:'HIVE',
-            storageFormat:'ORC',
-            separator:'\\t',
-            separatorHidden:true,
-            db:'',
-            dbName:'',
-            columns:[],
-            keyCount:0,
-            loading : false,
-            advancedKey:[],
-            replicas:1,
-            shards:5,
-            createAgain:false
-        })
     };
 
     //传入可编辑表的回调函数
@@ -556,11 +551,7 @@ class CreateTable extends React.Component{
                     />
                 </Card>
                     <div style={{textAlign: 'right'}}>
-                        {
-                            this.state.createAgain?
-                                <Button type={"primary"} onClick={this.handleCreateMore} >再来一张</Button>
-                                :<Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
-                        }
+                           <Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
                     </div>
                 </Spin>
             </div>

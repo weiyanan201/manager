@@ -6,6 +6,11 @@ import host from '../../config/host';
 
 const baseUrl = host;
 
+axios.interceptors.request.use((config) => {
+    config.headers['X-Requested-With'] = 'XMLHttpRequest';
+    return config
+})
+
 // axios.interceptors.request.use(function (config) {
 //     console.log("axios.interceptors.request.use");
 // });
@@ -35,10 +40,22 @@ function packPromise(options){
             }
         }).catch((error) => {
             console.error(error);
-            Modal.error({
-                title: "错误提示",
-                content: "系统异常，请联系管理员"
-            });
+            const response = error.response;
+            if (response && response.status===401){
+                const location = response.headers['location'];
+                if (location){
+                    window.location = location;
+                }
+                // Modal.error({
+                //     title: "错误提示",
+                //     content: "会话失效，请重新登录",
+                // });
+            }else{
+                Modal.error({
+                    title: "错误提示",
+                    content: "系统异常，请联系管理员"
+                });
+            }
             reject(error);
         })
     });

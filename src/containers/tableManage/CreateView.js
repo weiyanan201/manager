@@ -31,7 +31,7 @@ const tableColunms = [
     required:true
 }, {
     title: '别名',
-    dataIndex: 'expression',
+    dataIndex: 'alias',
     editable: true,
     columnType:'input',
     required:false,
@@ -65,7 +65,6 @@ class CreateView extends React.Component{
             keyCount:0,
             condition:'',
             tableId:'',
-            createAgain:false
         };
     }
 
@@ -157,9 +156,20 @@ class CreateView extends React.Component{
                 result.then(()=>{
                     this.setState({
                         loading:false,
-                        createAgain:true
                     });
-                    message.success("创建成功!")
+                    message.success("创建成功!");
+                    this.props.form.resetFields();
+                    this.setState({
+                        tableName:'',
+                        comment:'',
+                        storageType:'HIVE',
+                        groupId:'',
+                        columns:[],
+                        keyCount:0,
+                        condition:'',
+                        tableId:'',
+                        createAgain:false
+                    })
                 }).catch(()=>{
                     this.setState({
                         loading:false
@@ -168,21 +178,6 @@ class CreateView extends React.Component{
             }
         });
     };
-
-    handleCreateMore=()=>{
-        this.props.form.resetFields();
-        this.setState({
-            tableName:'',
-            comment:'',
-            storageType:'HIVE',
-            groupId:'',
-            columns:[],
-            keyCount:0,
-            condition:'',
-            tableId:'',
-            createAgain:false
-        })
-    }
 
     /**
      * 选取模板表
@@ -333,11 +328,7 @@ class CreateView extends React.Component{
                     />
                 </Card>
                 <div style={{textAlign: 'right'}}>
-                    {
-                        this.state.createAgain?
-                            <Button type={"primary"} onClick={this.handleCreateMore} >再来一张</Button>
-                            :<Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
-                    }
+                    <Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
                 </div>
 
             </div>
