@@ -25,7 +25,7 @@ const columns = [
         dataIndex: 'permissions',
         align: 'center',
         render:(permissions)=>{
-             if (permissions===undefined){
+             if (permissions===null || permissions===undefined || permissions.length===0){
                  return "-";
              }else if(permissions.includes(GROUP_PERMISSION.MODIFY_BUSINESS_SCHEMA) || permissions.includes(GROUP_PERMISSION.WRITE_BUSINESS_SCHEMA)){
                  return "开发者";

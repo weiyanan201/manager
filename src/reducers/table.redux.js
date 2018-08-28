@@ -62,6 +62,7 @@ export function table(state = tableInitState, action) {
     switch (action.type) {
         case GET_TABLE_LIST :
             let ds = action.payload.data.data;
+            ds.sort((a,b)=>b.updateTime-a.updateTime);
             return {
                 ...state,
                 allTable: ds,
