@@ -11,6 +11,7 @@ import config from '../../util/config';
 import axios from '../../util/axios';
 import util from '../../util/util';
 
+import style from './table.less';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
@@ -18,39 +19,44 @@ const TextArea  = Input.TextArea;
 
 const tableColunms = [
     {
-        title:'序号',
-        key:'key',
-        render:(text,row,index)=>index+1,
-        width:'80px'
+        title: '序号',
+        key: 'key',
+        align: 'center',
+        render: (text, row, index) => index + 1,
+        width: '80px'
     },
     {
-    title: '字段名称',
-    dataIndex: 'name',
-    editable: true,
-    columnType:'input',
-    required:true
-}, {
-    title: '别名',
-    dataIndex: 'alias',
-    editable: true,
-    columnType:'input',
-    required:false,
-}, {
-    title: '类型',
-    dataIndex: 'type',
-    editable: true,
-    columnType:'fieldType',
-    storageType:"HIVE",
-    required:true,
-    render: (text) => tableUtil.fieldTypeRender(text)
-}, {
-    title: '注释',
-    dataIndex: 'comment',
-    editable: true,
-    columnType:'input',
-    required:true,
-    width: '500px',
-},]
+        title: '字段名称',
+        dataIndex: 'name',
+        editable: true,
+        columnType: 'input',
+        required: true,
+        align: 'center',
+    }, {
+        title: '别名',
+        dataIndex: 'alias',
+        editable: true,
+        columnType: 'input',
+        required: false,
+        align: 'center',
+    }, {
+        title: '类型',
+        dataIndex: 'type',
+        editable: true,
+        columnType: 'fieldType',
+        storageType: "HIVE",
+        required: true,
+        render: (text) => tableUtil.fieldTypeRender(text),
+        align: 'center',
+    }, {
+        title: '注释',
+        dataIndex: 'comment',
+        editable: true,
+        columnType: 'input',
+        required: true,
+        width: '500px',
+        align: 'center',
+    },]
 
 class CreateView extends React.Component{
 
@@ -317,7 +323,7 @@ class CreateView extends React.Component{
                     </Form>
                 </Card>
 
-                <Card title={"字段详情"}>
+                <Card title={"字段详情"} className={style["roll-table"]}>
                     <EditableTable storageType={this.state.storageType}
                                    handleModifyColumn={this.handleModifyColumn}
                                    tableColumns={tableColunms}

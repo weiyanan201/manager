@@ -196,8 +196,8 @@ export default class EditableTable extends React.Component {
             }
             return {
                 //默认样式
-                align:'center',
-                width:'300px',
+                align:'right',
+                width:'200px',
                 ...col,
                 onCell: record => ({
                     record,
@@ -212,6 +212,7 @@ export default class EditableTable extends React.Component {
         }).concat(
             [{
                 title: '操作',
+                align:'center',
                 dataIndex: 'operation',
                 render: (text, record) => {
                     const editable = this.isEditing(record);
@@ -257,10 +258,10 @@ export default class EditableTable extends React.Component {
         return (
             <div>
                 <div style={{textAlign: 'right'}}>
-                    <Button onClick={this.handleAdd} type="primary" style={{ marginBottom: 16 }}>
+                    <Button onClick={this.handleAdd} type="primary" >
                         添加字段
                     </Button>
-                    <Button onClick={this.handleClear} type="danger" style={{ marginBottom: 16 }}>
+                    <Button onClick={this.handleClear} type="danger" >
                         清空字段
                     </Button>
                 </div>
@@ -269,7 +270,7 @@ export default class EditableTable extends React.Component {
                     bordered
                     dataSource={this.props.dataSource}
                     columns={columns}
-                    rowClassName={style["editable-row"]}
+                    // rowClassName={style["editable-row"]}
                     onRow={(record, index) => {
                         return {
 

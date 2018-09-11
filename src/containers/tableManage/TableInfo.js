@@ -9,6 +9,8 @@ import tableUtil from "../../util/tableUtil";
 import util from "../../util/util";
 import { pushBread} from "../../reducers/bread.redux";
 
+import style from './table.less';
+
 const FormItem = Form.Item;
 const TextArea = Input.TextArea;
 
@@ -17,54 +19,64 @@ const tableColumns = {
         title:'序号',
         key:'key',
         render:(text,row,index)=>index+1,
-        width:85
+        width:85,
+        align:'center',
     },{
         title: '字段名',
         dataIndex: 'name',
-        width:290
+        width:290,
+        align:'center',
     }, {
         title: '类型',
         dataIndex: 'type',
         width:300,
+        align:'center',
     }, {
         title: '注释',
         dataIndex: 'comment',
         width: 300,
+        align:'center',
     }, {
         title: '分区字段',
         dataIndex: 'isPartition',
         render: (text) => <Checkbox checked={text===true} />,
-        width:300
+        align:'center',
     },],
     "PHOENIX":[
         {
             title:'序号',
             key:'key',
             render:(text,row,index)=>index+1,
-            width:'100px'
+            width:'100px',
+            align:'center',
         },
         {
             title: 'name',
             dataIndex: 'name',
-            width:'300px'
+            width:'300px',
+            align:'center',
         }, {
             title: '类型',
             dataIndex: 'type',
-            width:'300px'
+            width:'300px',
+            align:'center',
         }, {
             title: '注释',
             dataIndex: 'comment',
-            width:'300px'
+            width:'300px',
+            align:'center',
         },{
             title:"主键",
             dataIndex: 'primaryKey',
             render: (text) => <Checkbox checked={text===true} />,
-            width:'200px'
+            width:'200px',
+            align:'center',
         }, {
             title: '可为空',
             dataIndex: 'nullable',
             render: (text) => <Checkbox checked={text===true} />,
-            width:'200px'
+            width:'200px',
+            align:'center',
         }
     ],
     "ES":[
@@ -72,20 +84,24 @@ const tableColumns = {
             title:'序号',
             key:'key',
             render:(text,row,index)=>index+1,
-            width:'100px'
+            width:'100px',
+            align:'center',
         },
         {
             title: 'name',
             dataIndex: 'name',
-            width:'300px'
+            width:'300px',
+            align:'center',
         }, {
             title: '类型',
             dataIndex: 'type',
-            width:'300px'
+            width:'300px',
+            align:'center',
         }, {
             title: '注释',
             dataIndex: 'comment',
-            width:'500px'
+            width:'500px',
+            align:'center',
         },
     ],
     "":[]
@@ -412,7 +428,8 @@ export default class TableInfo extends Component {
                     </Form>
                 </Card>
 
-                <Card title="表字段" style={{marginTop:10}}>
+                {/*className={style["roll-table"]}*/}
+                <Card title="表字段" style={{marginTop:10}} className={style["roll-table"]}>
                     <div style={{textAlign: 'right'}}>
                         {
                             this.state.modifyPermission?

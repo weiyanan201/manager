@@ -20,12 +20,9 @@ export default class TableList extends Component {
 
     constructor(props) {
         super(props);
-        let groupId = this.props.match.params.groupId;
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeSize = this.handleChangeSize.bind(this);
-        if (this.props.table.groupId!==groupId){
-            this.props.getTableList({groupId:groupId});
-        }
+        let groupId = this.props.match.params.groupId;
         this.state={
             searchText:'',
             pageSize:10,
@@ -33,41 +30,69 @@ export default class TableList extends Component {
                 {
                     title: 'id',
                     dataIndex: 'id',
+                    align:'center',
+                    width: '100px',
                 }, {
-                    title: 'name',
+                    title: '表名',
                     dataIndex: 'name',
+                    align:'center',
+                    width: '200px',
                 }, {
-                    title: 'db',
-                    dataIndex: "db"
+                    title: '数据库',
+                    dataIndex: "db",
+                    align:'center',
+                    width: '150px',
                 },{
-                    title: 'storageType',
-                    dataIndex: "storageType"
+                    title: '存储介质',
+                    dataIndex: "storageType",
+                    align:'center',
+                    width: '150px',
                 },{
-                    title: 'physicalType',
-                    dataIndex: "physicalType"
+                    title: '类型',
+                    dataIndex: "physicalType",
+                    align:'center',
+                    width: '100px',
                 },{
-                    title: 'produceType',
-                    dataIndex: "produceType"
+                    title: '业务类型',
+                    dataIndex: "produceType",
+                    align:'center',
+                    width: '120px',
                 },{
-                    title: 'comment',
-                    dataIndex: "comment"
+                    title: '注释',
+                    dataIndex: "comment",
+                    align:'center',
+                    width: '300px',
                 },{
-                    title: 'createTime',
+                    title: '创建时间',
                     dataIndex: "createTime",
-                    render: createTime=>util.formatDate(createTime)
+                    render: createTime=>util.formatDate(createTime),
+                    align:'center',
+                    width: '160px',
                 },{
-                    title: 'updateTime',
+                    title: '更新时间',
                     dataIndex: "updateTime",
-                    render:updateTime=>util.formatDate(updateTime)
+                    render:updateTime=>util.formatDate(updateTime),
+                    align:'center',
+                    width: '160px',
                 },{
-                    title: 'permissions',
+                    title: '权限',
                     dataIndex: "permissions",
-                    render:permissions=>tableUtil.getTablePermission(permissions)
+                    render:permissions=>tableUtil.getTablePermission(permissions),
+                    align:'center',
+                    width: '80px',
                 }, {
-                    render: (item) => <NavLink target={`/table/groups/${groupId}/${item.id}`} linkText={"详情"} />  //跳转页面  rout
+                    title: '详情',
+                    align:'center',
+                    render: (item) => <NavLink target={`/table/groups/${groupId}/${item.id}`} linkText={"详情"} />,  //跳转页面  rout
                 },
             ]
         }
+    }
+
+    componentDidMount(){
+        let groupId = this.props.match.params.groupId;
+        this.props.getTableList({groupId:groupId});
+        
     }
 
     //搜索框为空时自动刷新
@@ -108,16 +133,19 @@ export default class TableList extends Component {
                     style={{ width: 200 }}
                     onChange={(e)=>{this.handleChangeText(e.target.value)}}
                 />
-                <Table
-                    bordered
-                    columns={this.state.columns}
-                    dataSource={this.props.table.data}
-                    rowKey="tableId"
-                    // pagination={this.props.total}ConsumerManage
-                    pagination = {false}
-                    onRowDoubleClick = {this.handleDclick}
-                    loading={this.props.table.tableLoading}
-                />
+                <div className={style["roll-table"]}>
+                    <Table
+                        bordered
+                        columns={this.state.columns}
+                        dataSource={this.props.table.data}
+                        rowKey="tableId"
+                        // pagination={this.props.total}ConsumerManage
+                        pagination = {false}
+                        onRowDoubleClick = {this.handleDclick}
+                        loading={this.props.table.tableLoading}
+                        scroll={{ y: 600 }}
+                    />
+                </div>
                 <Pagination  total={this.props.table.total} showSizeChanger showQuickJumper
                              onChange = {(page, pageSize)=>{this.handleChange(page, pageSize)}}
                              onShowSizeChange = {(current, size)=>{this.handleChangeSize(current, size)}}

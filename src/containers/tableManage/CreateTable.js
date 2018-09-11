@@ -24,6 +24,7 @@ const tableColumns = {
     "HIVE":[{
         title:'序号',
         key:'key',
+        align:'center',
         render:(text,row,index)=>index+1,
         width:'80px'
     },{
@@ -31,7 +32,8 @@ const tableColumns = {
         dataIndex: 'name',
         editable: true,
         columnType:'input',
-        required:true
+        required:true,
+        align:'center',
     }, {
         title: '类型',
         dataIndex: 'type',
@@ -41,6 +43,7 @@ const tableColumns = {
         required:true,
         render: (text) => tableUtil.fieldTypeRender(text),
         width:'300px',
+        align:'center',
     }, {
         title: '注释',
         dataIndex: 'comment',
@@ -48,6 +51,7 @@ const tableColumns = {
         columnType:'input',
         required:true,
         width: '500px',
+        align:'center',
     }, {
         title: '分区字段',
         dataIndex: 'isPartition',
@@ -55,21 +59,25 @@ const tableColumns = {
         columnType:'checkbox',
         required:false,
         render: (text) => <Checkbox checked={text===true} />,
-        width:'200px'
+        width:'200px',
+        align:'center',
+
     },],
     "PHOENIX":[
         {
             title:'序号',
+            align:'center',
             key:'key',
             render:(text,row,index)=>index+1,
-            width:'80px'
+            width:'80px',
         },
         {
             title: 'name',
             dataIndex: 'name',
             editable: true,
             columnType:'input',
-            required:true
+            required:true,
+            align:'center',
         }, {
             title: '类型',
             dataIndex: 'type',
@@ -77,13 +85,15 @@ const tableColumns = {
             columnType:'fieldType',
             storageType:"PHOENIX",
             required:true,
-            render: (text) => tableUtil.fieldTypeRender(text)
+            render: (text) => tableUtil.fieldTypeRender(text),
+            align:'center',
         }, {
             title: '注释',
             dataIndex: 'comment',
             editable: true,
             columnType:'input',
             required:true,
+            align:'center',
         },{
             title:"主键",
             dataIndex: 'primaryKey',
@@ -91,7 +101,8 @@ const tableColumns = {
             columnType:'checkbox',
             required:false,
             render: (text) => <Checkbox checked={text===true} />,
-            width:'200px'
+            width:'200px',
+            align:'center',
         }, {
             title: '可为空',
             dataIndex: 'beNull',
@@ -99,15 +110,17 @@ const tableColumns = {
             columnType:'checkbox',
             required:false,
             render: (text) => <Checkbox checked={text===true} />,
-            width:'200px'
+            width:'200px',
+            align:'center',
         }
     ],
     "ES":[
         {
             title:'序号',
             key:'key',
+            align:'center',
             render:(text,row,index)=>index+1,
-            width:'100px'
+            width:'100px',
         },
         {
             title: 'name',
@@ -115,6 +128,7 @@ const tableColumns = {
             editable: true,
             columnType:'input',
             required:true,
+            align:'center',
         }, {
             title: '类型',
             dataIndex: 'type',
@@ -122,14 +136,16 @@ const tableColumns = {
             columnType:'fieldType',
             storageType:"ES",
             required:true,
-            render: (text) => tableUtil.fieldTypeRender(text)
+            render: (text) => tableUtil.fieldTypeRender(text),
+            align:'center',
         }, {
             title: '注释',
             dataIndex: 'comment',
             editable: true,
             columnType:'input',
             required:true,
-            width:'500px'
+            width:'500px',
+            align:'center',
         },
     ],
     "":[]
@@ -540,7 +556,7 @@ class CreateTable extends React.Component{
                         </Row>
                     </Form>
                 </Card>
-                <Card title={"字段详情"} >
+                <Card title={"字段详情"} className={style["roll-table"]}>
                     <EditableTable storageType={this.state.storageType}
                                    handleModifyColumn={this.handleModifyColumn}
                                    tableColumns={tableColumns[this.state.storageType]}
