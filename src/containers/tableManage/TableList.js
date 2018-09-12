@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Table, Pagination,Input } from 'antd';
+import { Table, Pagination,Input, Icon } from 'antd';
 import { Route } from 'react-router-dom';
 import NavLink from '../../components/NavLink/NavLink';
 import util from '../../util/util';
@@ -75,7 +75,7 @@ export default class TableList extends Component {
                     align:'center',
                     width: '160px',
                 },{
-                    title: '权限',
+                    title: "权限",
                     dataIndex: "permissions",
                     render:permissions=>tableUtil.getTablePermission(permissions),
                     align:'center',

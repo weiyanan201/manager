@@ -5,7 +5,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import {Button , Card,Spin,Form,Input,Select,Row,message,Modal,Collapse,Checkbox } from 'antd';
+import {Button , Card,Spin,Form,Input,Select,Row,message,Modal,Collapse,Checkbox, Icon} from 'antd';
 import GroupSelect  from '../../components/groupSelect/GroupSelect';
 import EditableTable from '../../components/BaseTable/EditableTable';
 import TableSelect from '../../components/TableSelect';
@@ -53,7 +53,7 @@ const tableColumns = {
         width: '500px',
         align:'center',
     }, {
-        title: '分区字段',
+        title: <div>分区字段<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
         dataIndex: 'isPartition',
         editable: true,
         columnType:'checkbox',
@@ -95,7 +95,7 @@ const tableColumns = {
             required:true,
             align:'center',
         },{
-            title:"主键",
+            title:<div>主键<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
             dataIndex: 'primaryKey',
             editable: true,
             columnType:'checkbox',
