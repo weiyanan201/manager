@@ -40,7 +40,7 @@ class MainHeader extends React.Component {
                                 </span>
                             }
                         >
-                            <Menu.Item key="logout" onClick={this.handleLogout} >
+                            <Menu.Item key="logout" onClick={this.handleLogout} style={{textAlign:"center"}}>
                                 退出
                             </Menu.Item>
                         </SubMenu>

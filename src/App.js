@@ -7,8 +7,6 @@ import { Provider } from 'react-redux';
 import { createStore , compose , applyMiddleware} from 'redux';
 import thunk from 'redux-thunk'
 
-import AuthRoute from './components/AuthRoute/AuthRoute';
-
 import reducers from './reducers'
 
 const store = createStore(
