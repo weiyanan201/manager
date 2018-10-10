@@ -521,6 +521,7 @@ export default class TableInfo extends Component {
                                     columnInfo={this.state.editColumn ? (this.state.rows.length > 0 ? this.state.rows[0] : null) : null}
                                     fieldTypes={this.props.config.fieldTypes}
                                     storageType={this.state.storageType}
+                                    isEdit={this.state.editColumn}
                         />
                     </Modal>
                 </Spin>
@@ -638,6 +639,7 @@ class CloumnForm extends React.Component {
                                 options={tableUtil.getFieldType(this.props.fieldTypes, this.props.storageType)}
                                 placeholder="请选择类型"
                                 expandTrigger={"hover"}
+                                disabled={this.props.isEdit}
                             />
                         )
                     }
