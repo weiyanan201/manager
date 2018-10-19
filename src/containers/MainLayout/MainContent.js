@@ -12,10 +12,16 @@ import GroupList from '../tableManage/GroupList';
 import TableList from '../tableManage/TableList';
 import TableInfo from '../tableManage/TableInfo';
 import AddTable from '../tableManage/AddTable';
+import UserList from '../../containers/userManage/list';
+import UserGroupPermission from '../../containers/userManage/groupPermission'
+import OutService from '../../containers/userManage/outService'
+import GroupManage from '../../containers/groupManage/list'
+import AppManage from '../../containers/appManage/list'
 
 import NotPage from '../NotPage';
 
 import style from './layout.less';
+import PermissionTransfer from "../userManage/groupPermission/component/permissonTransfer";
 
 const { Content } = Layout;
 
@@ -35,7 +41,12 @@ class MainContent extends React.Component{
                         <Route path="/table/groups/:groupId" exact component={TableList}/>
                         <Route path="/table/groups/:groupId/:tableId" exact component={TableInfo}/>
                         <Route path="/table/addTable" exact component={AddTable}/>
-                        <Route component={NotPage} />
+                        <Route path="/user/list" exact component={UserList}/>
+                        <Route path="/user/list/:tenantId" exact component={UserGroupPermission}/>
+                        <Route path="/user/outService" exact component={OutService}/>
+                        <Route path="/group/list" exact component={GroupManage}/>AppManage
+                         <Route path="/app/list" exact component={AppManage}/>
+                        <Route component={PermissionTransfer} />
                         </Switch>
                     </div>
                 </Content>

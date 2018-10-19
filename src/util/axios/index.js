@@ -3,6 +3,7 @@ import axios from 'axios';
 import qs from 'qs';
 
 import host from '../../config/host';
+import util from "../util";
 
 const baseUrl = host;
 
@@ -51,9 +52,15 @@ function packPromise(options){
                 //     content: "会话失效，请重新登录",
                 // });
             }else{
+                let errorMsg = "系统异常，请联系管理员";
+                if (!util.isEmpty(response.data.msg)){
+                    errorMsg = `msg : ${response.data.msg} ;
+                    status : ${response.data.status}
+                    `;
+                }
                 Modal.error({
                     title: "错误提示",
-                    content: "系统异常，请联系管理员"
+                    content: errorMsg
                 });
             }
             reject(error);
