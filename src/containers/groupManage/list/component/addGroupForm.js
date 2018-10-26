@@ -31,7 +31,6 @@ class AddGroupForm extends Component {
             },
         };
 
-        console.log(this.props);
         return (
 
             <Spin spinning={this.state.loading}>

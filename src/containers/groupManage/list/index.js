@@ -8,7 +8,6 @@ import util from "../../../util/util";
 import axios from "../../../util/axios";
 
 import AddGroupForm from './component/addGroupForm';
-import {TenantType} from "../../../config";
 
 const Search = Input.Search;
 const confirm = Modal.confirm;
