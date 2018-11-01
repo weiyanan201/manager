@@ -82,6 +82,22 @@ const menus=[
         "route": "/app/list",
         "bread": "App信息",
         "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+    },{
+        "id": 15,
+        "pid": -1,
+        "icon": "user",
+        "name": "数据库信息",
+        "route": "/db/list",
+        "bread": "数据库信息",
+        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+    },{
+        "id": 16,
+        "pid": -1,
+        "icon": "user",
+        "name": "手游类型管理",
+        "route": "/mobileGame/list",
+        "bread": "手游类型管理",
+        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
     }
 
 ];

@@ -88,10 +88,10 @@ class GroupList extends Component{
                     data,dataBack,appData,globalLoading:false
                 })
             }).catch(()=>{
-            this.setState({
-                globalLoading:false
-            });
-        })
+                this.setState({
+                    globalLoading:false
+                });
+            })
     };
 
     handleFilterSearch = (value)=> {
@@ -148,11 +148,11 @@ class GroupList extends Component{
                     });
                     message.success("创建成功!");
                 }).catch(()=>{
-                this.setState({
-                    modalVisible:false,
-                    addLoading:false,
-                    globalLoading:false
-                })
+                    this.setState({
+                        modalVisible:false,
+                        addLoading:false,
+                        globalLoading:false
+                    })
             });
         });
     };

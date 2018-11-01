@@ -112,6 +112,12 @@ const formItemLayout = {
 }
 
 
+/**
+ * 两个页面公用一个
+ * 1. /table/groups/:groupId/:tableId
+ * 2. /db/list/:databaseId
+ */
+
 @connect(
     state => {
         return {config: state.config, auth: state.auth}
@@ -122,8 +128,48 @@ export default class TableInfo extends Component {
 
     constructor(props) {
         super(props);
-        let groupId = this.props.match.params.groupId;
+        let processObject ;
+        const isGroup = this.props.match.params.hasOwnProperty("groupId");
         let tableId = this.props.match.params.tableId;
+        let _this = this;
+        if (isGroup){
+            let groupId = this.props.match.params.groupId;
+            processObject = {
+                url : '/table/getTableInfo',
+                formData : {tableId,groupId},
+                handleBread : function (resData) {
+
+                    const tableInfo = resData.tableDetail;
+                    const groupName = resData.groupName;
+
+                    const breadUrl = "/table/groups/" + groupId;
+                    const breadObj = {[breadUrl]: groupName};
+                    _this.props.pushBread(breadObj);
+
+                    const tableBreadUrl = "/table/groups/" + groupId + "/" + tableId;
+                    const tableBreadUrlObj = {[tableBreadUrl]: tableInfo.name};
+                    _this.props.pushBread(tableBreadUrlObj);
+                }
+            };
+        } else{
+            let databaseId = this.props.match.params.databaseId;
+            processObject = {
+                url : '/db/getTableInfo',
+                formData : {tableId,databaseId},
+                handleBread: function (resData) {
+                    const databaseName = resData.databaseName;
+                    const tableInfo = resData.tableDetail;
+
+                    const breadUrl = "/db/list/" + databaseId;
+                    const breadObj = {[breadUrl]: databaseName};
+                    _this.props.pushBread(breadObj);
+
+                    const tableBreadUrl =  _this.props.match.url;
+                    const tableBreadUrlObj = {[tableBreadUrl]: tableInfo.name};
+                    _this.props.pushBread(tableBreadUrlObj);
+                }
+            };
+        }
 
         this.state = {
             tableId: tableId,
@@ -139,24 +185,16 @@ export default class TableInfo extends Component {
             columnModalTitle: '',
             editColumn: false,
             modifyPermission: false,
-            loading: false,
+            loading: true,
         };
 
         this.props.getFieldsType();
-        axios.get("/table/getTableInfo", {tableId, groupId})
+        axios.get(processObject.url, processObject.formData)
             .then(res => {
+                const resData = res.data.data;
+                processObject.handleBread(resData);
+                const modifyPermission = resData.modifyPermission;
                 const tableInfo = res.data.data.tableDetail;
-                const groupName = res.data.data.groupName;
-                const modifyPermission = res.data.data.modifyPermission;
-                const breadUrl = "/table/groups/" + groupId;
-                const breadObj = {[breadUrl]: groupName};
-                this.props.pushBread(breadObj);
-
-                const tableBreadUrl = "/table/groups/" + groupId + "/" + tableId;
-                const tableBreadUrlObj = {[tableBreadUrl]: tableInfo.name};
-                this.props.pushBread(tableBreadUrlObj);
-
-
                 const dataSource = [];
                 const existed = [];
                 let index = 0;
@@ -195,9 +233,15 @@ export default class TableInfo extends Component {
                     tableName: tableInfo.name,
                     db: tableInfo.db,
                     comment: tableInfo.comment,
-                    index
+                    index,
+                    loading: false,
                 })
-            });
+            })
+            .catch(res=>{
+                this.setState({
+                    loading: false,
+                })
+            })
     }
 
     //弹出字段编辑窗
@@ -407,7 +451,7 @@ export default class TableInfo extends Component {
 
         return (
             <div>
-                <Spin spinning={this.state.loading} tip={'执行中...'}>
+                <Spin spinning={this.state.loading} >
                     <Card title={"表属性"}>
                         <div style={{textAlign: 'right'}}>
                             {

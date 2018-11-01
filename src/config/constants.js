@@ -30,8 +30,27 @@ const GROUP_PERMISSION = {
 };
 
 
+const StorageType = {
+    HIVE:"HIVE",
+    HDFS:"HDFS",
+    PHOENIX:"PHOENIX",
+    HBASE:"HBASE",
+    ES:"ES",
+    CASSANDRA:"CASSANDRA",
+    MYSQL:"MYSQL",
+    REDIS:"REDIS"
+};
+
+const ProduceType = {
+    ODS : "ODS",
+    BUSINESS : "BUSINESS",
+    PRIVATE : "PRIVATE",
+    TEMP : "TEMP"
+};
+
 export {
     TenantType,
     GROUP_PERMISSION,
-
+    StorageType,
+    ProduceType,
 }

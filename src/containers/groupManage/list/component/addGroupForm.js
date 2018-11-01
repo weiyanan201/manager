@@ -9,14 +9,6 @@ const Option = Select.Option;
 
 class AddGroupForm extends Component {
 
-    constructor(props){
-        super(props);
-        this.state={
-            loading:false,
-            sourceDisabled:true,
-        };
-    }
-
     render(){
 
         const { getFieldDecorator } = this.props.form;
@@ -33,7 +25,6 @@ class AddGroupForm extends Component {
 
         return (
 
-            <Spin spinning={this.state.loading}>
                 <Form >
 
                     <FormItem
@@ -82,7 +73,6 @@ class AddGroupForm extends Component {
                     </FormItem>
 
                 </Form>
-            </Spin>
         )
     }
 }

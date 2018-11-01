@@ -3,11 +3,13 @@
  */
 
 import React , { Component } from 'react';
-import {Pagination, Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
+import {Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
 import util from "../../../util/util";
 import axios from '../../../util/axios';
-import {TenantType} from "../../../config";
 import AddOutServiceForm from './component/addOutServiceForm';
+
+import style from './style.less';
+
 const Search = Input.Search;
 const confirm = Modal.confirm;
 
@@ -52,6 +54,7 @@ class OutService extends Component{
             ],
             dataBack:[],
             data:[],
+            dbs:{},
             modalVisible:false,
             addLoading:false,
             globalLoading:false,
@@ -59,6 +62,7 @@ class OutService extends Component{
         this.modalToggle = this.modalToggle.bind(this);
         this.handleAddSubmit = this.handleAddSubmit.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.expandedRowRender = this.expandedRowRender.bind(this);
     }
 
     componentDidMount(){
@@ -67,10 +71,12 @@ class OutService extends Component{
         });
         axios.get("/outService/getList")
             .then(res=>{
-                const data = res.data.data;
+                const resData = res.data.data;
+                const data = resData.serviceInfos;
                 const dataBack = data.slice(0);
+                const dbs = resData.dbs;
                 this.setState({
-                    data,dataBack,globalLoading:false
+                    data,dataBack,dbs,globalLoading:false
                 })
             }).catch(()=>{
                 this.setState({
@@ -138,8 +144,6 @@ class OutService extends Component{
     };
 
     handleDelete = (name,id) => {
-        console.log(name,id);
-
         const _this = this;
         confirm({
             title: '删除确认',
@@ -179,8 +183,36 @@ class OutService extends Component{
 
     };
 
+    expandedRowRender = (record) => {
+        const ownerId = record.ownerId;
+        let hasKey ;
+        if (this.state.dbs.hasOwnProperty(ownerId)){
+            hasKey = true;
+        } else{
+            hasKey = false;
+        }
+        const columns = [
+            { title: 'id', dataIndex: 'id', key: 'id',align: 'center', },
+            { title: 'name', dataIndex: 'name', key: 'name',align: 'center', },
+            { title: 'storageType', dataIndex: 'storageType', key: 'storageType',align: 'center', },
+            { title: 'usage', dataIndex: 'usage', key: 'usage' ,align: 'center',},
+            { title: 'comment', dataIndex: 'comment', key: 'comment' ,align: 'center',},
+        ];
+
+        return (
+                hasKey?
+                    <div className={style.childTable}>
+                    <Table
+                    columns={columns}
+                    dataSource={this.state.dbs[ownerId]}
+                    pagination={false}
+                    bordered={true}
+                    /></div>:
+                null
+        );
+    };
+
     render(){
-        console.log(this.state.data);
         return(
             <div>
                 <Spin spinning={this.state.globalLoading}>
@@ -196,8 +228,11 @@ class OutService extends Component{
                         <Button type='primary'  onClick={()=>this.modalToggle(true)} style={{float:"right"}}>新建outService</Button>
                     </div>
 
-                    <div >
-                        <Table columns={this.state.columns} dataSource={this.state.data}  bordered/>
+                    <div className={style["components-table-demo-nested"]}>
+                        <Table columns={this.state.columns}
+                               dataSource={this.state.data}
+                               expandedRowRender={this.expandedRowRender}
+                        />
                     </div>
 
                     <Modal

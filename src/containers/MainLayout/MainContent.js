@@ -17,6 +17,9 @@ import UserGroupPermission from '../../containers/userManage/groupPermission'
 import OutService from '../../containers/userManage/outService'
 import GroupManage from '../../containers/groupManage/list'
 import AppManage from '../../containers/appManage/list'
+import DatabaseList from '../../containers/databaseManage/list'
+import DbTableList from '../../containers/databaseManage/dbTables'
+import MobileGameList from '../../containers/mobileGame/list'
 
 import NotPage from '../NotPage';
 
@@ -45,7 +48,11 @@ class MainContent extends React.Component{
                         <Route path="/user/list/:tenantId" exact component={UserGroupPermission}/>
                         <Route path="/user/outService" exact component={OutService}/>
                         <Route path="/group/list" exact component={GroupManage}/>AppManage
-                         <Route path="/app/list" exact component={AppManage}/>
+                        <Route path="/app/list" exact component={AppManage}/>
+                        <Route path="/db/list" exact component={DatabaseList}/>
+                        <Route path="/db/list/:databaseId" exact component={DbTableList}/>
+                        <Route path="/db/list/:databaseId/:tableId" exact component={TableInfo}/>
+                        <Route path="/mobileGame/list" exact component={MobileGameList}/>
                         <Route component={PermissionTransfer} />
                         </Switch>
                     </div>

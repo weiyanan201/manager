@@ -3,21 +3,20 @@ import { Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
 import util from "../../../util/util";
 import axios from "../../../util/axios";
 
-import NavLink from '../../../components/NavLink/NavLink';
-import AddDbForm from './component/addDbForm';
-import {StorageType, ProduceType} from '../../../config';
+import AddMobileGameForm from './component/addMobileGameForm';
 
 const Search = Input.Search;
-const confirm = Modal.confirm;
+const NEW_TITLE = "新建手游类型";
+const EDIT_TITLE = "更新手游类型";
 
-class DatabaseList extends Component {
+class MobileGameList extends Component {
 
     constructor(props){
         super(props);
         this.state = {
             columns : [
                 {
-                    title: 'ID',
+                    title: 'id',
                     dataIndex: 'id',
                     align: 'center',
                 },{
@@ -26,64 +25,55 @@ class DatabaseList extends Component {
                     align: 'center',
                 },{
                     title: '描述',
-                    dataIndex: 'comment',
+                    dataIndex: 'desc',
                     align: 'center',
                 },{
-                    title: '存储介质',
-                    dataIndex: 'storageType',
-                    align: 'center',
-                    filters:Object.values(StorageType).map(val=>{
-                        return {
-                            "text":val,
-                            "value":val
-                        }
-                    }),
-                    onFilter: (value, record) => record.storageType.indexOf(value) === 0,
-                },{
-                    title: 'usage',
-                    dataIndex: 'usage',
-                    align: 'center',
-                    filters:Object.values(ProduceType).map(val=>{
-                        return {
-                            "text":val,
-                            "value":val
-                        }
-                    }),
-                    onFilter: (value, record) => record.usage.indexOf(value) === 0,
-                },{
-                    title: 'owner',
-                    dataIndex: 'ownerId',
-                    render: ownerId => this.state.tenants[`${ownerId}`],
+                    title: '操作人',
+                    dataIndex: 'operator',
                     align: 'center',
                 },{
-                    title: '表详情',
+                    title: '创建时间',
+                    dataIndex: 'createTime',
+                    align: 'center',
+                    render: createTime => util.formatDate(createTime),
+                    sorter: (a, b) => a.createTime - b.createTime,
+                },{
+                    title: '更新时间',
+                    dataIndex: 'updateTime',
+                    defaultSortOrder: 'descend',
+                    align: 'center',
+                    render: val => util.formatDate(val),
+                    sorter: (a, b) => a.updateTime - b.updateTime,
+                },{
+                    title: '操作',
                     align: 'center',
                     render: (text, record) => (
-                            <NavLink target={`/db/list/${record.id}`} linkText={"详情"}/>
+                        <a onClick={()=>this.modalToggle(true,EDIT_TITLE,record)}>编辑</a>
                     )
                 }
             ],
             modalVisible:false,
+            modalTitle : NEW_TITLE,
+            modalFormObject:{},
             globalLoading:false,
             data:[],
             dataBack:[],
-            tenants:[],
             addLoading:false
-        }
+        };
+        this.handleAddSubmit = this.handleAddSubmit.bind(this);
+        this.modalToggle = this.modalToggle.bind(this);
     }
 
     componentDidMount() {
         this.setState({
             globalLoading: true
         });
-        axios.get("/db/getList")
+        axios.get("/mobileGame/getList")
             .then(res => {
-                const result = res.data.data;
-                const dbs = result.dbs;
-                const tenants = result.tenants;
-                const dataBack = dbs.slice(0);
+                const data = res.data.data;
+                const dataBack = data.slice(0);
                 this.setState({
-                    data:dbs, dataBack,tenants, globalLoading: false
+                    data, dataBack, globalLoading: false
                 })
             })
             .catch(()=>{
@@ -93,13 +83,19 @@ class DatabaseList extends Component {
             })
     }
 
+    modalToggle = (modalVisible,modalTitle=NEW_TITLE,modalFormObject={})=>{
+        this.setState({
+            modalVisible,modalTitle,modalFormObject
+        })
+    };
+
     handleFilterSearch = (value)=> {
         let data = [];
         const dataBack = this.state.dataBack;
         if (util.isEmpty(value)){
             data = dataBack.slice(0);
         }else{
-            //顾虑
+            //过滤
             data = dataBack.filter(item=>item.name.indexOf(value)!==-1);
         }
         this.setState({
@@ -108,7 +104,7 @@ class DatabaseList extends Component {
     };
 
     handleAddSubmit = ()=>{
-        this.addDbForm.props.form.validateFields((error, values) => {
+        this.addMobileGameForm.props.form.validateFields((error, values) => {
             if (error) {
                 return;
             }
@@ -116,16 +112,36 @@ class DatabaseList extends Component {
                 addLoading : true,
                 globalLoading:true,
             });
-            axios.postByJson("/db/addDb",{...values})
+            axios.postByJson("/mobileGame/addMobileGame",{...values})
                 .then(res=>{
                     const newInfo = res.data.data;
                     const data = this.state.data;
                     const dataBack = this.state.dataBack;
-                    data.unshift(newInfo);
-                    dataBack.unshift(newInfo);
+
+                    let dataIndex = data.findIndex(item =>{
+                        if (item.id===newInfo.id){
+                            return true;
+                        }
+                    });
+                    let backIndex = dataBack.findIndex(item=>{
+                        if (item.id===newInfo.id){
+                            return true;
+                        }
+                    });
+                    if (backIndex===-1){
+                        //添加数据
+                        data.unshift(newInfo);
+                        dataBack.unshift(newInfo);
+                    }else{
+                        //更新数据
+                        dataBack[backIndex] = newInfo;
+                        if (dataIndex!==-1){
+                            data[dataIndex] = newInfo;
+                        }
+                    }
+
                     this.setState({
-                        data:data,
-                        dataBack:dataBack,
+                        data,dataBack,
                         modalVisible:false,
                         addLoading:false,
                         globalLoading:false
@@ -140,14 +156,14 @@ class DatabaseList extends Component {
                     })
                 })
         })
-    }
+    };
 
     render(){
         return (
             <div>
                 <Spin spinning={this.state.globalLoading}>
                     <div>
-                        组名：<Search
+                        游戏名：<Search
                         placeholder="input search text"
                         onChange={(e) => {
                             this.handleFilterSearch(e.target.value)
@@ -155,7 +171,7 @@ class DatabaseList extends Component {
                         enterButton
                         style={{width: 200}}
                     />
-                        <Button type='primary'  onClick={()=>this.setState({modalVisible:true})} style={{float:"right"}}>新建数据库</Button>
+                        <Button type='primary'  onClick={()=>this.modalToggle(true)} style={{float:"right"}}>新建手游类型</Button>
                     </div>
 
                     <div >
@@ -163,17 +179,17 @@ class DatabaseList extends Component {
                     </div>
 
                     <Modal
-                        title="添加数据库"
+                        title={this.state.modalTitle}
                         visible={this.state.modalVisible}
                         width={600}
-                        onCancel={()=>this.setState({modalVisible:false})}
+                        onCancel={()=>this.modalToggle(false)}
                         onOk={this.handleAddSubmit}
                         destroyOnClose={true}
                         maskClosable={false}
                         confirmLoading={this.state.addLoading}
                     >
-                        <AddDbForm wrappedComponentRef={(inst) => {this.addDbForm = inst;}}
-                                   tenants = {this.state.tenants}
+                        <AddMobileGameForm wrappedComponentRef={(inst) => {this.addMobileGameForm = inst;}}
+                                           formObject={this.state.modalFormObject}
                         />
 
                     </Modal>
@@ -184,4 +200,4 @@ class DatabaseList extends Component {
     }
 }
 
-export default DatabaseList;
+export default MobileGameList;

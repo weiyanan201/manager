@@ -113,8 +113,9 @@ class UserList extends Component {
     }
 
     componentDidMount(){
-        console.log("UserList.componentDidMount");
-
+        this.setState({
+            globalLoading: true
+        });
         axios.get("/tenant/getTenantList")
             .then(res=>{
                 const data = res.data.data;
@@ -141,8 +142,14 @@ class UserList extends Component {
                 const dataBack = data.slice(0);
 
                 this.setState({
-                    data,columns,dataBack
+                    data,columns,dataBack,
+                    globalLoading: false
                 })
+            })
+            .catch(error=>{
+                this.setState({
+                    globalLoading: false
+                });
             })
     }
 
@@ -235,7 +242,6 @@ class UserList extends Component {
     };
 
     render() {
-        console.log("UserList.render");
         return (
             <div>
                 <Spin spinning={this.state.globalLoading}>

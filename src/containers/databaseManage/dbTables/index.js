@@ -1,16 +1,22 @@
 import React,{ Component } from 'react';
+import { connect } from 'react-redux';
 import { Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
+
+import NavLink from '../../../components/NavLink/NavLink';
 import util from "../../../util/util";
 import axios from "../../../util/axios";
 
-import NavLink from '../../../components/NavLink/NavLink';
-import AddDbForm from './component/addDbForm';
 import {StorageType, ProduceType} from '../../../config';
+import {pushBread} from "../../../reducers/bread.redux";
 
 const Search = Input.Search;
 const confirm = Modal.confirm;
 
-class DatabaseList extends Component {
+@connect(
+     null,
+    { pushBread }
+)
+class DbTableList extends Component {
 
     constructor(props){
         super(props);
@@ -21,12 +27,8 @@ class DatabaseList extends Component {
                     dataIndex: 'id',
                     align: 'center',
                 },{
-                    title: '名称',
+                    title: '表名',
                     dataIndex: 'name',
-                    align: 'center',
-                },{
-                    title: '描述',
-                    dataIndex: 'comment',
                     align: 'center',
                 },{
                     title: '存储介质',
@@ -40,8 +42,8 @@ class DatabaseList extends Component {
                     }),
                     onFilter: (value, record) => record.storageType.indexOf(value) === 0,
                 },{
-                    title: 'usage',
-                    dataIndex: 'usage',
+                    title: 'produceType',
+                    dataIndex: 'produceType',
                     align: 'center',
                     filters:Object.values(ProduceType).map(val=>{
                         return {
@@ -51,39 +53,52 @@ class DatabaseList extends Component {
                     }),
                     onFilter: (value, record) => record.usage.indexOf(value) === 0,
                 },{
-                    title: 'owner',
-                    dataIndex: 'ownerId',
-                    render: ownerId => this.state.tenants[`${ownerId}`],
+                    title: '创建时间',
+                    dataIndex: 'createTime',
                     align: 'center',
+                    render: createTime => util.formatDate(createTime),
+                    sorter: (a, b) => a.createTime - b.createTime,
+                },{
+                    title: '更新时间',
+                    dataIndex: 'updateTime',
+                    align: 'center',
+                    defaultSortOrder: 'descend',
+                    render: updateTime => util.formatDate(updateTime),
+                    sorter: (a, b) => a.updateTime - b.updateTime,
                 },{
                     title: '表详情',
                     align: 'center',
                     render: (text, record) => (
-                            <NavLink target={`/db/list/${record.id}`} linkText={"详情"}/>
+                        <NavLink target={`/db/list/${this.state.databaseId}/${record.id}`} linkText={"详情"}/>
                     )
                 }
             ],
-            modalVisible:false,
-            globalLoading:false,
             data:[],
             dataBack:[],
-            tenants:[],
-            addLoading:false
-        }
+            databaseId:'',
+            databaseName:'',
+            globalLoading:false,
+        };
+        this.handleDeleteDb = this.handleDeleteDb.bind(this);
     }
 
     componentDidMount() {
+
+        let databaseId = this.props.match.params.databaseId;
         this.setState({
             globalLoading: true
         });
-        axios.get("/db/getList")
+        axios.get("/db/getTablesByDb",{databaseId:databaseId})
             .then(res => {
                 const result = res.data.data;
-                const dbs = result.dbs;
-                const tenants = result.tenants;
-                const dataBack = dbs.slice(0);
+                const dbName = result.dbName;
+                const tables = result.tables;
+                const dataBack = tables.slice(0);
+                const breadUrl = this.props.match.url;
+                const breadObj = {[breadUrl]: `${dbName}中的表`};
+                this.props.pushBread(breadObj);
                 this.setState({
-                    data:dbs, dataBack,tenants, globalLoading: false
+                    data:tables, dataBack, globalLoading: false,databaseId,databaseName:dbName
                 })
             })
             .catch(()=>{
@@ -91,6 +106,34 @@ class DatabaseList extends Component {
                     globalLoading:false
                 });
             })
+    }
+
+    handleDeleteDb = ()=> {
+        const _this = this;
+        confirm({
+            title: '删除确认',
+            autoFocusButton:"cancel",
+            content: `是否删除数据库：${_this.state.databaseName}`,
+            okText: '删除',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk() {
+                _this.setState({
+                    globalLoading:true
+                });
+                axios.post("/db/deleteDb", {databaseId: _this.state.databaseId})
+                    .then(() => {
+                        //删除成功，从data中去掉
+                        message.success("删除成功");
+                        _this.props.history.push("/db/list");
+                    })
+                    .catch(()=>{
+                        _this.setState({
+                            globalLoading:false
+                        })
+                    });
+            }
+        });
     }
 
     handleFilterSearch = (value)=> {
@@ -107,47 +150,12 @@ class DatabaseList extends Component {
         })
     };
 
-    handleAddSubmit = ()=>{
-        this.addDbForm.props.form.validateFields((error, values) => {
-            if (error) {
-                return;
-            }
-            this.setState({
-                addLoading : true,
-                globalLoading:true,
-            });
-            axios.postByJson("/db/addDb",{...values})
-                .then(res=>{
-                    const newInfo = res.data.data;
-                    const data = this.state.data;
-                    const dataBack = this.state.dataBack;
-                    data.unshift(newInfo);
-                    dataBack.unshift(newInfo);
-                    this.setState({
-                        data:data,
-                        dataBack:dataBack,
-                        modalVisible:false,
-                        addLoading:false,
-                        globalLoading:false
-                    });
-                    message.success("创建成功!");
-                })
-                .catch((error)=>{
-                    this.setState({
-                        modalVisible:false,
-                        addLoading:false,
-                        globalLoading:false
-                    })
-                })
-        })
-    }
-
     render(){
         return (
             <div>
                 <Spin spinning={this.state.globalLoading}>
                     <div>
-                        组名：<Search
+                        表名：<Search
                         placeholder="input search text"
                         onChange={(e) => {
                             this.handleFilterSearch(e.target.value)
@@ -155,28 +163,13 @@ class DatabaseList extends Component {
                         enterButton
                         style={{width: 200}}
                     />
-                        <Button type='primary'  onClick={()=>this.setState({modalVisible:true})} style={{float:"right"}}>新建数据库</Button>
+                        <Button type='danger'  onClick={this.handleDeleteDb} style={{float:"right"}}>删除数据库</Button>
                     </div>
 
                     <div >
                         <Table columns={this.state.columns} dataSource={this.state.data}  bordered/>
                     </div>
 
-                    <Modal
-                        title="添加数据库"
-                        visible={this.state.modalVisible}
-                        width={600}
-                        onCancel={()=>this.setState({modalVisible:false})}
-                        onOk={this.handleAddSubmit}
-                        destroyOnClose={true}
-                        maskClosable={false}
-                        confirmLoading={this.state.addLoading}
-                    >
-                        <AddDbForm wrappedComponentRef={(inst) => {this.addDbForm = inst;}}
-                                   tenants = {this.state.tenants}
-                        />
-
-                    </Modal>
 
                 </Spin>
             </div>
@@ -184,4 +177,4 @@ class DatabaseList extends Component {
     }
 }
 
-export default DatabaseList;
+export default DbTableList;
