@@ -65,5 +65,17 @@ export default {
         let ss = "0"+date.getSeconds();
         return y+"-"+m.substring(m.length-2,m.length)+"-"+d.substring(d.length-2,d.length)+" "+hour.substring(hour.length-2,hour.length)+":"+min.substring(min.length-2,min.length)+":"+ss.substring(ss.length-2,ss.length);
     },
+    getResponseError(res){
+        let msg = "系统异常";
+        if (res.status===200){
+            //web后台定义错误
+            const data = res.data;
+            msg = data.returnMessage;
+        } else if(res.response.status===500){
+            //服务异常
+            msg = res.response.data.msg;
+        }
+        return msg;
+    }
 
 }

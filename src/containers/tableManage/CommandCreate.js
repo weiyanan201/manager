@@ -56,11 +56,13 @@ export default class CommandCreate extends React.Component{
                 },1000);
             }
 
-        }).catch((res)=>{
+        }).catch((error)=>{
+            console.log(error);
             clearInterval(_this.state.timer);
+            let msg = util.getResponseError(error);
             this.setState({
                 loading:false,
-                log:res.data.returnMessage
+                log:msg
             })
         })
     };

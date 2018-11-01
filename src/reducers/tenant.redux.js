@@ -26,6 +26,7 @@ const tenantPermissionInit = {
     rightSearch:'',
     okLoading:false,
     original:{},
+    tenantSpinLoading:false
 };
 
 const UPDATE_DATASOURCE = "UPDATE_DATASOURCE";
@@ -35,6 +36,7 @@ const HANDLE_MOVE = "HANDLE_MOVE";
 const HANDLE_SEARCH = "HANDLE_SEARCH";
 const MODAL_TOGGLE = "MODAL_TOGGLE";
 const LOADING_TOGGLE = "LOADING_TOGGLE";
+const SPIN_TOGGLE = "SPIN_TOGGLE";
 
 export function tenantPermission(state = tenantPermissionInit, action) {
     switch (action.type) {
@@ -90,6 +92,8 @@ export function tenantPermission(state = tenantPermissionInit, action) {
             }
         case LOADING_TOGGLE:
             return {...tenantPermissionInit,okLoading:action.payload,original};
+        case SPIN_TOGGLE :
+            return {...state,tenantSpinLoading:action.payload}
         default:
             return state;
     }
@@ -206,6 +210,7 @@ function _handleSearch(state,payload) {
 
 export function updateDataSource(tenantId){
     return dispatch => {
+        dispatch(spinToggle(true));
         axios.post("/tenant/getGroupList",{tenantId:tenantId})
             .then(res=>{
                 const data = res.data.data.permissonGroups;
@@ -215,7 +220,11 @@ export function updateDataSource(tenantId){
                 const breadUrl = "/user/list/"+tenantId;
                 const breadObj = {[breadUrl]: `${tenant.userName}的权限`};
                 dispatch(pushBread(breadObj));
-            });
+                dispatch(spinToggle(false));
+            })
+            .catch(()=>{
+                dispatch(spinToggle(false));
+            })
     }
 }
 
@@ -237,6 +246,10 @@ export function handleSearch(text,direction) {
 
 export function modalToggle(toggle) {
     return {type:MODAL_TOGGLE,payload:toggle};
+}
+
+export function spinToggle(toggle){
+    return {type:SPIN_TOGGLE,payload:toggle};
 }
 
 export function handleSubmit(tenantId,has) {
