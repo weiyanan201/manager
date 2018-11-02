@@ -21,7 +21,7 @@ const menus=[
     }, {
         "id": 7,
         "pid": 5,
-        "icon": "user-add",
+        "iconfont": "icon-tableedit",
         "name": "新建表",
         "route": "/table/addTable",
         "bread": "新建表",
@@ -45,7 +45,7 @@ const menus=[
     },{
         "id": 10,
         "pid": 8,
-        "icon": "user",
+        "iconfont": "icon-user4",
         "name": "outService",
         "route": "/user/outService",
         "bread": "outService",
@@ -53,7 +53,7 @@ const menus=[
     },{
         "id": 11,
         "pid": -1,
-        "icon": "user",
+        "iconfont": "icon-dashboardbuttongroup",
         "name": "组管理",
         "route": "",
         "bread": "",
@@ -61,7 +61,7 @@ const menus=[
     },{
         "id": 12,
         "pid": 11,
-        "icon": "user",
+        "iconfont": "icon-dashboardbuttongroup",
         "name": "组信息",
         "route": "/group/list",
         "bread": "组信息",
@@ -69,7 +69,7 @@ const menus=[
     },{
         "id": 13,
         "pid": -1,
-        "icon": "user",
+        "iconfont": "icon-game",
         "name": "App管理",
         "route": "",
         "bread": "",
@@ -77,7 +77,7 @@ const menus=[
     },{
         "id": 14,
         "pid": 13,
-        "icon": "user",
+        "iconfont": "icon-game",
         "name": "App信息",
         "route": "/app/list",
         "bread": "App信息",
@@ -85,7 +85,7 @@ const menus=[
     },{
         "id": 15,
         "pid": -1,
-        "icon": "user",
+        "iconfont": "icon-database",
         "name": "数据库信息",
         "route": "/db/list",
         "bread": "数据库信息",
@@ -93,7 +93,7 @@ const menus=[
     },{
         "id": 16,
         "pid": -1,
-        "icon": "user",
+        "iconfont": "icon-mobile",
         "name": "手游类型管理",
         "route": "/mobileGame/list",
         "bread": "手游类型管理",

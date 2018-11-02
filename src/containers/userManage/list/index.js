@@ -17,6 +17,8 @@ import style from './style.less'
 const Search = Input.Search;
 const confirm = Modal.confirm;
 
+const NEW_TITILE = "新建用户";
+const EDIT_TITLE = "编辑用户";
 
 function onChange(pagination, filters, sorter) {
     console.log('params', pagination, filters, sorter);
@@ -94,7 +96,7 @@ class UserList extends Component {
                 align: 'center',
                 render: (text, record) => (
                     <span>
-                        {record.tenantType!==TenantType.OUTER_SERVICE.key?<span><a >编辑</a><Divider type="vertical" /></span>:null}
+                        <a onClick={()=>this.modalToggle(true,EDIT_TITLE,record)}>编辑</a><Divider type="vertical" />
                         {/*<a >编辑</a>*/}
 
                         <a onClick={()=>this.showDeleteConfirm(record.userName,record.id)}>删除</a>
@@ -104,7 +106,9 @@ class UserList extends Component {
         ];
 
         this.state={
-            addUserModalVisible:false,
+            modalVisible:false,
+            modalTitle:NEW_TITILE,
+            modalFormObject:{},
             addLoading:false,
             columns:columns,
             globalLoading:false,
@@ -153,9 +157,10 @@ class UserList extends Component {
             })
     }
 
-    modalToggle(toggle){
+    modalToggle(toggle,modalTitle=NEW_TITILE,modalFormObject={}){
         this.setState({
-            addUserModalVisible:toggle,
+            modalVisible:toggle,
+            modalTitle,modalFormObject
         })
     }
 
@@ -173,12 +178,33 @@ class UserList extends Component {
                     const newInfo = res.data.data;
                     const data = this.state.data;
                     const dataBack = this.state.dataBack;
-                    data.push(newInfo);
-                    dataBack.push(newInfo);
+
+                    let dataIndex = data.findIndex(item =>{
+                        if (item.id===newInfo.id){
+                            return true;
+                        }
+                    });
+                    let backIndex = dataBack.findIndex(item=>{
+                        if (item.id===newInfo.id){
+                            return true;
+                        }
+                    });
+                    if (backIndex===-1){
+                        //添加数据
+                        data.unshift(newInfo);
+                        dataBack.unshift(newInfo);
+                    }else{
+                        //更新数据
+                        dataBack[backIndex] = newInfo;
+                        if (dataIndex!==-1){
+                            data[dataIndex] = newInfo;
+                        }
+                    }
+
                     this.setState({
                         data:data,
                         dataBack:dataBack,
-                        addUserModalVisible:false,
+                        modalVisible:false,
                         addLoading:false
                     });
                     message.success("创建成功!");
@@ -263,7 +289,7 @@ class UserList extends Component {
                     </div>
                     <Modal
                         title="新建用户"
-                        visible={this.state.addUserModalVisible}
+                        visible={this.state.modalVisible}
                         width={600}
                         onCancel={() => {
                             this.modalToggle(false)
@@ -274,9 +300,10 @@ class UserList extends Component {
                         confirmLoading={this.state.addLoading}
                     >
 
-                        <AddUserForm  wrappedComponentRef={(inst) => {
-                            this.addUserForm = inst;
-                        }}/>
+                        <AddUserForm
+                            wrappedComponentRef={(inst) => {this.addUserForm = inst;}}
+                            formObject={this.state.modalFormObject}
+                        />
 
                     </Modal>
                 </Spin>

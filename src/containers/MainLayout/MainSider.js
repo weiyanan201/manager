@@ -12,6 +12,11 @@ import {
     Icon,
 } from 'antd';
 import { is } from 'immutable';
+import util from "../../util/util";
+
+const IconFont = Icon.createFromIconfontCN({
+    scriptUrl: '//at.alicdn.com/t/font_901688_fnruydxsbip.js',
+});
 
 
 const { Sider } = Layout;
@@ -175,7 +180,13 @@ function genMenus(menus) {
             return (
                 <SubMenu
                     key={item.id}
-                    title={<span><Icon type={item.icon}/><span>{item.name}</span></span>} >
+                    title={
+                        <span>
+                            {!util.isEmpty(item.iconfont)?<IconFont type={item.iconfont}/>:<Icon type={item.icon}/>}
+                            <span>{item.name}</span>
+                        </span>
+                    }
+                >
                     { genMenus(item.children) }
                 </SubMenu>
             )
@@ -183,7 +194,7 @@ function genMenus(menus) {
             routeToId.push({route:item.route,id:item.id,pid:item.pid});
             return (
                 <Item key={item.id}>
-                    <Icon type={item.icon}/>
+                    { !util.isEmpty(item.iconfont)?<IconFont type={item.iconfont}/>:<Icon type={item.icon}/> }
                     <span>{item.name}</span>
                     <Link to={item.route}/>
                 </Item>

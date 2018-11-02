@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 
 import {Button , Card,Spin,Form,Input,Select,Row,message,Modal,Collapse,Checkbox, Icon} from 'antd';
 import GroupSelect  from '../../components/groupSelect/GroupSelect';
-import EditableTable from '../../components/BaseTable/EditableTable';
+import EditableTable from './component/editableTable/EditableTable';
 import TableSelect from '../../components/TableSelect';
 import tableUtil from '../../util/tableUtil';
 import config from '../../util/config';
@@ -20,142 +20,12 @@ const Option = Select.Option;
 const FormItem = Form.Item;
 const Panel = Collapse.Panel;
 
-const tableColumns = {
-    "HIVE":[{
-        title:'序号',
-        key:'key',
-        align:'center',
-        render:(text,row,index)=>index+1,
-        width:'80px'
-    },{
-        title: 'name',
-        dataIndex: 'name',
-        editable: true,
-        columnType:'input',
-        required:true,
-        align:'center',
-    }, {
-        title: '类型',
-        dataIndex: 'type',
-        editable: true,
-        columnType:'fieldType',
-        storageType:"HIVE",
-        required:true,
-        render: (text) => tableUtil.fieldTypeRender(text),
-        width:'300px',
-        align:'center',
-    }, {
-        title: '注释',
-        dataIndex: 'comment',
-        editable: true,
-        columnType:'input',
-        required:true,
-        width: '500px',
-        align:'center',
-    }, {
-        title: <div>分区字段<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
-        dataIndex: 'isPartition',
-        editable: true,
-        columnType:'checkbox',
-        required:false,
-        render: (text) => <Checkbox checked={text===true} />,
-        width:'200px',
-        align:'center',
-
-    },],
-    "PHOENIX":[
-        {
-            title:'序号',
-            align:'center',
-            key:'key',
-            render:(text,row,index)=>index+1,
-            width:'80px',
-        },
-        {
-            title: 'name',
-            dataIndex: 'name',
-            editable: true,
-            columnType:'input',
-            required:true,
-            align:'center',
-        }, {
-            title: '类型',
-            dataIndex: 'type',
-            editable: true,
-            columnType:'fieldType',
-            storageType:"PHOENIX",
-            required:true,
-            render: (text) => tableUtil.fieldTypeRender(text),
-            align:'center',
-        }, {
-            title: '注释',
-            dataIndex: 'comment',
-            editable: true,
-            columnType:'input',
-            required:true,
-            align:'center',
-        },{
-            title:<div>主键<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
-            dataIndex: 'primaryKey',
-            editable: true,
-            columnType:'checkbox',
-            required:false,
-            render: (text) => <Checkbox checked={text===true} />,
-            width:'200px',
-            align:'center',
-        }, {
-            title: '可为空',
-            dataIndex: 'beNull',
-            editable: true,
-            columnType:'checkbox',
-            required:false,
-            render: (text) => <Checkbox checked={text===true} />,
-            width:'200px',
-            align:'center',
-        }
-    ],
-    "ES":[
-        {
-            title:'序号',
-            key:'key',
-            align:'center',
-            render:(text,row,index)=>index+1,
-            width:'100px',
-        },
-        {
-            title: 'name',
-            dataIndex: 'name',
-            editable: true,
-            columnType:'input',
-            required:true,
-            align:'center',
-        }, {
-            title: '类型',
-            dataIndex: 'type',
-            editable: true,
-            columnType:'fieldType',
-            storageType:"ES",
-            required:true,
-            render: (text) => tableUtil.fieldTypeRender(text),
-            align:'center',
-        }, {
-            title: '注释',
-            dataIndex: 'comment',
-            editable: true,
-            columnType:'input',
-            required:true,
-            width:'500px',
-            align:'center',
-        },
-    ],
-    "":[]
-}
-
 @connect(
     state => state.config,
     {}
 )
 class CreateTable extends React.Component{
+
     constructor(props){
         super(props);
         this.state={
@@ -174,6 +44,7 @@ class CreateTable extends React.Component{
             advancedKey:[],
             replicas:1,
             shards:5,
+            isTemp:false
         };
     }
 
@@ -206,7 +77,8 @@ class CreateTable extends React.Component{
         this.setState({
             groupId:index,
             db:change?'':this.state.db,
-            ...andvanced
+            ...andvanced,
+            isTemp:newIsTmp
         });
         this.props.form.setFieldsValue({
             db:change?'':this.state.db,
@@ -436,6 +308,138 @@ class CreateTable extends React.Component{
             marginBottom: 24,
             border: 0,
             overflow: 'hidden',
+        };
+
+        const tableColumns = {
+            "HIVE":[
+                {
+                    title:'序号',
+                    key:'key',
+                    align:'center',
+                    render:(text,row,index)=>index+1,
+                    width:'80px'
+                },{
+                title: 'name',
+                dataIndex: 'name',
+                editable: true,
+                columnType:'input',
+                required:true,
+                align:'center',
+            }, {
+                title: '类型',
+                dataIndex: 'type',
+                editable: true,
+                columnType:'fieldType',
+                storageType:"HIVE",
+                required:true,
+                render: (text) => tableUtil.fieldTypeRender(text),
+                width:'300px',
+                align:'center',
+            }, {
+                title: '注释',
+                dataIndex: 'comment',
+                editable: true,
+                columnType:'input',
+                required:!this.state.isTemp,
+                width: '500px',
+                align:'center',
+            }, {
+                title: <div>分区字段<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
+                dataIndex: 'isPartition',
+                editable: true,
+                columnType:'checkbox',
+                required:false,
+                render: (text) => <Checkbox checked={text===true} />,
+                width:'200px',
+                align:'center',
+
+            },],
+            "PHOENIX":[
+                {
+                    title:'序号',
+                    align:'center',
+                    key:'key',
+                    render:(text,row,index)=>index+1,
+                    width:'80px',
+                },
+                {
+                    title: 'name',
+                    dataIndex: 'name',
+                    editable: true,
+                    columnType:'input',
+                    required:true,
+                    align:'center',
+                }, {
+                title: '类型',
+                dataIndex: 'type',
+                editable: true,
+                columnType:'fieldType',
+                storageType:"PHOENIX",
+                required:true,
+                render: (text) => tableUtil.fieldTypeRender(text),
+                align:'center',
+            }, {
+                title: '注释',
+                dataIndex: 'comment',
+                editable: true,
+                columnType:'input',
+                required:!this.state.isTemp,
+                align:'center',
+            },{
+                title:<div>主键<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
+                dataIndex: 'primaryKey',
+                editable: true,
+                columnType:'checkbox',
+                required:false,
+                render: (text) => <Checkbox checked={text===true} />,
+                width:'200px',
+                align:'center',
+            }, {
+                title: '可为空',
+                dataIndex: 'beNull',
+                editable: true,
+                columnType:'checkbox',
+                required:false,
+                render: (text) => <Checkbox checked={text===true} />,
+                width:'200px',
+                align:'center',
+            }
+                ],
+            "ES":[
+                {
+                    title:'序号',
+                    key:'key',
+                    align:'center',
+                    render:(text,row,index)=>index+1,
+                    width:'100px',
+                },
+                {
+                    title: 'name',
+                    dataIndex: 'name',
+                    editable: true,
+                    columnType:'input',
+                    required:true,
+                    align:'center',
+                }, {
+                title: '类型',
+                dataIndex: 'type',
+                editable: true,
+                columnType:'fieldType',
+                storageType:"ES",
+                required:true,
+                render: (text) => tableUtil.fieldTypeRender(text),
+                align:'center',
+            }, {
+                title: '注释',
+                dataIndex: 'comment',
+                editable: true,
+                columnType:'input',
+                required:!this.state.isTemp,
+                width:'500px',
+                align:'center',
+            },
+                ],
+            "":[]
         };
 
         //高级属性对象

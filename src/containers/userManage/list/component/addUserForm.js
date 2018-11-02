@@ -15,11 +15,31 @@ class AddUserForm extends Component {
         this.state={
             loading:false,
             disabled:true,
-            sourceDisabled:true
+            sourceDisabled:true,
+            isEdit:false,
+            editOutService:false,
         };
 
         this.handleRelateUAM = this.handleRelateUAM.bind(this);
         this.handleChangeType = this.handleChangeType.bind(this);
+        this.getTypeSelect = this.getTypeSelect.bind(this);
+    }
+
+    componentDidMount(){
+        const formObject = this.props.formObject;
+        if (Object.keys(formObject).length>0){
+            this.setState({
+                isEdit:true,
+                editOutService:formObject.tenantType===TenantType.OUTER_SERVICE.key,
+                sourceDisabled:formObject.tenantType===TenantType.OUTER_SERVICE.key,
+                disabled:formObject.tenantType!==TenantType.OUTER_SERVICE.key,
+            })
+        } else{
+            this.setState({
+                isEdit:false,
+            })
+        }
+        
     }
 
     //切换用户种类
@@ -74,6 +94,47 @@ class AddUserForm extends Component {
         });
     };
 
+    //add show all
+    //edit outService  disable
+    //edit other exclude outService
+    getTypeSelect=()=>{
+        const { isEdit,editOutService } = this.state;
+        if (!isEdit){
+            return <Select onSelect={(val)=>this.handleChangeType(val)}>
+                {
+                    Object.keys(TenantType).map(item=>
+                        <Option value={item} key={item}>{TenantType[item].text}</Option>
+                    )
+                }
+            </Select>
+        }else{
+            //edit
+            if (editOutService){
+                return <Select onSelect={(val)=>this.handleChangeType(val)} disabled={true}>
+                    {
+                        Object.keys(TenantType).map(item=>
+                            <Option value={item} key={item}>{TenantType[item].text}</Option>
+                        )
+                    }
+                </Select>
+            }else{
+                let options = [];
+                Object.keys(TenantType).forEach(item=>
+                    {
+                        if (item!==TenantType.OUTER_SERVICE.key){
+                            options.push(<Option value={item} key={item}>{TenantType[item].text}</Option>);
+                        }
+                    }
+                );
+                return <Select onSelect={(val)=>this.handleChangeType(val)}>
+                    {
+                         options
+                    }
+                </Select>
+            }
+        }
+    };
+
     render(){
 
         const { getFieldDecorator } = this.props.form;
@@ -89,7 +150,6 @@ class AddUserForm extends Component {
         };
 
         return (
-            <Spin spinning={this.state.loading}>
                 <Form onSubmit={this.handleSubmit}>
                     <FormItem
                         {...formItemLayout}
@@ -99,14 +159,9 @@ class AddUserForm extends Component {
                             rules: [{
                                 required: true, message: 'Please input your E-mail!',
                             }],
+                            initialValue: this.props.formObject.tenantType
                         })(
-                            <Select onSelect={(val)=>this.handleChangeType(val)}>
-                                {
-                                    Object.keys(TenantType).map(item=>
-                                        <Option value={item} key={item}>{TenantType[item].text}</Option>
-                                    )
-                                }
-                            </Select>
+                            this.getTypeSelect()
                         )}
                     </FormItem>
 
@@ -116,7 +171,9 @@ class AddUserForm extends Component {
                     >
                         <Row gutter={8}>
                             <Col span={20}>
-                                {getFieldDecorator('sourceId')(
+                                {getFieldDecorator('sourceId',{
+                                    initialValue: this.props.formObject.sourceId
+                                })(
                                     <Input disabled={this.state.sourceDisabled}/>
                                 )}
                             </Col>
@@ -134,6 +191,7 @@ class AddUserForm extends Component {
                             rules: [{
                                 required: true, message: '请输入用户名',
                             }],
+                            initialValue: this.props.formObject.userName
                         })(
                             <Input disabled={this.state.disabled}/>
                         )}
@@ -147,6 +205,7 @@ class AddUserForm extends Component {
                             rules: [{
                                 required: true, message: '请输入部门',
                             }],
+                            initialValue: this.props.formObject.deptName
                         })(
                             <Input disabled={this.state.disabled}/>
                         )}
@@ -160,6 +219,7 @@ class AddUserForm extends Component {
                             rules: [{
                                 required: true, message: '请输入电话号码',
                             }],
+                            initialValue: this.props.formObject.mobile
                         })(
                             <Input disabled={this.state.disabled}/>
                         )}
@@ -169,15 +229,30 @@ class AddUserForm extends Component {
                         {...formItemLayout}
                         label="邮箱"
                     >
-                        {getFieldDecorator('email')(
+                        {getFieldDecorator('email',{
+                            initialValue: this.props.formObject.email
+                        })(
                             <Input disabled={this.state.disabled} />
                         )}
                     </FormItem>
+
+                    <FormItem
+
+                    >
+                        {getFieldDecorator('id',{
+                            initialValue: this.props.formObject.id
+                        })(
+                            <Input type="hidden" />
+                        )}
+                    </FormItem>
                 </Form>
-            </Spin>
         )
     }
 }
+
+AddUserForm.defaultProps = {
+    formObject:{}
+};
 
 const WrappedAddUserForm = Form.create()(AddUserForm);
 

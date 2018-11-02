@@ -4,7 +4,7 @@ import {Button ,Card,Form,Input,Select,Row,message,Modal } from 'antd';
 
 import GroupSelect  from '../../components/groupSelect/GroupSelect';
 import TableSelect from '../../components/TableSelect';
-import EditableTable from '../../components/BaseTable/EditableTable';
+import EditableTable from './component/editableTable/EditableTable';
 
 import tableUtil from '../../util/tableUtil';
 import config from '../../util/config';

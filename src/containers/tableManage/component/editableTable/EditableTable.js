@@ -3,9 +3,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {Button , Card,Spin,Table,Cascader,Form,InputNumber,Input,Popconfirm,Select,Row,message,Modal,Collapse ,Checkbox,Badge } from 'antd';
-import tableUtil from '../../util/tableUtil';
+import tableUtil from '../../../../util/tableUtil';
 
-import style from './index.less'
 
 const FormItem = Form.Item;
 const EditableContext = React.createContext();

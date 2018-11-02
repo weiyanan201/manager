@@ -6,8 +6,9 @@ import {getFieldsType} from "../../reducers/config.redux";
 import BaseTable from '../../components/BaseTable';
 import axios from '../../util/axios';
 import tableUtil from "../../util/tableUtil";
-import util from "../../util/util";
 import {pushBread} from "../../reducers/bread.redux";
+import CloumnForm from './component/tableInfo/CloumnForm';
+import InfoForm from './component/tableInfo/InfoForm';
 
 import style from './table.less';
 
@@ -105,13 +106,6 @@ const tableColumns = {
     "": []
 };
 
-
-const formItemLayout = {
-    labelCol: {span: 5},
-    wrapperCol: {span: 19}
-}
-
-
 /**
  * 两个页面公用一个
  * 1. /table/groups/:groupId/:tableId
@@ -186,6 +180,7 @@ export default class TableInfo extends Component {
             editColumn: false,
             modifyPermission: false,
             loading: true,
+            isTemp:false
         };
 
         this.props.getFieldsType();
@@ -194,6 +189,7 @@ export default class TableInfo extends Component {
                 const resData = res.data.data;
                 processObject.handleBread(resData);
                 const modifyPermission = resData.modifyPermission;
+                const isTemp = resData.isTemp;
                 const tableInfo = res.data.data.tableDetail;
                 const dataSource = [];
                 const existed = [];
@@ -227,7 +223,7 @@ export default class TableInfo extends Component {
 
                 }
                 this.setState({
-                    dataSource, existed, modifyPermission,
+                    dataSource, existed, modifyPermission,isTemp,
                     storageType: tableInfo.storageType,
                     columns: tableColumns[tableInfo.storageType],
                     tableName: tableInfo.name,
@@ -562,6 +558,7 @@ export default class TableInfo extends Component {
                         <CloumnForm wrappedComponentRef={(inst) => {
                             this.columnForm = inst;
                         }}
+                                    isTemp={this.state.isTemp}
                                     columnInfo={this.state.editColumn ? (this.state.rows.length > 0 ? this.state.rows[0] : null) : null}
                                     fieldTypes={this.props.config.fieldTypes}
                                     storageType={this.state.storageType}
@@ -575,152 +572,3 @@ export default class TableInfo extends Component {
 
 }
 
-
-class InfoForm extends React.Component {
-
-    render() {
-        let tableInfo = this.props.tableInfo || {};
-        const {getFieldDecorator} = this.props.form;
-        const formItemLayout = {
-            labelCol: {span: 5},
-            wrapperCol: {span: 19}
-        }
-        return (
-            <Form layout="horizontal">
-                <FormItem label="表名" {...formItemLayout}>
-                    {
-                        getFieldDecorator('tableName', {
-                            rules: [{
-                                required: true,
-                                message: `tableName is required.`,
-                            }],
-                            initialValue: tableInfo.tableName
-                        })(
-                            <Input type="text" disabled={tableInfo.storageType !== "HIVE"}/>
-                        )
-                    }
-                </FormItem>
-                <FormItem label="dbName" {...formItemLayout}>
-                    {
-                        getFieldDecorator('db', {
-                            rules: [{
-                                required: true,
-                                message: `db is required.`,
-                            }],
-                            initialValue: tableInfo.db
-                        })(
-                            <Input type="text" disabled={true}/>
-                        )
-                    }
-                </FormItem>
-                <FormItem label="存储介质" {...formItemLayout}>
-                    {
-                        getFieldDecorator('storageType', {
-                            rules: [{
-                                required: true,
-                                message: `storageType is required.`,
-                            }],
-                            initialValue: tableInfo.storageType
-                        })(
-                            <Input type="text" disabled={true}/>
-                        )
-                    }
-                </FormItem>
-                <FormItem label="描述" {...formItemLayout}>
-                    {
-                        getFieldDecorator('comment', {
-                            rules: [{
-                                required: true,
-                                message: `comment is required.`,
-                            }],
-                            initialValue: tableInfo.comment
-                        })(
-                            <TextArea rows={3} placeholder="请输入注释"/>
-                        )
-                    }
-                </FormItem>
-            </Form>
-        );
-    }
-}
-
-InfoForm = Form.create({})(InfoForm);
-
-class CloumnForm extends React.Component {
-    render() {
-
-        let columnInfo = this.props.columnInfo || {};
-        const {getFieldDecorator} = this.props.form;
-        const formItemLayout = {
-            labelCol: {span: 5},
-            wrapperCol: {span: 19}
-        }
-        return (
-            <Form layout="horizontal">
-                <FormItem label="字段名称" {...formItemLayout}>
-                    {
-                        getFieldDecorator('name', {
-                            rules: [{
-                                required: true,
-                                message: `name is required.`,
-                            }],
-                            initialValue: columnInfo.name
-                        })(
-                            <Input type="text"/>
-                        )
-                    }
-                </FormItem>
-                <FormItem label="type" {...formItemLayout}>
-                    {
-                        getFieldDecorator('type', {
-                            rules: [{
-                                required: true,
-                                message: `type is required.`,
-                            }],
-                            initialValue: util.isEmpty(columnInfo.type) ? '' : tableUtil.fieldTypeDeser(columnInfo.type)
-                        })(
-                            <Cascader
-                                options={tableUtil.getFieldType(this.props.fieldTypes, this.props.storageType)}
-                                placeholder="请选择类型"
-                                expandTrigger={"hover"}
-                                disabled={this.props.isEdit}
-                            />
-                        )
-                    }
-                </FormItem>
-
-                <FormItem label="注释" {...formItemLayout}>
-                    {
-                        getFieldDecorator('comment', {
-                            rules: [{
-                                required: true,
-                                message: `comment is required.`,
-                            }],
-                            initialValue: columnInfo.comment
-                        })(
-                            <TextArea rows={3} placeholder="请输入注释"/>
-                        )
-                    }
-                </FormItem>
-
-                {
-                    this.props.storageType === "PHOENIX" ?
-                        <FormItem label="可为空" {...formItemLayout}>
-                            {
-                                getFieldDecorator('nullable', {
-                                    valuePropName: 'checked',
-                                    initialValue: columnInfo.nullable,
-                                })(
-                                    <Checkbox defaultChecked={columnInfo.nullable === 'true'}/>
-                                )
-                            }
-                        </FormItem>
-                        : null
-
-                }
-            </Form>
-        );
-    }
-}
-
-CloumnForm = Form.create({})(CloumnForm);

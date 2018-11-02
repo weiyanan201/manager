@@ -88,7 +88,7 @@ export function tenantPermission(state = tenantPermissionInit, action) {
                     original:state.original,
                 }
             }else{
-                return {...state,modalVisible:toggle};
+                return {...state,modalVisible:toggle,tenantSpinLoading:false};
             }
         case LOADING_TOGGLE:
             return {...tenantPermissionInit,okLoading:action.payload,original};
@@ -257,9 +257,9 @@ export function handleSubmit(tenantId,has) {
         dispatch({type:LOADING_TOGGLE,payload:true});
         axios.postByJson("/tenant/saveTenantPermission",{has:has,tenantId:tenantId})
             .then(()=>{
-                dispatch(updateDataSource(tenantId));
                 dispatch({type:LOADING_TOGGLE,payload:false});
                 dispatch(modalToggle(false));
+                dispatch(updateDataSource(tenantId));
             }).catch(()=>{
                 dispatch(updateDataSource(tenantId));
             });

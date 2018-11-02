@@ -7,6 +7,7 @@ import {updateDataSource} from "../../../reducers/tenant.redux";
 import {pushBread} from "../../../reducers/bread.redux";
 import {GROUP_PERMISSION} from "../../../util/config";
 import PermissionTransfer from "./component/permissonTransfer";
+import util from "../../../util/util";
 
 const columns = [
     {
@@ -54,7 +55,7 @@ class UserGroupPermission extends Component {
     render() {
         return (
             <div>
-                <Spin spinning={this.props.tenantPermission.tenantSpinLoading}>
+                <Spin spinning={util.isEmpty(this.props.tenantPermission.tenantSpinLoading)?false:this.props.tenantPermission.tenantSpinLoading} tip={"加载中..."}>
                     <div className={style.addPermissionButton}>
                         <PermissionTransfer/>
                     </div>
