@@ -1,11 +1,8 @@
 import React,{ Component } from 'react';
 import { Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete, Spin, Modal } from 'antd';
 
-import axios from '../../../../util/axios';
 import util from "../../../../util/util";
-
 import style from '../style.less';
-import {TenantType} from "../../../../config";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -35,6 +32,14 @@ class AddAppForm extends Component {
         };
     };
 
+    componentDidMount(){
+        if (Object.keys(this.props.formObject).length!==0 && util.isEmpty(this.props.formObject.parentId)){
+            this.setState({
+                studioDisabled:true
+            })
+        }
+    }
+
     handleChangeType = (value) =>{
 
         if (FORM_TYPE_STUDIO===value){
@@ -55,6 +60,10 @@ class AddAppForm extends Component {
                 mobileGameTypeId:{
                 },
             });
+            //改变表单值
+            // this.props.form.setFieldsValue({
+            //     note: `Hi, ${value === 'male' ? 'man' : 'lady'}!`,
+            // });
         }
 
         this.setState({
@@ -90,6 +99,7 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: true, message: '请选择类型',
                             }],
+                            initialValue: Object.keys(this.props.formObject).length===0?null:util.isEmpty(this.props.formObject.parentId)?FORM_TYPE.STUDIO.key:FORM_TYPE.APP.key
                         })(
                             <Select onSelect={(val)=>this.handleChangeType(val)}>
                                 <Option value={ FORM_TYPE.APP.key } key={ FORM_TYPE.APP.key }>{ FORM_TYPE.APP.text }</Option>
@@ -106,7 +116,7 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: true, message: '请输入appId',
                             }],
-                            initialValue: this.props.info.id
+                            initialValue: this.props.formObject.id
                         })(
                             <Input />
                         )}
@@ -120,7 +130,7 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: true, message: '请输入应用名称',
                             }],
-                            initialValue: this.props.info.appName
+                            initialValue: this.props.formObject.appName
                         })(
                             <Input />
                         )}
@@ -134,7 +144,7 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: true, message: '请输入应用缩写',
                             }],
-                            initialValue: this.props.info.appAbbrName
+                            initialValue: this.props.formObject.appAbbrName
                         })(
                             <Input />
                         )}
@@ -148,7 +158,7 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: true, message: '请输入应用描述',
                             }],
-                            initialValue: this.props.info.appDesc
+                            initialValue: this.props.formObject.appDesc
                         })(
                             <Input />
                         )}
@@ -162,15 +172,13 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: !this.state.studioDisabled, message: '请选择游戏类型',
                             }],
-                            initialValue: `${util.isEmpty(this.props.info.appType)?"":this.props.info.appType}`
+                            initialValue: `${util.isEmpty(this.props.formObject.appType)?"":this.props.formObject.appType}`
                         })(
                             <Select disabled={this.state.studioDisabled}>
                                 {
-                                    this.props.appType.map(item => {
-                                        return Object.keys(item).map(key=>{
-                                            return <Option value={key} key={key}>{item[key]}</Option>
-                                        })
-                                    })
+                                    Object.keys(this.props.appType).map(key => (
+                                        <Option value={key} key={key}>{this.props.appType[key]}</Option>
+                                    ))
                                 }
                             </Select>
                         )}
@@ -184,15 +192,13 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: !this.state.studioDisabled, message: '请选择客户端类型',
                             }],
-                            initialValue: `${util.isEmpty(this.props.info.clientType)?"":this.props.info.clientType}`
+                            initialValue: `${util.isEmpty(this.props.formObject.clientType)?"":this.props.formObject.clientType}`
                         })(
                             <Select disabled={this.state.studioDisabled}>
                                 {
-                                    this.props.clientType.map(item => {
-                                        return Object.keys(item).map(key=>{
-                                            return <Option value={key} key={key}>{item[key]}</Option>
-                                        })
-                                    })
+                                    Object.keys(this.props.clientType).map(key => (
+                                        <Option value={key} key={key}>{this.props.clientType[key]}</Option>
+                                    ))
                                 }
                             </Select>
                         )}
@@ -206,15 +212,13 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: !this.state.studioDisabled, message: '请选择建模机制',
                             }],
-                            initialValue: `${util.isEmpty(this.props.info.graphicsMode)?"":this.props.info.graphicsMode}`
+                            initialValue: `${util.isEmpty(this.props.formObject.graphicsMode)?"":this.props.formObject.graphicsMode}`
                         })(
                             <Select disabled={this.state.studioDisabled}>
                                 {
-                                    this.props.graphicsMode.map(item => {
-                                        return Object.keys(item).map(key=>{
-                                            return <Option value={key} key={key}>{item[key]}</Option>
-                                        })
-                                    })
+                                    Object.keys(this.props.graphicsMode).map(key => (
+                                        <Option value={key} key={key}>{this.props.graphicsMode[key]}</Option>
+                                    ))
                                 }
                             </Select>
                         )}
@@ -228,15 +232,13 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: !this.state.studioDisabled, message: '请选择运营归属',
                             }],
-                            initialValue: `${util.isEmpty(this.props.info.operationMode)?"":this.props.info.operationMode}`
+                            initialValue: `${util.isEmpty(this.props.formObject.operationMode)?"":this.props.formObject.operationMode}`
                         })(
                             <Select disabled={this.state.studioDisabled}>
                                 {
-                                    this.props.operationMode.map(item => {
-                                        return Object.keys(item).map(key=>{
-                                            return <Option value={key} key={key}>{item[key]}</Option>
-                                        })
-                                    })
+                                    Object.keys(this.props.operationMode).map(key => (
+                                        <Option value={key} key={key}>{this.props.operationMode[key]}</Option>
+                                    ))
                                 }
                             </Select>
                         )}
@@ -250,15 +252,13 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: !this.state.studioDisabled, message: '请选择来源',
                             }],
-                            initialValue: `${util.isEmpty(this.props.info.appSource)?"":this.props.info.appSource}`
+                            initialValue: `${util.isEmpty(this.props.formObject.appSource)?"":this.props.formObject.appSource}`
                         })(
                             <Select disabled={this.state.studioDisabled}>
                                 {
-                                    this.props.appSource.map(item => {
-                                        return Object.keys(item).map(key=>{
-                                            return <Option value={key} key={key}>{item[key]}</Option>
-                                        })
-                                    })
+                                    Object.keys(this.props.appSource).map(key => (
+                                        <Option value={key} key={key}>{this.props.appSource[key]}</Option>
+                                    ))
                                 }
                             </Select>
                         )}
@@ -273,14 +273,12 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: !this.state.studioDisabled, message: '请选择工作室',
                             }],
-                            initialValue: `${util.isEmpty(this.props.info.parentId)?"":this.props.info.parentId}`
+                            initialValue: `${util.isEmpty(this.props.formObject.parentId)?"":this.props.formObject.parentId}`
                         })(
                             <Select disabled={this.state.studioDisabled}>
                                 {
-                                    this.props.parentId.map(item => {
-                                        return Object.keys(item).map(key=>{
-                                            return <Option value={key} key={key}>{item[key]}</Option>
-                                        })
+                                    Object.keys(this.props.parentId).map(key => {
+                                         return <Option value={key} key={key}>{this.props.parentId[key]}</Option>
                                     })
                                 }
                             </Select>
@@ -295,17 +293,25 @@ class AddAppForm extends Component {
                             rules: [{
                                 required: !this.state.studioDisabled, message: '请选择二级手游分类',
                             }],
-                            initialValue: `${util.isEmpty(this.props.info.mobileGameTypeId)?"":this.props.info.mobileGameTypeId}`
+                            initialValue: `${util.isEmpty(this.props.formObject.mobileGameTypeId)?"":this.props.formObject.mobileGameTypeId}`
                         })(
                             <Select disabled={this.state.studioDisabled}>
                                 {
-                                    this.props.mobileGameType.map(item => {
-                                        return Object.keys(item).map(key=>{
-                                            return <Option value={key} key={key}>{item[key]}</Option>
-                                        })
-                                    })
+
+                                    Object.keys(this.props.mobileGameType).map(key => (
+                                        <Option value={key} key={key}>{this.props.mobileGameType[key]}</Option>
+                                    ))
                                 }
                             </Select>
+                        )}
+                    </FormItem>
+
+                    <FormItem
+                    >
+                        {getFieldDecorator('originalID',{
+                            initialValue: Object.keys(this.props.formObject).length===0?"":this.props.formObject.id
+                        })(
+                            <input type="hidden"/>
                         )}
                     </FormItem>
 
@@ -319,14 +325,14 @@ class AddAppForm extends Component {
 
 AddAppForm.defaultProps = {
     apps: {},
-    info:{},
-    appType:[],
-    clientType:[],
-    graphicsMode:[],
-    operationMode:[],
-    appSource:[],
-    mobileGameType:[],
-    parentId:[{1:'test'},{2:'test2'},{3:'test3'},{4:'test4'}],
+    formObject:{},
+    appType:{},
+    clientType:{},
+    graphicsMode:{},
+    operationMode:{},
+    appSource:{},
+    mobileGameType:{},
+    parentId:{},
 };
 
 

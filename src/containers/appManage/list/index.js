@@ -12,8 +12,8 @@ import AddAppForm from './component/addAppForm';
 const Search = Input.Search;
 const confirm = Modal.confirm;
 
-const NEW_TITLE = "新建组";
-const EDIT_TITLE = "编辑组";
+const NEW_TITLE = "新建APP";
+const EDIT_TITLE = "编辑APP";
 
 class AppList extends Component {
 
@@ -52,6 +52,13 @@ class AppList extends Component {
                 }, {
                     title: '工作室',
                     dataIndex: 'parentId',
+                    render: parentId => {
+                        console.log(this.state.parentId,parentId);
+                        const obj = Object.keys(this.state.parentId).find(i=>i===parentId+"");
+                        if (!util.isEmpty(obj)) {
+                            return this.state.parentId[parentId];
+                        }
+                    },
                     align: 'center',
                 }, {
                     title: '创建时间',
@@ -75,8 +82,8 @@ class AppList extends Component {
                     align: 'center',
                     render: (text, record) => (
                         <span>
-                            <a>编辑</a><Divider type="vertical"/>
-                            <a>删除</a>
+                            <a onClick={()=>this.modalToggle(true,EDIT_TITLE,record)}>编辑</a><Divider type="vertical"/>
+                            <a onClick={()=>this.handleDelete(record.id,record.appName)}>删除</a>
                         </span>
                     )
                 }
@@ -92,11 +99,12 @@ class AppList extends Component {
             dataBack: [],
             modalVisible: false,
             modalTitle: NEW_TITLE,
+            modalFormObject:{},
             addLoading: false,
-            globalLoading: false,
-            formObject: {}
+            globalLoading: false
         };
         this.handleFilterSearch = this.handleFilterSearch.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     componentDidMount() {
@@ -114,8 +122,28 @@ class AppList extends Component {
                 const operationMode = result.operationMode;
                 const appSource = result.appSource;
                 const mobileGameType = result.mobileGameType;
-                // const parentId = result.parentId;
-                const parentId = [{88888888: "传奇工作室"}, {88888889: "传世工作室"}, {88888890: "D.N.A工作室"}]
+                const parentId = result.parentId;
+
+                const keySet = new Set();
+                const deptFilters = [];
+                Object.keys(parentId).map(key=>{
+                    if (!keySet.has(key)){
+                        keySet.add(key);
+                        deptFilters.push({
+                            "text":parentId[key],
+                            "value":key
+                        });
+                    }
+                });
+                const columns = this.state.columns;
+                columns.forEach(value=>{
+                    if (value.title==='工作室'){
+                        value.filters=deptFilters;
+                        value.onFilter=(value, record) => {
+                            return record.parentId+""===value;
+                        }
+                    }
+                });
 
                 const data = result.data;
                 const dataBack = data.slice(0);
@@ -142,12 +170,51 @@ class AppList extends Component {
     /**
      * 对话框--新增和编辑
      */
-    modalToggle(toggle, title = NEW_TITLE, info = {}) {
+    modalToggle(toggle, title = NEW_TITLE, modalFormObject = {}) {
         this.setState({
             modalVisible: toggle,
             modalTitle: title,
-            formObject: info
+            modalFormObject: modalFormObject
         })
+    };
+
+    handleDelete=(appId,appName)=>{
+        const _this = this;
+        confirm({
+            title: '删除确认',
+            autoFocusButton:"cancel",
+            content: `是否删除：${appName}`,
+            okText: '删除',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk() {
+                _this.setState({
+                    globalLoading:true
+                });
+                axios.post("/app/deleteApp", {appId: appId})
+                    .then(() => {
+                        //删除成功，从data中去掉
+                        message.success("删除成功");
+                        const data = _this.state.data;
+                        const dataBack = _this.state.dataBack;
+                        const index = data.findIndex(item => item.id === appId);
+                        data.splice(index, 1);
+
+                        const indexBack = dataBack.findIndex(item => item.id === appId);
+                        dataBack.splice(indexBack, 1);
+
+                        _this.setState({
+                            data,dataBack,
+                            globalLoading:false
+                        })
+                    })
+                    .catch(()=>{
+                        _this.setState({
+                            globalLoading:false
+                        })
+                    });
+            }
+        });
     };
 
     handleFilterSearch = (value) => {
@@ -169,21 +236,41 @@ class AppList extends Component {
             if (error) {
                 return;
             }
-            console.log(values);
-            const data = this.addAppForm.props.form.getFieldsValue();
             this.setState({
                 addLoading: true,
                 globalLoading: true,
             });
-            axios.postByJson("/app/addApp", {...data})
+            axios.postByJson("/app/addApp", {...values})
                 .then(res => {
                     // 添加成功
                     // data中插入记录 关闭modal
                     const newInfo = res.data.data;
                     const data = this.state.data;
                     const dataBack = this.state.dataBack;
-                    data.push(newInfo);
-                    dataBack.push(newInfo);
+
+                    //id  非数据库自然id，与其他的处理有区别
+                    const originalID = values['originalID'];
+                    if (util.isEmpty(originalID)){
+                        data.unshift(newInfo);
+                        dataBack.unshift(newInfo);
+                    }else{
+                        //更新数据
+                        let dataIndex = data.findIndex(item =>{
+                            if (item.id===originalID){
+                                return true;
+                            }
+                        });
+                        let backIndex = dataBack.findIndex(item=>{
+                            if (item.id===originalID){
+                                return true;
+                            }
+                        });
+                        dataBack[backIndex] = newInfo;
+                        if (dataIndex!==-1){
+                            data[dataIndex] = newInfo;
+                        }
+                    }
+
                     this.setState({
                         data: data,
                         dataBack: dataBack,
@@ -236,7 +323,7 @@ class AppList extends Component {
                         maskClosable={false}
                         confirmLoading={this.state.addLoading}
                     >
-                        <AddAppForm apps={this.state.appData} info={this.state.formObject}
+                        <AddAppForm apps={this.state.appData} formObject={this.state.modalFormObject}
                                     appType={this.state.appType}
                                     clientType={this.state.clientType}
                                     graphicsMode={this.state.graphicsMode}
