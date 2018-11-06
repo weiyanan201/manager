@@ -33,7 +33,7 @@ const menus=[
         "name": "用户管理",
         "route": "",
         "bread": "",
-        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+        "roles":[roles.PLATFORM]
     },{
         "id": 9,
         "pid": 8,
@@ -41,7 +41,7 @@ const menus=[
         "name": "用户信息",
         "route": "/user/list",
         "bread": "用户信息",
-        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+        "roles":[roles.PLATFORM]
     },{
         "id": 10,
         "pid": 8,
@@ -49,7 +49,7 @@ const menus=[
         "name": "outService",
         "route": "/user/outService",
         "bread": "outService",
-        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+        "roles":[roles.PLATFORM]
     },{
         "id": 11,
         "pid": -1,

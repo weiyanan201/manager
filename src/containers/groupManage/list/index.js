@@ -37,7 +37,7 @@ class GroupList extends Component{
                 },{
                     title: 'app',
                     dataIndex: 'appId',
-                    render: appId => this.state.appData[appId],
+                    render: appId => this.state.allApp[appId],
                     align: 'center',
                 },{
                     title: '创建时间',
@@ -65,7 +65,8 @@ class GroupList extends Component{
             ],
             dataBack:[],
             data:[],
-            appData:[],
+            allApp:{},
+            restApp:{},
             modalVisible:false,
             modalTitle:NEW_TITLE,
             addLoading:false,
@@ -81,11 +82,12 @@ class GroupList extends Component{
         axios.get("/group/getList")
             .then(res=>{
                 const result = res.data.data;
-                const appData = result.app;
+                const allApp = result.allApp;
+                const restApp = result.restApp;
                 const data = result.group;
                 const dataBack = data.slice(0);
                 this.setState({
-                    data,dataBack,appData,globalLoading:false
+                    data,dataBack,allApp,restApp,globalLoading:false
                 })
             }).catch(()=>{
                 this.setState({
@@ -137,8 +139,29 @@ class GroupList extends Component{
                     const newInfo = res.data.data;
                     const data = this.state.data;
                     const dataBack = this.state.dataBack;
-                    data.push(newInfo);
-                    dataBack.push(newInfo);
+
+                    let dataIndex = data.findIndex(item =>{
+                        if (item.id===newInfo.id){
+                            return true;
+                        }
+                    });
+                    let backIndex = dataBack.findIndex(item=>{
+                        if (item.id===newInfo.id){
+                            return true;
+                        }
+                    });
+                    if (backIndex===-1){
+                        //添加数据
+                        data.unshift(newInfo);
+                        dataBack.unshift(newInfo);
+                    }else{
+                        //更新数据
+                        dataBack[backIndex] = newInfo;
+                        if (dataIndex!==-1){
+                            data[dataIndex] = newInfo;
+                        }
+                    }
+
                     this.setState({
                         data:data,
                         dataBack:dataBack,
@@ -162,7 +185,7 @@ class GroupList extends Component{
         confirm({
             title: '删除确认',
             autoFocusButton:"cancel",
-            content: `是否删除用户：${name}`,
+            content: `是否删除group：${name}`,
             okText: '删除',
             okType: 'danger',
             cancelText: '取消',
@@ -198,7 +221,6 @@ class GroupList extends Component{
 
     };
 
-
     render(){
         return (
             <div>
@@ -231,11 +253,12 @@ class GroupList extends Component{
                         maskClosable={false}
                         confirmLoading={this.state.addLoading}
                     >
-                        <AddGroupForm apps={this.state.appData} info={this.state.formObject}
+                        <AddGroupForm restApp={this.state.restApp}
+                                      formObject={this.state.formObject}
+                                      allApps={this.state.allApp}
                             wrappedComponentRef={(inst) => {
                             this.addGroupForm = inst;
                         }}/>
-
                     </Modal>
 
                 </Spin>

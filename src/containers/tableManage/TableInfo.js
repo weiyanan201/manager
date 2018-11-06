@@ -323,12 +323,16 @@ export default class TableInfo extends Component {
                 } else {
                     if (oldItem.name !== column.name || oldItem.type !== column.type || oldItem.comment !== column.comment || oldItem.nullable !== column.nullable) {
 
+                        if (this.state.storageType==='ES' || this.state.storageType=== "PHOENIX"){
+                            message.error("ES、PHOENIX 不允许修改已有字段");
+                            return ;
+                        }
+
                         axios.postByJson("/table/modifyColumn", {
                             ...column,
                             oldName: oldName,
                             tableId: this.state.tableId
-                        })
-                            .then(res => {
+                        }).then(res => {
                                 message.success("字段更新成功");
                                 const dataSource = this.state.dataSource;
                                 column.key = oldItem.key;
@@ -422,7 +426,7 @@ export default class TableInfo extends Component {
             return;
         }
         this.setState({loading: true});
-        axios.postByJson("/table/addColumns", {columns: columns, tableId: this.state.tableId})
+        axios.postByJson("/table/addColumns", {columns: columns, tableId: this.state.tableId,storageType:this.state.storageType})
             .then(res => {
                 message.success("更新成功！");
                 const existed = this.state.existed;

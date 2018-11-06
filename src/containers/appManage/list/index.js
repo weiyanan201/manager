@@ -312,7 +312,7 @@ class AppList extends Component {
                     </div>
 
                     <Modal
-                        title="新建组"
+                        title="新建App"
                         visible={this.state.modalVisible}
                         width={600}
                         onCancel={() => {

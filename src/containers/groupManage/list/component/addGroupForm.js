@@ -9,6 +9,22 @@ const Option = Select.Option;
 
 class AddGroupForm extends Component {
 
+    state = {
+        apps:{}
+    }
+    componentDidMount(){
+        //组合剩余app
+        //rest+选中的app
+        // const apps =  this.props.restApp;
+        const apps = Object.assign({}, this.props.restApp);
+        if (Object.keys(this.props.formObject).length>0){
+            apps[this.props.formObject.appId]=this.props.allApps[this.props.formObject.appId];
+        }
+        this.setState({
+            apps
+        })
+    }
+
     render(){
 
         const { getFieldDecorator } = this.props.form;
@@ -26,7 +42,6 @@ class AddGroupForm extends Component {
         return (
 
                 <Form >
-
                     <FormItem
                         {...formItemLayout}
                         label="组名"
@@ -35,7 +50,7 @@ class AddGroupForm extends Component {
                             rules: [{
                                 required: true, message: '请输入组名',
                             }],
-                            initialValue: this.props.info.name
+                            initialValue: this.props.formObject.name
                         })(
                             <Input />
                         )}
@@ -49,7 +64,7 @@ class AddGroupForm extends Component {
                             rules: [{
                                 required: true, message: '请输入描述',
                             }],
-                            initialValue: this.props.info.desc
+                            initialValue: this.props.formObject.desc
                         })(
                             <Input />
                         )}
@@ -60,18 +75,29 @@ class AddGroupForm extends Component {
                         label="对应APP"
                     >
                         {getFieldDecorator('appId',{
-                            initialValue: `${util.isEmpty(this.props.info.appId)?"":this.props.info.appId}`
+                            initialValue: `${util.isEmpty(this.props.formObject.appId)?"":this.props.formObject.appId}`
                         })(
-                            <Select>
+                            <Select
+                                filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                showSearch
+                            >
                                 {
-                                    Object.keys(this.props.apps).map(id=>
-                                        <Option value={id} key={id}>{this.props.apps[id]}</Option>
+                                    Object.keys(this.state.apps).map(id=>
+                                        <Option value={id} key={id}>{this.state.apps[id]}</Option>
                                     )
                                 }
                             </Select>
                         )}
                     </FormItem>
 
+                    <FormItem
+                    >
+                        {getFieldDecorator('id',{
+                            initialValue: Object.keys(this.props.formObject).length===0?"":this.props.formObject.id
+                        })(
+                            <input type="hidden" />
+                        )}
+                    </FormItem>
                 </Form>
         )
     }
@@ -79,8 +105,9 @@ class AddGroupForm extends Component {
 
 
 AddGroupForm.defaultProps = {
-    apps: {},
-    info:{}
+    restApp: {},
+    allApps:{},
+    formObject:{}
 };
 
 
