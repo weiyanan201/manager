@@ -6,7 +6,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import {Button , Card,Spin,Form,Input,Select,Row,message,Modal,Collapse,Checkbox, Icon} from 'antd';
-import GroupSelect  from '../../components/groupSelect/GroupSelect';
 import EditableTable from './component/editableTable/EditableTable';
 import TableSelect from '../../components/TableSelect';
 import tableUtil from '../../util/tableUtil';
@@ -510,7 +509,17 @@ class CreateTable extends React.Component{
                                         message: '请选择group分组',
                                     }],
                                 })(
-                                    <GroupSelect groupData={tableUtil.filterGroup(this.props.group.allGroup,this.props.auth)} handleChange={this.handleChangeGroup} handleSearch={this.handleChangeGroup} />
+                                    <Select style={{width: 200}}
+                                            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                            onChange={this.handleChangeGroup}
+                                            showSearch
+                                    >
+                                        {
+                                            tableUtil.filterGroup(this.props.group.allGroup,this.props.auth).map(group=>
+                                                <Option key={group.id}>{group.name}</Option>
+                                            )
+                                        }
+                                    </Select>
                                 )}
                             </FormItem>
                             <FormItem label="存储介质" >

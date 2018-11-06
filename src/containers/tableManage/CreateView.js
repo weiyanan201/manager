@@ -2,10 +2,8 @@
 import React from 'react';
 import {Button ,Card,Form,Input,Select,Row,message,Modal } from 'antd';
 
-import GroupSelect  from '../../components/groupSelect/GroupSelect';
 import TableSelect from '../../components/TableSelect';
 import EditableTable from './component/editableTable/EditableTable';
-
 import tableUtil from '../../util/tableUtil';
 import config from '../../util/config';
 import axios from '../../util/axios';
@@ -261,7 +259,17 @@ class CreateView extends React.Component{
                                         message: '请选择group分组',
                                     }],
                                 })(
-                                    <GroupSelect groupData={tableUtil.filterGroup(this.props.group.allGroup,this.props.auth)} handleChange={this.handleChangeGroup} handleSearch={this.handleChangeGroup} />
+                                    <Select style={{width: 200}}
+                                            filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+                                            onChange={this.handleChangeGroup}
+                                            showSearch
+                                    >
+                                        {
+                                            tableUtil.filterGroup(this.props.group.allGroup,this.props.auth).map(group=>
+                                                <Option key={group.id}>{group.name}</Option>
+                                            )
+                                        }
+                                    </Select>
                                 )}
                             </FormItem>
                             <FormItem label="存储介质" >

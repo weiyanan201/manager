@@ -57,7 +57,7 @@ const menus=[
         "name": "组管理",
         "route": "",
         "bread": "",
-        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+        "roles":[roles.PLATFORM]
     },{
         "id": 12,
         "pid": 11,
@@ -65,7 +65,7 @@ const menus=[
         "name": "组信息",
         "route": "/group/list",
         "bread": "组信息",
-        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+        "roles":[roles.PLATFORM]
     },{
         "id": 13,
         "pid": -1,
@@ -83,20 +83,20 @@ const menus=[
         "bread": "App信息",
         "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
     },{
+        "id": 16,
+        "pid": 13,
+        "iconfont": "icon-mobile",
+        "name": "手游类型管理",
+        "route": "/mobileGame/list",
+        "bread": "手游类型管理",
+        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+    },{
         "id": 15,
         "pid": -1,
         "iconfont": "icon-database",
         "name": "数据库信息",
         "route": "/db/list",
         "bread": "数据库信息",
-        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
-    },{
-        "id": 16,
-        "pid": -1,
-        "iconfont": "icon-mobile",
-        "name": "手游类型管理",
-        "route": "/mobileGame/list",
-        "bread": "手游类型管理",
         "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
     }
 
