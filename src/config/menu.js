@@ -97,7 +97,7 @@ const menus=[
         "name": "数据库信息",
         "route": "/db/list",
         "bread": "数据库信息",
-        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+        "roles":[roles.PLATFORM]
     }
 
 ];

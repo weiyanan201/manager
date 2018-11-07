@@ -315,7 +315,7 @@ class AppList extends Component {
     };
 
     hasOperationAuth=()=>{
-        return this.props.role === TenantType.GROUP_USER.key || this.props.role === TenantType.GROUP_USER.key;
+        return this.props.role === TenantType.PLATFORM.key || this.props.role === TenantType.GLOBAL_DEVELOPER.key;
     };
 
     render() {

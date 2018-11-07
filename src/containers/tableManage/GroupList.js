@@ -84,10 +84,6 @@ export default class GroupList extends Component {
 
     //搜索框为空时自动刷新
     handleChangeText(value) {
-        // if (util.isEmpty(value)){
-        //     console.log("changne");
-        //
-        // }
         this.handleSearch(value);
         this.setState({
             textValue: value

@@ -114,7 +114,6 @@ class GroupList extends Component{
      * 对话框--新增和编辑
      */
     modalToggle(toggle,title=NEW_TITLE,info={}){
-        console.log(toggle,title,info);
         this.setState({
             modalVisible:toggle,
             modalTitle:title,

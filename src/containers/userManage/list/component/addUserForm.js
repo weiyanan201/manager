@@ -71,7 +71,6 @@ class AddUserForm extends Component {
         axios.get("/tenant/getUserInfoByUAM",{sourceId:sourceId})
             .then(res=>{
                 const data = res.data.data;
-                console.log(data);
                 this.props.form.setFieldsValue({
                     userName:data.UserName,
                     deptName:data.DeptName,

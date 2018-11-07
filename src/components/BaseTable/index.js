@@ -26,7 +26,6 @@ export default class BaseTable extends React.Component{
             let selectedRowKeys = selection._self.state[ROW_KYES];
             this.rowSelection = {
                 onChange: (selectedRowKeys, selectedRows) => {
-                    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
                     stateUtil.updateTest(selection._self,{[ROW_KYES]:selectedRowKeys,[ROWS]:selectedRows});
                 },
                 selectedRowKeys:[]

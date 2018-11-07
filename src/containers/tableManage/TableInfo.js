@@ -341,8 +341,8 @@ export default class TableInfo extends Component {
                                 existed.splice(existedIndex, 1, column.name);
                                 this.setState({dataSource, columnEditVisible: false, rows: [column]});
                             }).catch(error => {
-                            console.log(error);
-                        })
+                                console.log(error);
+                            })
                     }
                     this.setState({columnEditVisible: false})
                 }
@@ -413,7 +413,6 @@ export default class TableInfo extends Component {
                     })
             },
             onCancel() {
-                console.log('Cancel');
             },
         });
     }

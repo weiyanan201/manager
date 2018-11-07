@@ -131,7 +131,6 @@ class CreateTable extends React.Component{
                     let columns = [];
                     let count = 1;
                     rdata.columns.map(item=>{
-                        console.log(item);
                         item.type = tableUtil.fieldTypeDeser(item.type);
                         item.key = count;
                         count++;
@@ -294,7 +293,6 @@ class CreateTable extends React.Component{
 
     //高级属性开关
     handleToggleAdvanced=()=>{
-        console.log(this.state.advancedKey);
         this.setState({
             advancedKey:this.state.advancedKey.length>0?[]:['1']
         })

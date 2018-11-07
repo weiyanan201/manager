@@ -242,7 +242,6 @@ class UserList extends Component {
                 });
                 axios.post("/tenant/deleteTenant", {tenantId: id})
                     .then(res => {
-                        console.log(res);
                         //删除成功，从data中去掉
                         message.success("删除成功");
                         const data = _this.state.data;
