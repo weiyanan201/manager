@@ -101,7 +101,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: Object.keys(this.props.formObject).length===0?null:util.isEmpty(this.props.formObject.parentId)?FORM_TYPE.STUDIO.key:FORM_TYPE.APP.key
                         })(
-                            <Select onSelect={(val)=>this.handleChangeType(val)}>
+                            <Select onSelect={(val)=>this.handleChangeType(val)} disabled={this.props.readOnly}>
                                 <Option value={ FORM_TYPE.APP.key } key={ FORM_TYPE.APP.key }>{ FORM_TYPE.APP.text }</Option>
                                 <Option value={ FORM_TYPE.STUDIO.key } key={ FORM_TYPE.STUDIO.key }>{ FORM_TYPE.STUDIO.text }</Option>
                             </Select>
@@ -118,7 +118,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: this.props.formObject.id
                         })(
-                            <Input />
+                            <Input disabled={this.props.readOnly}/>
                         )}
                     </FormItem>
 
@@ -132,7 +132,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: this.props.formObject.appName
                         })(
-                            <Input />
+                            <Input disabled={this.props.readOnly}/>
                         )}
                     </FormItem>
 
@@ -146,7 +146,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: this.props.formObject.appAbbrName
                         })(
-                            <Input />
+                            <Input disabled={this.props.readOnly}/>
                         )}
                     </FormItem>
 
@@ -160,7 +160,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: this.props.formObject.appDesc
                         })(
-                            <Input />
+                            <Input disabled={this.props.readOnly}/>
                         )}
                     </FormItem>
 
@@ -174,7 +174,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: `${util.isEmpty(this.props.formObject.appType)?"":this.props.formObject.appType}`
                         })(
-                            <Select disabled={this.state.studioDisabled}>
+                            <Select disabled={this.state.studioDisabled || this.props.readOnly}>
                                 {
                                     Object.keys(this.props.appType).map(key => (
                                         <Option value={key} key={key}>{this.props.appType[key]}</Option>
@@ -194,7 +194,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: `${util.isEmpty(this.props.formObject.clientType)?"":this.props.formObject.clientType}`
                         })(
-                            <Select disabled={this.state.studioDisabled}>
+                            <Select disabled={this.state.studioDisabled || this.props.readOnly}>
                                 {
                                     Object.keys(this.props.clientType).map(key => (
                                         <Option value={key} key={key}>{this.props.clientType[key]}</Option>
@@ -214,7 +214,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: `${util.isEmpty(this.props.formObject.graphicsMode)?"":this.props.formObject.graphicsMode}`
                         })(
-                            <Select disabled={this.state.studioDisabled}>
+                            <Select disabled={this.state.studioDisabled || this.props.readOnly}>
                                 {
                                     Object.keys(this.props.graphicsMode).map(key => (
                                         <Option value={key} key={key}>{this.props.graphicsMode[key]}</Option>
@@ -234,7 +234,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: `${util.isEmpty(this.props.formObject.operationMode)?"":this.props.formObject.operationMode}`
                         })(
-                            <Select disabled={this.state.studioDisabled}>
+                            <Select disabled={this.state.studioDisabled || this.props.readOnly}>
                                 {
                                     Object.keys(this.props.operationMode).map(key => (
                                         <Option value={key} key={key}>{this.props.operationMode[key]}</Option>
@@ -254,7 +254,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: `${util.isEmpty(this.props.formObject.appSource)?"":this.props.formObject.appSource}`
                         })(
-                            <Select disabled={this.state.studioDisabled}>
+                            <Select disabled={this.state.studioDisabled || this.props.readOnly}>
                                 {
                                     Object.keys(this.props.appSource).map(key => (
                                         <Option value={key} key={key}>{this.props.appSource[key]}</Option>
@@ -275,7 +275,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: `${util.isEmpty(this.props.formObject.parentId)?"":this.props.formObject.parentId}`
                         })(
-                            <Select disabled={this.state.studioDisabled}>
+                            <Select disabled={this.state.studioDisabled || this.props.readOnly}>
                                 {
                                     Object.keys(this.props.parentId).map(key => {
                                          return <Option value={key} key={key}>{this.props.parentId[key]}</Option>
@@ -295,7 +295,7 @@ class AddAppForm extends Component {
                             }],
                             initialValue: `${util.isEmpty(this.props.formObject.mobileGameTypeId)?"":this.props.formObject.mobileGameTypeId}`
                         })(
-                            <Select disabled={this.state.studioDisabled}>
+                            <Select disabled={this.state.studioDisabled || this.props.readOnly}>
                                 {
 
                                     Object.keys(this.props.mobileGameType).map(key => (
@@ -333,6 +333,7 @@ AddAppForm.defaultProps = {
     appSource:{},
     mobileGameType:{},
     parentId:{},
+    readOnly:false
 };
 
 

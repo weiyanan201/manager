@@ -1,20 +1,28 @@
 /**
  * app 管理页面
+ * 所有人都能看到，PLATFORM+GLOBAL_DEVELOPER 可以操作，其他角色隐藏操作按钮
  */
 
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
 import {Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
+
 import util from "../../../util/util";
 import axios from "../../../util/axios";
-
 import AddAppForm from './component/addAppForm';
+import {TenantType} from '../../../config'
 
 const Search = Input.Search;
 const confirm = Modal.confirm;
 
 const NEW_TITLE = "新建APP";
 const EDIT_TITLE = "编辑APP";
+const INFO_TITLE = "APP详情";
 
+@connect(
+    state => state.auth,
+    {}
+)
 class AppList extends Component {
 
     constructor(props) {
@@ -53,7 +61,6 @@ class AppList extends Component {
                     title: '工作室',
                     dataIndex: 'parentId',
                     render: parentId => {
-                        console.log(this.state.parentId,parentId);
                         const obj = Object.keys(this.state.parentId).find(i=>i===parentId+"");
                         if (!util.isEmpty(obj)) {
                             return this.state.parentId[parentId];
@@ -81,10 +88,15 @@ class AppList extends Component {
                     title: '操作',
                     align: 'center',
                     render: (text, record) => (
-                        <span>
-                            <a onClick={()=>this.modalToggle(true,EDIT_TITLE,record)}>编辑</a><Divider type="vertical"/>
-                            <a onClick={()=>this.handleDelete(record.id,record.appName)}>删除</a>
-                        </span>
+                        this.hasOperationAuth()?
+                            <span>
+                                <a onClick={()=>this.modalToggle(true,EDIT_TITLE,record)}>编辑</a><Divider type="vertical"/>
+                                <a onClick={()=>this.handleDelete(record.id,record.appName)}>删除</a>
+                            </span>
+                            :
+                            <span>
+                                <a onClick={()=>this.modalToggle(true,INFO_TITLE,record)}>详情</a>
+                            </span>
                     )
                 }
             ],
@@ -100,11 +112,13 @@ class AppList extends Component {
             modalVisible: false,
             modalTitle: NEW_TITLE,
             modalFormObject:{},
+            modalReadOnly:false,
             addLoading: false,
             globalLoading: false
         };
         this.handleFilterSearch = this.handleFilterSearch.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+        this.hasOperationAuth = this.hasOperationAuth.bind(this);
     }
 
     componentDidMount() {
@@ -114,9 +128,7 @@ class AppList extends Component {
         axios.get("/app/getList")
             .then(res => {
                 const result = res.data.data;
-                console.log(result);
                 const appType = result.appType;
-                console.log(appType);
                 const clientType = result.clientType;
                 const graphicsMode = result.graphicsMode;
                 const operationMode = result.operationMode;
@@ -171,10 +183,15 @@ class AppList extends Component {
      * 对话框--新增和编辑
      */
     modalToggle(toggle, title = NEW_TITLE, modalFormObject = {}) {
+        let readonly = false;
+        if (title===INFO_TITLE){
+            readonly = true;
+        }
         this.setState({
             modalVisible: toggle,
             modalTitle: title,
-            modalFormObject: modalFormObject
+            modalFormObject: modalFormObject,
+            modalReadOnly:readonly,
         })
     };
 
@@ -232,6 +249,14 @@ class AppList extends Component {
     };
 
     handleAddSubmit = () => {
+
+        if (this.state.modalReadOnly===true){
+            this.setState({
+                modalVisible: false,
+            })
+            return ;
+        }
+
         this.addAppForm.props.form.validateFields((error, values) => {
             if (error) {
                 return;
@@ -280,17 +305,20 @@ class AppList extends Component {
                     });
                     message.success("创建成功!");
                 }).catch(() => {
-                this.setState({
-                    modalVisible: false,
-                    addLoading: false,
-                    globalLoading: false
-                })
+                    this.setState({
+                        modalVisible: false,
+                        addLoading: false,
+                        globalLoading: false
+                    })
             });
         });
     };
 
+    hasOperationAuth=()=>{
+        return this.props.role === TenantType.GROUP_USER.key || this.props.role === TenantType.GROUP_USER.key;
+    };
+
     render() {
-        console.log(this.state);
         return (
             <div>
                 <Spin spinning={this.state.globalLoading}>
@@ -304,6 +332,7 @@ class AppList extends Component {
                         style={{width: 200}}
                     />
                         <Button type='primary' onClick={() => this.modalToggle(true)}
+                                hidden={!this.hasOperationAuth()}
                                 style={{float: "right"}}>新建App</Button>
                     </div>
 
@@ -312,7 +341,7 @@ class AppList extends Component {
                     </div>
 
                     <Modal
-                        title="新建App"
+                        title={this.state.modalTitle}
                         visible={this.state.modalVisible}
                         width={600}
                         onCancel={() => {
@@ -331,6 +360,7 @@ class AppList extends Component {
                                     appSource={this.state.appSource}
                                     mobileGameType={this.state.mobileGameType}
                                     parentId={this.state.parentId}
+                                    readOnly={this.state.modalReadOnly}
                                     wrappedComponentRef={(inst) => {
                                         this.addAppForm = inst;
                                     }}/>

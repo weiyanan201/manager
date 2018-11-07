@@ -89,7 +89,7 @@ const menus=[
         "name": "手游类型管理",
         "route": "/mobileGame/list",
         "bread": "手游类型管理",
-        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+        "roles":[roles.PLATFORM]
     },{
         "id": 15,
         "pid": -1,
