@@ -1,17 +1,15 @@
 import React,{ Component } from 'react';
-import { Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete, Spin, Modal } from 'antd';
+import { Form, Input } from 'antd';
 
-import { StorageType,ProduceType } from '../../../../config';
 import util from "../../../../util/util";
 
 const FormItem = Form.Item;
-const Option = Select.Option;
 
 class AddMobileGameForm extends Component {
 
     state = {
         ownerDisabled:true
-    }
+    };
 
     formItemLayout = {
         labelCol: {

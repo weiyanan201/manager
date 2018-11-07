@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import { Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete, Spin, Modal } from 'antd';
+import { Form, Input, Select } from 'antd';
 
 import { StorageType,ProduceType } from '../../../../config';
 

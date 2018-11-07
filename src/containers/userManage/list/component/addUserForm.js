@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import { Form, Input,  Select, Row, Col, Button, Spin } from 'antd';
+import { Form, Input,  Select, Row, Col, Button } from 'antd';
 
 import {TenantType} from "../../../../config";
 import axios from '../../../../util/axios';
@@ -84,15 +84,6 @@ class AddUserForm extends Component {
 
     };
 
-    handleSubmit = (e) => {
-        e.preventDefault();
-        this.props.form.validateFieldsAndScroll((err, values) => {
-            if (!err) {
-                console.log('Received values of form: ', values);
-            }
-        });
-    };
-
     //add show all
     //edit outService  disable
     //edit other exclude outService
@@ -149,7 +140,7 @@ class AddUserForm extends Component {
         };
 
         return (
-                <Form onSubmit={this.handleSubmit}>
+                <Form >
                     <FormItem
                         {...formItemLayout}
                         label="用户类型"

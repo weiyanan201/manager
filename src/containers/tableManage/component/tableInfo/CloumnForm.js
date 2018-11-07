@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Card, Form, Button, Input, Checkbox, Modal, Cascader, message, Spin, Icon} from 'antd';
+import { Form, Input, Checkbox, Cascader } from 'antd';
 
 import tableUtil from "../../../../util/tableUtil";
 import util from "../../../../util/util";

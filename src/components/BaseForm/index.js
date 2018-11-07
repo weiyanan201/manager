@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
 import { Input, Select, Form, Button, Checkbox, Radio, DatePicker} from 'antd'
 
 import {getOptionList} from '../../util/util'

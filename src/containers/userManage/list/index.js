@@ -3,7 +3,7 @@
  */
 
 import React, {Component} from 'react';
-import {Pagination, Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
+import { Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
 
 import util from "../../../util/util";
 import { TenantType } from "../../../config"
@@ -19,10 +19,6 @@ const confirm = Modal.confirm;
 
 const NEW_TITILE = "新建用户";
 const EDIT_TITLE = "编辑用户";
-
-function onChange(pagination, filters, sorter) {
-    console.log('params', pagination, filters, sorter);
-}
 
 class UserList extends Component {
     constructor(props){
@@ -284,7 +280,7 @@ class UserList extends Component {
                     </div>
 
                     <div className={style.userTableWrapper}>
-                        <Table columns={this.state.columns} dataSource={this.state.data} onChange={onChange} bordered/>
+                        <Table columns={this.state.columns} dataSource={this.state.data} bordered/>
                     </div>
                     <Modal
                         title="新建用户"

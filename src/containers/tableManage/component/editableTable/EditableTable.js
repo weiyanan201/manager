@@ -2,7 +2,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import {Button , Card,Spin,Table,Cascader,Form,InputNumber,Input,Popconfirm,Select,Row,message,Modal,Collapse ,Checkbox,Badge } from 'antd';
+import {Button , Table,Cascader,Form,Input,Popconfirm,Modal ,Checkbox } from 'antd';
 import tableUtil from '../../../../util/tableUtil';
 
 

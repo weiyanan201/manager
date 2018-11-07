@@ -47,7 +47,7 @@ function _arrayToTree(menus){
     data.forEach((item,index)=>{
         // hash[data[index]['id']] = data[index];
         hash[item.id] = item;
-    })
+    });
     data.forEach(item=>{
         let hasParent = hash[item['pid']];
         if(hasParent){
@@ -58,7 +58,7 @@ function _arrayToTree(menus){
         }else{
             result.push(item);
         }
-    })
+    });
     return result;
 
 }

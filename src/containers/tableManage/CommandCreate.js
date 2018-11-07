@@ -3,7 +3,6 @@ import {Button , Card,Spin,Input,message } from 'antd';
 
 import axios from '../../util/axios';
 import util from '../../util/util';
-
 import style from './table.less';
 
 const { TextArea } = Input;
@@ -57,7 +56,8 @@ export default class CommandCreate extends React.Component{
             }
 
         }).catch((error)=>{
-            console.log(error);
+            console.error(error);
+            // console.log(error);
             clearInterval(_this.state.timer);
             let msg = util.getResponseError(error);
             this.setState({

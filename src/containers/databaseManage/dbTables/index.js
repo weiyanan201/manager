@@ -1,6 +1,6 @@
 import React,{ Component } from 'react';
 import { connect } from 'react-redux';
-import { Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
+import { Input, Button, Table, Modal, message, Spin } from 'antd';
 
 import NavLink from '../../../components/NavLink/NavLink';
 import util from "../../../util/util";

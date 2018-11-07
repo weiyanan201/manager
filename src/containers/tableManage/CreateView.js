@@ -113,7 +113,6 @@ class CreateView extends React.Component{
     };
 
     handleSubmit=()=>{
-        console.log(this.state);
         let errorMessage = [];
         this.props.form.validateFields((err, values) => {
             if (!err) {

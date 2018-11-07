@@ -4,19 +4,16 @@
 
 import React, {Component} from 'react';
 import { connect } from 'react-redux';
-
 import { Button, Modal } from 'antd';
 
 import util from "../../../../util/util";
 import { handleAllCheck,handleCheck,handleMove, handleSearch, modalToggle,handleSubmit, updateDataSource,ANALYST,DEVELOPER,CLEAR,LEFT,RIGHT } from "../../../../reducers/tenant.redux";
-
 
 @connect(
     state => state.tenantPermission,
     {handleAllCheck , handleCheck ,handleMove, handleSearch,modalToggle,handleSubmit, updateDataSource}
 )
 class PermissionTransfer extends Component {
-
 
     render() {
         const props = this.props;

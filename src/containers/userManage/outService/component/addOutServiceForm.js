@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import { Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete, Spin, Modal } from 'antd';
+import { Form, Input, Select,Spin } from 'antd';
 
 import axios from '../../../../util/axios';
 
@@ -9,7 +9,6 @@ const Option = Select.Option;
 class AddOutServiceForm extends Component {
 
     constructor(props){
-        console.log("AddOutServiceForm.constructor");
         super(props);
         this.state={
             loading:false,
@@ -28,15 +27,6 @@ class AddOutServiceForm extends Component {
             })
     }
 
-    handleSubmit = (e) => {
-        e.preventDefault();
-        this.props.form.validateFieldsAndScroll((err, values) => {
-            if (!err) {
-                console.log('Received values of form: ', values);
-            }
-        });
-    };
-
     render(){
 
         const { getFieldDecorator } = this.props.form;
@@ -54,7 +44,7 @@ class AddOutServiceForm extends Component {
         return (
 
             <Spin spinning={this.state.loading}>
-                <Form onSubmit={this.handleSubmit}>
+                <Form >
 
                     <FormItem
                         {...formItemLayout}

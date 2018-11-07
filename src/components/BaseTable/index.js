@@ -4,13 +4,11 @@ import { Table } from 'antd';
 
 import stateUtil from '../../util/stateUtil'
 
-
 export default class BaseTable extends React.Component{
 
     rowSelection={
 
     };
-
     componentWillMount(){
         let row_selection = this.props.selection;
 

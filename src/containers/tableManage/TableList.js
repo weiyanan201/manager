@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Table, Pagination,Input, Icon } from 'antd';
+import { Table, Pagination,Input } from 'antd';
 import { Route } from 'react-router-dom';
 import NavLink from '../../components/NavLink/NavLink';
 import util from '../../util/util';

@@ -1,7 +1,6 @@
 import React,{ Component } from 'react';
-import { Form, Input, Tooltip, Icon, Cascader, Select, Row, Col, Checkbox, Button, AutoComplete, Spin, Modal } from 'antd';
+import { Form, Input, Select } from 'antd';
 
-import axios from '../../../../util/axios';
 import util from "../../../../util/util";
 
 const FormItem = Form.Item;
@@ -11,7 +10,7 @@ class AddGroupForm extends Component {
 
     state = {
         apps:{}
-    }
+    };
     componentDidMount(){
         //组合剩余app
         //rest+选中的app

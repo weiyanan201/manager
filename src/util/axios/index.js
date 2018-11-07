@@ -12,10 +12,6 @@ axios.interceptors.request.use((config) => {
     return config
 })
 
-// axios.interceptors.request.use(function (config) {
-//     console.log("axios.interceptors.request.use");
-// });
-
 /**
  * @param options
  * @returns {Promise<any>}

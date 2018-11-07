@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Card, Form, Button, Input, Checkbox, Modal, Cascader, message, Spin, Icon} from 'antd';
+import {Card, Form, Button, Input, Checkbox, Modal, message, Spin, Icon} from 'antd';
 import {getFieldsType} from "../../reducers/config.redux";
 
 import BaseTable from '../../components/BaseTable';
@@ -308,7 +308,6 @@ export default class TableInfo extends Component {
             if (this.state.existed.includes(oldName)) {
                 //更新字段
                 let existedIndex = this.state.existed.indexOf(oldName);
-                console.log("existedIndex", existedIndex);
                 let oldItem = {};
                 let oldIndex = 0;
                 this.state.dataSource.forEach((item, index) => {

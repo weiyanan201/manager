@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import { Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
+import { Input, Button, Table, Modal, message, Spin} from 'antd';
 import util from "../../../util/util";
 import axios from "../../../util/axios";
 

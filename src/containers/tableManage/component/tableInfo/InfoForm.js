@@ -1,7 +1,7 @@
 
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import {Card, Form, Button, Input, Checkbox, Modal, Cascader, message, Spin, Icon} from 'antd';
+import { Form, Input } from 'antd';
 
 
 const FormItem = Form.Item;
@@ -15,7 +15,7 @@ class InfoForm extends React.Component {
         const formItemLayout = {
             labelCol: {span: 5},
             wrapperCol: {span: 19}
-        }
+        };
         return (
             <Form layout="horizontal">
                 <FormItem label="表名" {...formItemLayout}>

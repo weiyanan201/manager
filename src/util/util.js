@@ -22,7 +22,7 @@ export default {
             if(index+1>=start && index+1<=end){
                 return val;
             }
-        })
+        });
         return newDatas;
     },
 

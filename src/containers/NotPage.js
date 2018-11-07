@@ -7,7 +7,7 @@ export default class NotPage extends React.Component {
     state = {
         mockData: [],
         targetKeys: [],
-    }
+    };
 
     componentDidMount() {
         this.getMock();
@@ -29,15 +29,15 @@ export default class NotPage extends React.Component {
             mockData.push(data);
         }
         this.setState({ mockData, targetKeys });
-    }
+    };
 
     filterOption = (inputValue, option) => {
         return option.description.indexOf(inputValue) > -1;
-    }
+    };
 
     handleChange = (targetKeys) => {
         this.setState({ targetKeys });
-    }
+    };
 
     render() {
         return (

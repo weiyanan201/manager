@@ -11,7 +11,6 @@ import CreateTable from './CreateTable';
 import CreateView from './CreateView';
 import CommandCreate from './CommandCreate';
 
-
 const TabPane = Tabs.TabPane;
 
 @connect(
