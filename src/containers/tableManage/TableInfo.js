@@ -266,6 +266,7 @@ export default class TableInfo extends Component {
 
     //修改表属性提交
     handleInfoSubmit = () => {
+        const _this = this;
         this.infoForm.props.form.validateFields((error, row) => {
             if (error) {
                 return;
@@ -280,7 +281,10 @@ export default class TableInfo extends Component {
                         this.setState({
                             tableName: data.tableName,
                             comment: data.comment
-                        })
+                        });
+                        const tableBreadUrl = _this.props.match.url;
+                        const tableBreadUrlObj = {[tableBreadUrl]: data.tableName};
+                        _this.props.pushBread(tableBreadUrlObj);
                     })
             }
             this.setState({

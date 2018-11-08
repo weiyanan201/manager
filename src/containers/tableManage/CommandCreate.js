@@ -42,9 +42,11 @@ export default class CommandCreate extends React.Component{
                         .then(res=>{
                             const state = res.data.data.state;
                             const msg = res.data.data.msg;
+                            const stack = res.data.data.stack;
                             if (state!=='RUNNING') {
                                 clearInterval(_this.state.timer);
-                                this.setState({loading:false,log:msg})
+                                const error = `msg:\n ${msg} \n stacktrace:\n ${stack} `;
+                                this.setState({loading:false,log:error})
                             }
                         }).catch(res=>{
                             clearInterval(_this.state.timer);
@@ -81,12 +83,10 @@ export default class CommandCreate extends React.Component{
                         <Button type={"primary"} onClick={this.handleSubmit} style={{marginRight:10}} >运行</Button>
                         <Button type={"primary"} onClick={this.handleReset}>清空</Button>
                     </div>
-                    <div>
+                    <div className={style["command-card"]}>
                         <TextArea placeholder="请输入建表语句" autosize={false} style={{height: 'calc(40vh)'}} value={this.state.sql} onChange={(e)=>{this.handleChangeText(e.target.value)}}/>
-                        {/*<TextArea placeholder="日志信息" autosize={false} style={{height: 'calc(40vh)'}} />*/}
-                        <Card title={"日志"} style={{height: 'calc(30vh)'}}>
-                            {this.state.log}
-                        </Card>
+                        <Card title={"日志"}  />
+                        <TextArea  autosize={false} value={this.state.log} style={{height: 'calc(30vh)'}}/>
                     </div>
                 </Spin>
             </div>
