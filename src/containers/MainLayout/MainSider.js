@@ -13,9 +13,10 @@ import {
 } from 'antd';
 import { is } from 'immutable';
 import util from "../../util/util";
+import { iconfontUrl } from '../../config';
 
 const IconFont = Icon.createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/font_901688_fnruydxsbip.js',
+    scriptUrl: iconfontUrl,
 });
 
 

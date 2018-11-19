@@ -48,9 +48,12 @@ const ProduceType = {
     TEMP : "TEMP"
 };
 
+const iconfontUrl = "//at.alicdn.com/t/font_901688_ub4cswsexro.js";
+
 export {
     TenantType,
     GROUP_PERMISSION,
     StorageType,
     ProduceType,
+    iconfontUrl
 }
