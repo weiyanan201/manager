@@ -48,15 +48,20 @@ export default class CommandCreate extends React.Component{
                             const state = res.data.data.state;
                             const msg = res.data.data.msg;
                             const stack = res.data.data.stack;
-                            if (state!=='RUNNING') {
+                            if (state==='ERROR') {
                                 clearInterval(_this.state.timer);
                                 const error = `msg:\n ${msg} \n stacktrace:\n ${stack} `;
                                 this.setState({loading:false,log:error})
+                            }else if (state==="FINISH"){
+                                clearInterval(_this.state.timer);
+                                this.setState({loading:false,log:"建表成功!"})
                             }
                         }).catch(res=>{
                             clearInterval(_this.state.timer);
+                            console.error(res);
                             this.setState({
                                 loading:false,
+                                log:"error:"+res
                             });
                         })
                 },1000);
