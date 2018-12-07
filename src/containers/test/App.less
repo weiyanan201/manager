@@ -1,0 +1,58 @@
+.card{
+    display: flex;
+    margin: 50px;
+}
+
+.card div{
+    margin-right: 20px;
+}
+
+
+
+.test{
+
+  :global{
+    .editable-cell {
+      position: relative;
+    }
+
+    .editable-cell-value-wrap {
+      padding: 5px 12px;
+      cursor: pointer;
+      background: red;
+    }
+
+    .editable-row:hover .editable-cell-value-wrap {
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 4px 11px;
+    }
+  }
+}
+
+.dragTable{
+
+  :global{
+     tr.drop-over-downward td {
+      border-bottom: 2px dashed #1890ff;
+    }
+
+     tr.drop-over-upward td {
+      border-top: 2px dashed #1890ff;
+    }
+  }
+
+}
+
+.dragTable2 {
+
+
+  ant-table-row tr.drop-over-downward td {
+      border-bottom: 2px dashed #1890ff;
+    }
+
+  ant-table-row tr.drop-over-upward td {
+      border-top: 2px dashed #1890ff;
+    }
+
+}

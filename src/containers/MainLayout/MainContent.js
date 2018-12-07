@@ -21,6 +21,10 @@ import DatabaseList from '../../containers/databaseManage/list'
 import DbTableList from '../../containers/databaseManage/dbTables'
 import MobileGameList from '../../containers/mobileGame/list'
 
+import Test from '../../containers/test';
+import EditTable from '../../containers/test/editTable';
+import DragDropTable from '../../containers/test/dragDropTable';
+import TestTable from '../../containers/test/testTable';
 import NotPage from '../NotPage';
 
 import style from './layout.less';
@@ -53,6 +57,9 @@ class MainContent extends React.Component{
                         <Route path="/db/list/:databaseId" exact component={DbTableList}/>
                         <Route path="/db/list/:databaseId/:tableId" exact component={TableInfo}/>
                         <Route path="/mobileGame/list" exact component={MobileGameList}/>
+                        <Route path="/test" exact component={EditTable}/>
+                        <Route path="/test2" exact component={DragDropTable}/>
+                        <Route path="/test3" exact component={TestTable}/>
                         <Route component={PermissionTransfer} />
                         </Switch>
                     </div>
