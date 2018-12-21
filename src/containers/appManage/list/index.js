@@ -12,6 +12,8 @@ import axios from "../../../util/axios";
 import AddAppForm from './component/addAppForm';
 import {TenantType} from '../../../config'
 
+import globalStyle from '../../../index.less';
+
 const Search = Input.Search;
 const confirm = Modal.confirm;
 
@@ -336,7 +338,7 @@ class AppList extends Component {
                                 style={{float: "right"}}>新建App</Button>
                     </div>
 
-                    <div>
+                    <div className = {globalStyle.tableToSearchPadding}>
                         <Table columns={this.state.columns} dataSource={this.state.data} bordered/>
                     </div>
 

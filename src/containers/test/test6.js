@@ -1,4 +1,5 @@
-import React, {Component} from 'react';
+import React from 'react'
+
 import {
     Table, Input, InputNumber, Popconfirm, Form,Button
 } from 'antd';
@@ -14,12 +15,12 @@ for (let i = 0; i < 100; i++) {
 }
 const FormItem = Form.Item;
 const EditableContext = React.createContext();
-const tmp = [];
-const EditableRow = ({ form, index, ...props }) => {
-    return <EditableContext.Provider value={form}>
+
+const EditableRow = ({ form, index, ...props }) => (
+    <EditableContext.Provider value={form}>
         <tr {...props} />
     </EditableContext.Provider>
-};
+);
 
 const EditableFormRow = Form.create()(EditableRow);
 
@@ -133,10 +134,7 @@ class EditableTable extends React.Component {
     };
 
     save(form, key) {
-        tmp.push(form);
-        console.log(form.getFieldsValue());
         form.validateFields((error, row) => {
-            console.log(form.getFieldsValue());
             if (error) {
                 return;
             }
@@ -154,19 +152,15 @@ class EditableTable extends React.Component {
                 this.setState({ data: newData, editingKey: '' });
             }
         });
-        console.log(form.getFieldsValue());
-
     }
 
     edit(key) {
         this.setState({ editingKey: key });
     }
 
-    handleTmp = ()=>{
-        tmp.forEach(item=>{
-            console.log(item,item.getFieldsValue());
-        })
-    };
+    test = ()=>{
+        console.log(this.state.data);
+    }
 
     render() {
         const components = {
@@ -194,7 +188,6 @@ class EditableTable extends React.Component {
 
         return (
             <div>
-                    <Button onClick={this.handleTmp}>xx</Button>
             <Table
                 components={components}
                 bordered
@@ -202,8 +195,10 @@ class EditableTable extends React.Component {
                 columns={columns}
                 rowClassName="editable-row"
             />
+                <Button onClick={this.test}>xxxx</Button>
             </div>
         );
     }
 }
-export default EditableTable;
+
+export default  EditableTable;

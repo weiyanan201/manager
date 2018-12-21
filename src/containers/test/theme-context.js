@@ -2,8 +2,8 @@ import React from 'react'
 
 export const themes = {
     light: {
-        foreground: '#ff160c',
-        background: '#3aee83',
+        foreground: '#000000',
+        background: '#eeeeee',
     },
     dark: {
         foreground: '#ffffff',
@@ -11,9 +11,6 @@ export const themes = {
     },
 };
 
-// Make sure the shape of the default value passed to
-// createContext matches the shape that the consumers expect!
-export const ThemeContext = React.createContext({
-    theme: themes.dark,
-    toggleTheme: () => {},
-});
+export const ThemeContext = React.createContext(
+    themes.dark // default value
+);

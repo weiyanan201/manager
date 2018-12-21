@@ -12,6 +12,7 @@ import axios from '../../../util/axios';
 import AddUserForm from './component/addUserForm';
 import NavLink from '../../../components/NavLink/NavLink'
 
+import globalStyle from '../../../index.less';
 import style from './style.less'
 
 const Search = Input.Search;
@@ -279,7 +280,7 @@ class UserList extends Component {
                         <Button type='primary' className={style.createUserButton} onClick={()=>this.modalToggle(true)}>新建用户</Button>
                     </div>
 
-                    <div className={style.userTableWrapper}>
+                    <div className={globalStyle.tableToSearchPadding}>
                         <Table columns={this.state.columns} dataSource={this.state.data} bordered/>
                     </div>
                     <Modal

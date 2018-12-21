@@ -6,6 +6,7 @@ import BaseTable from '../../components/BaseTable';
 import NavLink from '../../components/NavLink/NavLink';
 import {getGroupList, getShowGroup, getShowGroupById} from "../../reducers/table.redux";
 import style from './table.less';
+import globalStyle from '../../index.less';
 import {GROUP_PERMISSION} from '../../util/config';
 import util from '../../util/util';
 
@@ -131,6 +132,7 @@ export default class GroupList extends Component {
                     rowKey="id"
                     loading={this.props.groupLoading}
                     pagination={false}
+                    className = {globalStyle.tableToSearchPadding}
                 />
                 <Pagination total={this.props.total} showSizeChanger showQuickJumper
                             onChange={(page, pageSize) => {

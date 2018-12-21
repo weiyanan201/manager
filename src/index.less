@@ -4,12 +4,31 @@ body {
   font-family: sans-serif;
 }
 
-
-:global {
-  // 表格内容过多时自动换行
-  .ant-table-bordered .ant-table-thead > tr > th, .ant-table-bordered .ant-table-tbody > tr > td {
-    word-wrap: break-word;
-    word-break: break-all;
-    max-width: 200px;
-  }
+//css
+table{
+  table-layout:fixed;
 }
+.resultColumns{
+  overflow: hidden;
+}
+.resultColumnsDiv{
+  //width:92%;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tableToSearchPadding{
+  padding-top: 10px;
+}
+
+//:global {
+//   //表格内容过多时自动换行
+//  .ant-table-bordered .ant-table-thead > tr > th, .ant-table-bordered .ant-table-tbody > tr > td {
+//    word-wrap: break-word;
+//    word-break: break-all;
+//    max-width: 200px;
+//  }
+//
+//}

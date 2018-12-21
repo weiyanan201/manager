@@ -5,8 +5,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import {Button , Card,Spin,Form,Input,Select,Row,message,Modal,Collapse,Checkbox, Icon} from 'antd';
-import EditableTable from './component/editableTable/EditableTable';
+import {Button , Card,Spin,Form,Input,Select,Row,message,Modal,Collapse,Checkbox, Icon,Popconfirm} from 'antd';
+import DragAndEditTable from './component/dragAndEditTable';
 import TableSelect from '../../components/TableSelect';
 import tableUtil from '../../util/tableUtil';
 import config from '../../util/config';
@@ -37,8 +37,7 @@ class CreateTable extends React.Component{
             separatorHidden:true,
             db:'',
             dbName:'',
-            columns:[],
-            keyCount:0,
+            dataSource:[],
             loading : false,
             advancedKey:[],
             replicas:1,
@@ -109,7 +108,7 @@ class CreateTable extends React.Component{
             })
         }
 
-    }
+    };
     //切换数据库
     handleSelectDb=(item,object)=>{
         this.setState({
@@ -123,18 +122,17 @@ class CreateTable extends React.Component{
      */
     handleSelectTemplate = (key)=>{
         if (!util.isEmpty(key)){
-            let tableId = key;
-            axios.get("/table/getTableColumns",{tableId})
+            axios.get("/table/getTableColumns",{tableId: key})
                 .then(res=>{
                     const rdata = res.data.data;
                     const tempStorageType = rdata.storageType;
-                    let columns = [];
+                    let dataSource = [];
                     let count = 1;
                     rdata.columns.map(item=>{
                         item.type = tableUtil.fieldTypeDeser(item.type);
                         item.key = count;
                         count++;
-                        columns.push(item);
+                        dataSource.push(item);
                     });
                     if (tempStorageType==='HIVE'){
                         let keys = rdata.keys;
@@ -144,7 +142,7 @@ class CreateTable extends React.Component{
                                 item.key = count;
                                 item.type = tableUtil.fieldTypeDeser(item.type);
                                 count++;
-                                columns.push(item);
+                                dataSource.push(item);
                             });
                         }
                     } else if (tempStorageType==='ES'){
@@ -153,85 +151,74 @@ class CreateTable extends React.Component{
                         //TODO 处理key
                     }
                     this.setState({
-                        columns:columns,
-                        keyCount:columns.length+1
-                    })
+                        dataSource:dataSource,
+                    });
+                    //调用table的方法
+                    this.table.modifyTableStateDataSource(dataSource);
                 })
         }
     }
 
     //提交建表请求
     handleSubmit=()=>{
+        //调用子组件的函数
+        const records =  this.table.handleSubmit();
+        if (util.isEmpty(records)){
+            message.error("字段列表出错或未空!");
+            return ;
+        }
+
         let errorMessage = [];
-        const {columns} = this.state;
 
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                let filterColumns ;
+                // let filterColumns ;
                 let repColumns = [];
-                let legalType = tableUtil.getFieldType(this.props.fieldTypes,this.state.storageType);
-
                 //检查字段 过滤空行
-                if (columns!==null && columns.length>0){
-                    filterColumns = columns.filter(item=>{
-                        return !util.isEmpty(item.name) || !util.isEmpty(item.type) || !util.isEmpty(item.comment)
-                    });
-                    if (filterColumns && filterColumns.length>0){
-                        //检查字是否 name、type、comment
-                        //hive:必须有一个普通列
-                        //es:必须有一列
-                        //phoenix:必须有一个主键列，并且可为空字段不能为true
-                        let blankRows = true;
-                        filterColumns.map(item=>{
-                            const en = util.isEmpty(item.name);
-                            const et = util.isEmpty(item.type);
-                            if (!en && et){
-                                errorMessage.push("字段:"+item.name+"未指定字段类型");
-                            }else if(en && !et){
-                                errorMessage.push("有表字段未指定名称")
-                            }else{
-                                if(!tableUtil.checkoutFieldType(legalType,item.type)){
-                                    errorMessage.push(`字段:${item.name}的类型错误`);
+                if (records!==null && records.length>0){
+                    //检查字是否 name、type、comment
+                    //hive:必须有一个普通列
+                    //es:必须有一列
+                    //phoenix:必须有一个主键列，并且可为空字段不能为true
+                    let blankRows = true;
+                    records.map(item=>{
+                        repColumns.push({...item,type:tableUtil.fieldTypeRender(item.type)});
+                        switch (this.state.storageType) {
+                            case config.STORAGE_TYPE_OBJ.HIVE:
+                                //有一个非分区字段即可
+                                if (item.isPartition===undefined || item.isPartition===false){
+                                    blankRows = false;
                                 }
-                                repColumns.push({...item,type:tableUtil.fieldTypeRender(item.type)});
-                                switch (this.state.storageType) {
-                                    case config.STORAGE_TYPE_OBJ.HIVE:
-                                        if (item.isPartition===undefined || item.isPartition===false){
-                                            blankRows = false;
-                                        }
-                                        break;
-                                    case config.STORAGE_TYPE_OBJ.ES:
-                                        blankRows = false;
-                                        break;
-                                    case config.STORAGE_TYPE_OBJ.PHOENIX:
-                                        if (item.primaryKey===true){
-                                            blankRows = false;
-                                        }
-                                        if (item.primaryKey===true && item.beNull===true){
-                                            errorMessage.push(`字段:${item.name}为主键，不能可为空`);
-                                        }
-                                        break;
-                                    default:
-                                        break;
+                                break;
+                            case config.STORAGE_TYPE_OBJ.ES:
+                                //有一个字段即可
+                                blankRows = false;
+                                break;
+                            case config.STORAGE_TYPE_OBJ.PHOENIX:
+                                if (item.primaryKey===true){
+                                    blankRows = false;
                                 }
-                            }
-                        });
-                        if (blankRows){
-                            //验证失败
-                            switch (this.state.storageType) {
-                                case config.STORAGE_TYPE_OBJ.HIVE:
-                                    errorMessage.push(`hive建表必须有一个非分区列`);
-                                    break;
-                                case config.STORAGE_TYPE_OBJ.ES:
-                                    errorMessage.push(`es建表必须有一列`);
-                                    break;
-                                case config.STORAGE_TYPE_OBJ.PHOENIX:
-                                    errorMessage.push(`phoenix建表必须有一个主键，且该主键不能可为空`);
-                                    break;
-                            }
+                                if (item.primaryKey===true && item.beNull===true){
+                                    errorMessage.push(`字段:${item.name}为主键，不能可为空`);
+                                }
+                                break;
+                            default:
+                                break;
                         }
-                    }else{
-                        errorMessage.push("字段列表不能为空!");
+                    });
+                    if (blankRows){
+                        //验证失败
+                        switch (this.state.storageType) {
+                            case config.STORAGE_TYPE_OBJ.HIVE:
+                                errorMessage.push(`hive建表必须有一个非分区列`);
+                                break;
+                            case config.STORAGE_TYPE_OBJ.ES:
+                                errorMessage.push(`es建表必须有一列`);
+                                break;
+                            case config.STORAGE_TYPE_OBJ.PHOENIX:
+                                errorMessage.push(`phoenix建表必须有一个主键，且该主键不能可为空`);
+                                break;
+                        }
                     }
                 }else{
                     errorMessage.push("字段列表不能为空!");
@@ -264,14 +251,14 @@ class CreateTable extends React.Component{
                         separatorHidden:true,
                         db:'',
                         dbName:'',
-                        columns:[],
-                        keyCount:0,
+                        dataSource:[],
                         loading : false,
                         advancedKey:[],
                         replicas:1,
                         shards:5,
                         createAgain:false
                     });
+                    this.table.modifyTableStateDataSource([]);
                 }).catch(()=>{
                     this.setState({
                         loading:false
@@ -279,16 +266,6 @@ class CreateTable extends React.Component{
                 })
             }
         });
-    };
-
-    //传入可编辑表的回调函数
-    //dataSource : 表格中的记录
-    //keyCount ： 下一个key值
-    handleModifyColumn=(dataSource,keyCount=this.state.keyCount)=>{
-        this.setState({
-            columns:dataSource,
-            keyCount:keyCount
-        })
     };
 
     //高级属性开关
@@ -316,41 +293,42 @@ class CreateTable extends React.Component{
                     render:(text,row,index)=>index+1,
                     width:'80px'
                 },{
-                title: 'name',
-                dataIndex: 'name',
-                editable: true,
-                columnType:'input',
-                required:true,
-                align:'center',
-            }, {
-                title: '类型',
-                dataIndex: 'type',
-                editable: true,
-                columnType:'fieldType',
-                storageType:"HIVE",
-                required:true,
-                render: (text) => tableUtil.fieldTypeRender(text),
-                width:'300px',
-                align:'center',
-            }, {
-                title: '注释',
-                dataIndex: 'comment',
-                editable: true,
-                columnType:'input',
-                required:!this.state.isTemp,
-                width: '500px',
-                align:'center',
-            }, {
-                title: <div>分区字段<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
-                dataIndex: 'isPartition',
-                editable: true,
-                columnType:'checkbox',
-                required:false,
-                render: (text) => <Checkbox checked={text===true} />,
-                width:'200px',
-                align:'center',
+                    title: 'name',
+                    dataIndex: 'name',
+                    editable: true,
+                    type:'input',
+                    required:true,
+                    align:'center',
+                }, {
+                    title: '类型',
+                    dataIndex: 'type',
+                    editable: true,
+                    type:'fieldType',
+                    storageType:"HIVE",
+                    fieldTypes:this.props.fieldTypes,
+                    required:true,
+                    render: (text) => tableUtil.fieldTypeRender(text),
+                    width:'300px',
+                    align:'center',
+                }, {
+                    title: '注释',
+                    dataIndex: 'comment',
+                    editable: true,
+                    type:'input',
+                    required:!this.state.isTemp,
+                    width: '500px',
+                    align:'center',
+                }, {
+                    title: <div>分区字段<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
+                    dataIndex: 'isPartition',
+                    editable: true,
+                    type:'checkbox',
+                    required:false,
+                    render: (text) => <Checkbox checked={text===true} />,
+                    width:'200px',
+                    align:'center',
 
-            },],
+                }],
             "PHOENIX":[
                 {
                     title:'序号',
@@ -363,45 +341,45 @@ class CreateTable extends React.Component{
                     title: 'name',
                     dataIndex: 'name',
                     editable: true,
-                    columnType:'input',
+                    type:'input',
                     required:true,
                     align:'center',
                 }, {
-                title: '类型',
-                dataIndex: 'type',
-                editable: true,
-                columnType:'fieldType',
-                storageType:"PHOENIX",
-                required:true,
-                render: (text) => tableUtil.fieldTypeRender(text),
-                align:'center',
+                    title: '类型',
+                    dataIndex: 'type',
+                    editable: true,
+                    type:'fieldType',
+                    storageType:"PHOENIX",
+                    fieldTypes:this.props.fieldTypes,
+                    required:true,
+                    render: (text) => tableUtil.fieldTypeRender(text),
+                    align:'center',
             }, {
-                title: '注释',
-                dataIndex: 'comment',
-                editable: true,
-                columnType:'input',
-                required:!this.state.isTemp,
-                align:'center',
+                    title: '注释',
+                    dataIndex: 'comment',
+                    editable: true,
+                    type:'input',
+                    required:!this.state.isTemp,
+                    align:'center',
             },{
-                title:<div>主键<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
-                dataIndex: 'primaryKey',
-                editable: true,
-                columnType:'checkbox',
-                required:false,
-                render: (text) => <Checkbox checked={text===true} />,
-                width:'200px',
-                align:'center',
+                    title:<div>主键<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
+                    dataIndex: 'primaryKey',
+                    editable: true,
+                    type:'checkbox',
+                    required:false,
+                    render: (text) => <Checkbox checked={text===true} />,
+                    width:'200px',
+                    align:'center',
             }, {
-                title: '可为空',
-                dataIndex: 'beNull',
-                editable: true,
-                columnType:'checkbox',
-                required:false,
-                render: (text) => <Checkbox checked={text===true} />,
-                width:'200px',
-                align:'center',
-            }
-                ],
+                    title: '可为空',
+                    dataIndex: 'beNull',
+                    editable: true,
+                    type:'checkbox',
+                    required:false,
+                    render: (text) => <Checkbox checked={text===true} />,
+                    width:'200px',
+                    align:'center',
+            }],
             "ES":[
                 {
                     title:'序号',
@@ -414,28 +392,28 @@ class CreateTable extends React.Component{
                     title: 'name',
                     dataIndex: 'name',
                     editable: true,
-                    columnType:'input',
+                    type:'input',
                     required:true,
                     align:'center',
                 }, {
-                title: '类型',
-                dataIndex: 'type',
-                editable: true,
-                columnType:'fieldType',
-                storageType:"ES",
-                required:true,
-                render: (text) => tableUtil.fieldTypeRender(text),
-                align:'center',
+                    title: '类型',
+                    dataIndex: 'type',
+                    editable: true,
+                    type:'fieldType',
+                    storageType:"ES",
+                    fieldTypes:this.props.fieldTypes,
+                    required:true,
+                    render: (text) => tableUtil.fieldTypeRender(text),
+                    align:'center',
             }, {
-                title: '注释',
-                dataIndex: 'comment',
-                editable: true,
-                columnType:'input',
-                required:!this.state.isTemp,
-                width:'500px',
-                align:'center',
-            },
-                ],
+                    title: '注释',
+                    dataIndex: 'comment',
+                    editable: true,
+                    type:'input',
+                    required:!this.state.isTemp,
+                    width:'500px',
+                    align:'center',
+            },],
             "":[]
         };
 
@@ -474,6 +452,7 @@ class CreateTable extends React.Component{
         const { getFieldDecorator } = this.props.form;
 
         const tableSelect = <TableSelect handleSelect={this.handleSelectTemplate} storageType={this.state.storageType}/>;
+
         return (
             <div>
                 <Spin spinning={this.state.loading} >
@@ -531,7 +510,7 @@ class CreateTable extends React.Component{
                                     <Select style={{ width: 150 }} value={this.state.storageType} onChange={this.handleSelectStorageType}>
                                         {tableUtil.getStorageType().map((item)=><Option value={item} key={item}>{item}</Option>)}
                                     </Select>
-                                )}
+                                )}模板表
                             </FormItem>
                             <FormItem label="数据库" >
                                 {getFieldDecorator('db', {
@@ -545,8 +524,6 @@ class CreateTable extends React.Component{
                                     </Select>
                                 )}
                             </FormItem>
-
-
                         </Row>
                         <Row>
                             {/*选取模板表*/}
@@ -568,13 +545,14 @@ class CreateTable extends React.Component{
                     </Form>
                 </Card>
                 <Card title={"字段详情"} className={style["roll-table"]}>
-                    <EditableTable storageType={this.state.storageType}
-                                   handleModifyColumn={this.handleModifyColumn}
-                                   tableColumns={tableColumns[this.state.storageType]}
-                                   dataSource={this.state.columns}
-                                   keyCount={this.state.keyCount}
+                    <DragAndEditTable
+                                   storageType={this.state.storageType}
+                                   fieldTypes={this.props.fieldTypes}
+                                   columns={tableColumns[this.state.storageType]}
+                                   dataSource={this.state.dataSource}
                                    scroll={{ y: 500 }}
                                    pagination = {false}
+                                   onRef={(ref)=>{this.table=ref;}}
                     />
                 </Card>
                     <div style={{textAlign: 'right'}}>

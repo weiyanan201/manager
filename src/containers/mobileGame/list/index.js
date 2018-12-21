@@ -5,6 +5,8 @@ import axios from "../../../util/axios";
 
 import AddMobileGameForm from './component/addMobileGameForm';
 
+import globalStyle from '../../../index.less';
+
 const Search = Input.Search;
 const NEW_TITLE = "新建手游类型";
 const EDIT_TITLE = "更新手游类型";
@@ -174,7 +176,7 @@ class MobileGameList extends Component {
                         <Button type='primary'  onClick={()=>this.modalToggle(true)} style={{float:"right"}}>新建手游类型</Button>
                     </div>
 
-                    <div >
+                    <div className = {globalStyle.tableToSearchPadding}>
                         <Table columns={this.state.columns} dataSource={this.state.data}  bordered/>
                     </div>
 

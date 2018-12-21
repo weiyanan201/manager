@@ -8,6 +8,8 @@ import {Input, Button, Table, Modal, message, Spin } from 'antd';
 import util from "../../../util/util";
 import axios from '../../../util/axios';
 import AddOutServiceForm from './component/addOutServiceForm';
+
+import globalStyle from '../../../index.less';
 import style from './style.less';
 
 const Search = Input.Search;
@@ -228,7 +230,7 @@ class OutService extends Component{
                         <Button type='primary'  onClick={()=>this.modalToggle(true)} style={{float:"right"}}>新建outService</Button>
                     </div>
 
-                    <div className={style["components-table-demo-nested"]}>
+                    <div className={ `${style["components-table-demo-nested"]} ${globalStyle.tableToSearchPadding}` } >
                         <Table columns={this.state.columns}
                                dataSource={this.state.data}
                                expandedRowRender={this.expandedRowRender}

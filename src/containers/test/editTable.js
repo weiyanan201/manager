@@ -17,14 +17,18 @@ const FormItem = Form.Item;
 const EditableContext = React.createContext();
 
 
-const EditableRow = ({ form, index, ...props }) => (
-    <EditableContext.Provider value={form}>
+const EditableRow = ({ form, index, ...props }) => {
+
+    return <EditableContext.Provider value={form}>
         <tr {...props} />
     </EditableContext.Provider>
-);
+}
 
 const EditableFormRow = Form.create()(EditableRow);
 
+const EditableFormRow2 = ()=>(<EditableFormRow
+    wrappedComponentRef={(form) => this.formRef = form}       //5、使用wrappedComponentRef 拿到子组件传递过来的ref（官方写法）
+/>)
 
 @connect(
     state => state.config,
@@ -68,7 +72,6 @@ class EditableCell extends React.Component {
                 this.save();
             }
         }else if (this.type==='checkbox'){
-            console.log(this.cell,e.target,this.cell.contains(e.target));
             if (editing && this.cell !== e.target && !this.cell.contains(e.target)) {
                 this.save();
             }
@@ -79,7 +82,6 @@ class EditableCell extends React.Component {
     save = () => {
         const { record, handleSave } = this.props;
         this.form.validateFields((error, values) => {
-            console.log(values);
             if (error) {
                 return;
             }
@@ -283,14 +285,19 @@ class TestTable extends Component {
         this.setState({ dataSource: newData });
     }
 
-    render() {
+    test=()=>{
+        console.log(this,this.form);
+    }
 
-        const components = {
-            body: {
-                row: EditableFormRow,
-                cell: EditableCell,
-            },
-        };
+     BodyWrapper = (props) => {return <EditableFormRow {...props} wrappedComponentRef={(inst) => this.formRef = inst} />};
+     components = {
+        body: {
+            row: EditableFormRow,
+            cell: EditableCell,
+        },
+    };
+
+    render() {
 
         const columns = this.columns.map((col) => {
             if (!col.editable) {
@@ -315,14 +322,14 @@ class TestTable extends Component {
                 <Button type="primary">添加字段</Button>
                 <Button type="danger">清空字段</Button>
                 <Table
-                    components={components}
+                    components={this.components}
                     rowClassName={() => 'editable-row'}
                     bordered
                     dataSource={this.state.dataSource}
                     columns={columns}
                     pagination={false}
                 />
-                <Button type="primary">创建</Button>
+                <Button type="primary" onClick={this.test}>创建</Button>
 
             </div>
         );

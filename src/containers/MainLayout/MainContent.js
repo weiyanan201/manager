@@ -25,6 +25,14 @@ import Test from '../../containers/test';
 import EditTable from '../../containers/test/editTable';
 import DragDropTable from '../../containers/test/dragDropTable';
 import TestTable from '../../containers/test/testTable';
+import DragEditTable from '../../containers/tableManage/component/dragAndEditTable'
+import XXX from '../../containers/tableManage/TestTable'
+import Test6 from '../../containers/test/test6'
+import Test7 from '../../containers/test/Test7'
+
+import MyTest from '../../containers/test/theme-test'
+import MyTest2 from '../../containers/test/contextTest'
+
 import NotPage from '../NotPage';
 
 import style from './layout.less';
@@ -60,6 +68,12 @@ class MainContent extends React.Component{
                         <Route path="/test" exact component={EditTable}/>
                         <Route path="/test2" exact component={DragDropTable}/>
                         <Route path="/test3" exact component={TestTable}/>
+                        <Route path="/test4" exact component={DragEditTable}/>
+                        <Route path="/test5" exact component={XXX}/>
+                        <Route path="/test6" exact component={Test6}/>
+                        <Route path="/test7" exact component={Test7}/>
+                        <Route path="/myTest" exact component={MyTest}/>
+                        <Route path="/myTest2" exact component={MyTest2}/>
                         <Route component={PermissionTransfer} />
                         </Switch>
                     </div>

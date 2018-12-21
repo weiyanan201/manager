@@ -9,6 +9,8 @@ import axios from "../../../util/axios";
 
 import AddGroupForm from './component/addGroupForm';
 
+import globalStyle from '../../../index.less';
+
 const Search = Input.Search;
 const confirm = Modal.confirm;
 
@@ -236,7 +238,7 @@ class GroupList extends Component{
                         <Button type='primary'  onClick={()=>this.modalToggle(true)} style={{float:"right"}}>新建组</Button>
                     </div>
 
-                    <div >
+                    <div className={globalStyle.tableToSearchPadding}>
                         <Table columns={this.state.columns} dataSource={this.state.data}  bordered/>
                     </div>
 

@@ -96,6 +96,10 @@ export default {
             return [type];
         }
     },
+    validateFieldType(fieldTyps,storageType,type){
+        const types = this.getFieldType(fieldTyps,storageType);
+        return this.checkoutFieldType(types,type);
+    },
     /**
      * @param legalTypes  合法的类型（getFieldType中获取）
      * @param type 待校验的字段类型 []

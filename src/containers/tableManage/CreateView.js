@@ -1,62 +1,24 @@
 
 import React from 'react';
+import { connect } from 'react-redux';
 import {Button ,Card,Form,Input,Select,Row,message,Modal } from 'antd';
 
 import TableSelect from '../../components/TableSelect';
-import EditableTable from './component/editableTable/EditableTable';
+import DragAndEditTable from './component/dragAndEditTable';
 import tableUtil from '../../util/tableUtil';
 import config from '../../util/config';
 import axios from '../../util/axios';
 import util from '../../util/util';
-
 import style from './table.less';
 
 const Option = Select.Option;
 const FormItem = Form.Item;
 const TextArea  = Input.TextArea;
 
-const tableColunms = [
-    {
-        title: '序号',
-        key: 'key',
-        align: 'center',
-        render: (text, row, index) => index + 1,
-        width: '80px'
-    },
-    {
-        title: '字段名称',
-        dataIndex: 'name',
-        editable: true,
-        columnType: 'input',
-        required: true,
-        align: 'center',
-    }, {
-        title: '别名',
-        dataIndex: 'alias',
-        editable: true,
-        columnType: 'input',
-        required: false,
-        align: 'center',
-    }, {
-        title: '类型',
-        dataIndex: 'type',
-        editable: true,
-        columnType: 'fieldType',
-        storageType: "HIVE",
-        required: true,
-        render: (text) => tableUtil.fieldTypeRender(text),
-        align: 'center',
-    }, {
-        title: '注释',
-        dataIndex: 'comment',
-        editable: true,
-        columnType: 'input',
-        required: true,
-        width: '500px',
-        align: 'center',
-    },]
-
 class CreateView extends React.Component{
+
+    //不能删，constructor中的state有引用
+    state = {};
 
     constructor(props){
         super(props);
@@ -65,10 +27,11 @@ class CreateView extends React.Component{
             comment:'',
             storageType:'HIVE',
             groupId:'',
-            columns:[],
-            keyCount:0,
+            dataSource:[],
             condition:'',
             tableId:'',
+            isTemp:false,
+
         };
     }
 
@@ -87,7 +50,8 @@ class CreateView extends React.Component{
         let change = (oldIsTmp&&!newIsTmp) || (!oldIsTmp&&newIsTmp);
         this.setState({
             groupId:index,
-            db:change?'':this.state.db
+            db:change?'':this.state.db,
+            isTemp:newIsTmp
         });
         this.props.form.setFieldsValue({
             db:change?'':this.state.db,
@@ -102,47 +66,23 @@ class CreateView extends React.Component{
         })
     };
 
-    //传入可编辑表的回调函数
-    //dataSource : 表格中的记录
-    //keyCount ： 下一个key值
-    handleModifyColumn=(dataSource,keyCount=this.state.keyCount)=>{
-        this.setState({
-            columns:dataSource,
-            keyCount:keyCount
-        })
-    };
-
     handleSubmit=()=>{
+        const records =  this.table.handleSubmit();
+        if (util.isEmpty(records)){
+            message.error("字段列表出错或未空!");
+            return ;
+        }
         let errorMessage = [];
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 this.setState({
                     loading:true
                 });
-
-                //检查字段 过滤空行
-                const { columns }  = this.state;
-                let filterColumns ;
                 let repColumns = [];
-                if (columns!==null && columns.length>0){
-                    filterColumns = columns.filter(item=>{
-                        return !util.isEmpty(item.name) || !util.isEmpty(item.type) || !util.isEmpty(item.comment)
-                    });
-                    if (filterColumns && filterColumns.length>0){
-                        //检查字是否 name、type、comment
-                        filterColumns.map(item=>{
-                            const en = util.isEmpty(item.name);
-                            const et = util.isEmpty(item.type);
-                            if (!en && et){
-                                errorMessage.push("字段:"+item.name+"未指定字段类型");
-                            }else if(en && !et){
-                                errorMessage.push("有表字段未指定名称")
-                            }
-                            repColumns.push({...item,type:tableUtil.fieldTypeRender(item.type)})
-                        })
-                    }else{
-                        errorMessage.push("字段列表不能为空!");
-                    }
+                if (records!==null && records.length>0){
+                    records.map(item=>{
+                        repColumns.push({...item,type:tableUtil.fieldTypeRender(item.type)})
+                    })
                 }else{
                     errorMessage.push("字段列表不能为空!");
                 }
@@ -167,12 +107,12 @@ class CreateView extends React.Component{
                         comment:'',
                         storageType:'HIVE',
                         groupId:'',
-                        columns:[],
-                        keyCount:0,
+                        dataSource:[],
                         condition:'',
                         tableId:'',
                         createAgain:false
-                    })
+                    });
+                    this.table.modifyTableStateDataSource([]);
                 }).catch(()=>{
                     this.setState({
                         loading:false
@@ -217,14 +157,58 @@ class CreateView extends React.Component{
                         });
                     }
                     this.setState({
-                        columns:columns,
-                        keyCount:columns.length+1
-                    })
+                        dataSource:columns,
+                    });
+                    //调用table的方法
+                    this.table.modifyTableStateDataSource(columns);
                 })
         }
-    }
+    };
 
     render(){
+
+        const tableColunms = [
+            {
+                title: '序号',
+                key: 'key',
+                align: 'center',
+                render: (text, row, index) => index + 1,
+                width: '80px'
+            },
+            {
+                title: '字段名称',
+                dataIndex: 'name',
+                editable: true,
+                type:'input',
+                required: true,
+                align: 'center',
+            }, {
+                title: '别名',
+                dataIndex: 'alias',
+                editable: true,
+                type:'input',
+                required: false,
+                align: 'center',
+            }, {
+                title: '类型',
+                dataIndex: 'type',
+                editable: true,
+                type:'fieldType',
+                fieldTypes:this.props.config.fieldTypes,
+                storageType: "HIVE",
+                required: true,
+                render: (text) => tableUtil.fieldTypeRender(text),
+                align: 'center',
+            }, {
+                title: '注释',
+                dataIndex: 'comment',
+                editable: true,
+                type:'input',
+                required:!this.state.isTemp,
+                width: '500px',
+                align: 'center',
+            },];
+
         const { getFieldDecorator } = this.props.form;
         return (
             <div>
@@ -331,13 +315,14 @@ class CreateView extends React.Component{
                 </Card>
 
                 <Card title={"字段详情"} className={style["roll-table"]}>
-                    <EditableTable storageType={this.state.storageType}
-                                   handleModifyColumn={this.handleModifyColumn}
-                                   tableColumns={tableColunms}
-                                   dataSource={this.state.columns}
-                                   keyCount={this.state.keyCount}
-                                   scroll={{ y: 500 }}
-                                   pagination = {false}
+                    <DragAndEditTable
+                        storageType={this.state.storageType}
+                        fieldTypes={this.props.config.fieldTypes}
+                        columns={tableColunms}
+                        dataSource={this.state.dataSource}
+                        scroll={{ y: 500 }}
+                        pagination = {false}
+                        onRef={(ref)=>{this.table=ref;}}
                     />
                 </Card>
                 <div style={{textAlign: 'right'}}>

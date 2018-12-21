@@ -3,7 +3,7 @@ const roles = config.TenantType;
 
 const menus=[
     {
-        "id": 5,
+        "id": 1,
         "pid": -1,
         "icon": "table",
         "name": "表管理",
@@ -11,23 +11,31 @@ const menus=[
         "bread": "",
         "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
     }, {
-        "id": 6,
-        "pid": 5,
+        "id": 11,
+        "pid": 1,
+        "icon": "idcard",
+        "name": "组信息",
+        "route": "/table/groups",
+        "bread": "组列表",
+        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
+    },{
+        "id": 16,
+        "pid": 1,
         "icon": "idcard",
         "name": "表信息",
         "route": "/table/groups",
-        "bread": "group列表",
+        "bread": "table列表",
         "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
-    }, {
-        "id": 7,
-        "pid": 5,
+    },{
+        "id": 17,
+        "pid": 1,
         "iconfont": "icon-tableedit",
         "name": "新建表",
         "route": "/table/addTable",
         "bread": "新建表",
         "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
     },{
-        "id": 8,
+        "id": 2,
         "pid": -1,
         "icon": "user",
         "name": "用户管理",
@@ -35,23 +43,23 @@ const menus=[
         "bread": "",
         "roles":[roles.PLATFORM]
     },{
-        "id": 9,
-        "pid": 8,
+        "id": 21,
+        "pid": 2,
         "icon": "user",
         "name": "用户信息",
         "route": "/user/list",
         "bread": "用户信息",
         "roles":[roles.PLATFORM]
     },{
-        "id": 10,
-        "pid": 8,
+        "id": 22,
+        "pid": 2,
         "iconfont": "icon-user4",
         "name": "outService",
         "route": "/user/outService",
         "bread": "outService",
         "roles":[roles.PLATFORM]
     },{
-        "id": 11,
+        "id": 3,
         "pid": -1,
         "iconfont": "icon-dashboardbuttongroup",
         "name": "组管理",
@@ -59,15 +67,15 @@ const menus=[
         "bread": "",
         "roles":[roles.PLATFORM]
     },{
-        "id": 12,
-        "pid": 11,
+        "id": 31,
+        "pid": 3,
         "iconfont": "icon-dashboardbuttongroup",
         "name": "组信息",
         "route": "/group/list",
         "bread": "组信息",
         "roles":[roles.PLATFORM]
     },{
-        "id": 13,
+        "id": 4,
         "pid": -1,
         "iconfont": "icon-game",
         "name": "App管理",
@@ -75,23 +83,23 @@ const menus=[
         "bread": "",
         "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
     },{
-        "id": 14,
-        "pid": 13,
+        "id": 41,
+        "pid": 4,
         "iconfont": "icon-game",
         "name": "App信息",
         "route": "/app/list",
         "bread": "App信息",
         "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
     },{
-        "id": 16,
-        "pid": 13,
+        "id": 42,
+        "pid": 4,
         "iconfont": "icon-mobile",
         "name": "手游类型管理",
         "route": "/mobileGame/list",
         "bread": "手游类型管理",
         "roles":[roles.PLATFORM]
     },{
-        "id": 15,
+        "id": 101,
         "pid": -1,
         "iconfont": "icon-database",
         "name": "数据库信息",

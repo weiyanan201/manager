@@ -7,6 +7,8 @@ import NavLink from '../../../components/NavLink/NavLink';
 import AddDbForm from './component/addDbForm';
 import {StorageType, ProduceType} from '../../../config';
 
+import globalStyle from '../../../index.less';
+
 const Search = Input.Search;
 
 class DatabaseList extends Component {
@@ -157,7 +159,7 @@ class DatabaseList extends Component {
                         <Button type='primary'  onClick={()=>this.setState({modalVisible:true})} style={{float:"right"}}>新建数据库</Button>
                     </div>
 
-                    <div >
+                    <div className = {globalStyle.tableToSearchPadding}>
                         <Table columns={this.state.columns} dataSource={this.state.data}  bordered/>
                     </div>
 

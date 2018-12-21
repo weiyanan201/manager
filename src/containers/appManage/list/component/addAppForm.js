@@ -291,7 +291,7 @@ class AddAppForm extends Component {
                     >
                         {getFieldDecorator('mobileGameTypeId',{
                             rules: [{
-                                required: !this.state.studioDisabled, message: '请选择二级手游分类',
+                                required: false,
                             }],
                             initialValue: `${util.isEmpty(this.props.formObject.mobileGameTypeId)?"":this.props.formObject.mobileGameTypeId}`
                         })(

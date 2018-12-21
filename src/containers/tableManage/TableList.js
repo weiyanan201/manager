@@ -8,6 +8,7 @@ import {getTableList,getShowTablePage} from "../../reducers/table.redux";
 import { pushBread } from "../../reducers/bread.redux";
 import tableUtil from "../../util/tableUtil";
 
+import globalStyle from '../../index.less';
 import style from './table.less'
 
 const Search = Input.Search;
@@ -37,6 +38,11 @@ export default class TableList extends Component {
                     dataIndex: 'name',
                     align:'center',
                     width: '200px',
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.name} className={globalStyle.resultColumnsDiv}>{record.name}</div>
+                        ),
                 }, {
                     title: '数据库',
                     dataIndex: "db",
@@ -62,6 +68,11 @@ export default class TableList extends Component {
                     dataIndex: "comment",
                     align:'center',
                     width: '300px',
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.comment} className={globalStyle.resultColumnsDiv}>{record.comment}</div>
+                        ),
                 },{
                     title: '创建时间',
                     dataIndex: "createTime",
@@ -133,7 +144,7 @@ export default class TableList extends Component {
                     style={{ width: 200 }}
                     onChange={(e)=>{this.handleChangeText(e.target.value)}}
                 />
-                <div className={style["roll-table"]}>
+                <div className={ `${style["roll-table"]} ${globalStyle.tableToSearchPadding}` }  >
                     <Table
                         bordered
                         columns={this.state.columns}
@@ -144,6 +155,7 @@ export default class TableList extends Component {
                         onRowDoubleClick = {this.handleDclick}
                         loading={this.props.table.tableLoading}
                         scroll={{ y: 600 }}
+                        style={{tableLayout:"fixed"}}
                     />
                 </div>
                 <Pagination  total={this.props.table.total} showSizeChanger showQuickJumper
