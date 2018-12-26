@@ -158,7 +158,7 @@ class CreateTable extends React.Component{
                     this.table.modifyTableStateDataSource(dataSource);
                 })
         }
-    }
+    };
 
     //提交建表请求
     handleSubmit=()=>{
@@ -440,7 +440,6 @@ class CreateTable extends React.Component{
                         />
                     </FormItem>
                 }
-
             </Panel>;
         }else if(this.state.storageType==='ES'){
             advancedPro = <Panel  key="1" style={customPanelStyle} showArrow={false} >
@@ -461,7 +460,7 @@ class CreateTable extends React.Component{
 
         return (
             <div>
-                {/*<Spin spinning={this.state.loading} >*/}
+                <Spin spinning={this.state.loading} >
                 <Card title={"表信息"}>
                     <Form layout="inline" >
                         <Row>
@@ -565,7 +564,7 @@ class CreateTable extends React.Component{
                     <div style={{textAlign: 'right',marginTop:10}}>
                            <Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
                     </div>
-                {/*</Spin>*/}
+                </Spin>
             </div>
         )
     }
