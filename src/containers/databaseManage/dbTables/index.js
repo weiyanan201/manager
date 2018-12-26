@@ -9,6 +9,9 @@ import axios from "../../../util/axios";
 import {StorageType, ProduceType} from '../../../config';
 import {pushBread} from "../../../reducers/bread.redux";
 
+import CommonTable from '../../../components/commonTable';
+import globalStyle from '../../../index.less';
+
 const Search = Input.Search;
 const confirm = Modal.confirm;
 
@@ -30,6 +33,11 @@ class DbTableList extends Component {
                     title: '表名',
                     dataIndex: 'name',
                     align: 'center',
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.name} className={globalStyle.resultColumnsDiv}>{record.name}</div>
+                        ),
                 },{
                     title: '存储介质',
                     dataIndex: 'storageType',
@@ -42,7 +50,7 @@ class DbTableList extends Component {
                     }),
                     onFilter: (value, record) => record.storageType.indexOf(value) === 0,
                 },{
-                    title: 'produceType',
+                    title: '数据层次',
                     dataIndex: 'produceType',
                     align: 'center',
                     filters:Object.values(ProduceType).map(val=>{
@@ -166,8 +174,8 @@ class DbTableList extends Component {
                         <Button type='danger'  onClick={this.handleDeleteDb} style={{float:"right"}}>删除数据库</Button>
                     </div>
 
-                    <div >
-                        <Table columns={this.state.columns} dataSource={this.state.data}  bordered/>
+                    <div className={globalStyle.tableToSearchPadding}>
+                        <CommonTable columns={this.state.columns} dataSource={this.state.data} />
                     </div>
 
 

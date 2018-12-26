@@ -3,9 +3,8 @@
  */
 
 import React, {Component} from 'react';
-import {
-    Layout
-} from 'antd';
+import {Layout, LocaleProvider} from 'antd';
+import zh_CN from 'antd/lib/locale-provider/zh_CN';
 import {Route} from 'react-router-dom'
 import {connect} from 'react-redux';
 
@@ -29,14 +28,16 @@ class MainLayout extends Component {
 
     render() {
         return (
-            <Layout >
-                <MainSider />
-                {/*style={{height: '100vh', overflow: 'auto'}}*/}
-                <Layout className={style.rightLayout}>
-                    <MainHeader/>
-                    <MainContent/>
+            <LocaleProvider locale={ zh_CN }>
+                <Layout >
+                    <MainSider />
+                    {/*style={{height: '100vh', overflow: 'auto'}}*/}
+                    <Layout className={style.rightLayout}>
+                        <MainHeader/>
+                        <MainContent/>
+                    </Layout>
                 </Layout>
-            </Layout>
+            </LocaleProvider>
         );
     }
 }

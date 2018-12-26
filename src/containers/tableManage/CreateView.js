@@ -166,14 +166,13 @@ class CreateView extends React.Component{
     };
 
     render(){
-
         const tableColunms = [
             {
                 title: '序号',
                 key: 'key',
                 align: 'center',
                 render: (text, row, index) => index + 1,
-                width: '80px'
+                width: '5%'
             },
             {
                 title: '字段名称',
@@ -182,6 +181,7 @@ class CreateView extends React.Component{
                 type:'input',
                 required: true,
                 align: 'center',
+                width:'25%'
             }, {
                 title: '别名',
                 dataIndex: 'alias',
@@ -189,6 +189,7 @@ class CreateView extends React.Component{
                 type:'input',
                 required: false,
                 align: 'center',
+                width:'15%'
             }, {
                 title: '类型',
                 dataIndex: 'type',
@@ -199,13 +200,14 @@ class CreateView extends React.Component{
                 required: true,
                 render: (text) => tableUtil.fieldTypeRender(text),
                 align: 'center',
+                width:'15%'
             }, {
                 title: '注释',
                 dataIndex: 'comment',
                 editable: true,
                 type:'input',
                 required:!this.state.isTemp,
-                width: '500px',
+                width: '30%',
                 align: 'center',
             },];
 
@@ -215,27 +217,27 @@ class CreateView extends React.Component{
                 <Card title={"视图信息"}>
                     <Form layout="inline" >
                         <Row>
-                            <FormItem label="表名" >
+                            <FormItem label="视图名" >
                                 {getFieldDecorator('tableName', {
                                     rules: [{
                                         required: true,
-                                        message: '表名不可为空',
+                                        message: '视图名不可为空',
                                     }],
                                 })(
-                                    <Input rows={3} placeholder="请输入表名" value={this.state.tableName} onChange={(e)=>{this.handleChangeText("tableName",e.target.value)}} />
+                                    <Input rows={3} placeholder="请输入视图名" value={this.state.tableName} onChange={(e)=>{this.handleChangeText("tableName",e.target.value)}} />
                                 )}
                             </FormItem>
                             <FormItem label="描述" >
                                 {getFieldDecorator('comment', {
                                     rules: [{
                                         required: true,
-                                        message: '表注释不可为空',
+                                        message: '视图注释不可为空',
                                     }],
                                 })(
                                     <Input rows={3} placeholder="请输入注释" onChange={(e)=>{this.handleChangeText("comment",e.target.value)}}/>
                                 )}
                             </FormItem>
-                            <FormItem label="组名" >
+                            <FormItem label="游戏名" >
                                 {getFieldDecorator('groupId', {
                                     rules: [{
                                         required: true,
@@ -281,7 +283,7 @@ class CreateView extends React.Component{
                             </FormItem>
 
                             {/*选取模板表*/}
-                            <FormItem label="模板表">
+                            <FormItem label="源表">
                                 {getFieldDecorator('template',{
                                     rules: [{
                                     required: true,
@@ -293,16 +295,6 @@ class CreateView extends React.Component{
                             </FormItem>
                         </Row>
                         <Row >
-
-                            {/*<FormItem label="所有字段" >*/}
-                                {/*{getFieldDecorator('isAll', {*/}
-                                {/*})(*/}
-                                    {/*<Select style={{ width: 180 }}  >*/}
-
-                                    {/*</Select>*/}
-                                {/*)}*/}
-                            {/*</FormItem>*/}
-
                             <FormItem label="筛选条件" >
                                     <TextArea placeholder={`可以留空或写带where的condition,聚合其他语句会被忽略`}
                                               autosize style={{width:"600px"}}
@@ -313,19 +305,20 @@ class CreateView extends React.Component{
                         </Row>
                     </Form>
                 </Card>
-
                 <Card title={"字段详情"} className={style["roll-table"]}>
-                    <DragAndEditTable
-                        storageType={this.state.storageType}
-                        fieldTypes={this.props.config.fieldTypes}
-                        columns={tableColunms}
-                        dataSource={this.state.dataSource}
-                        scroll={{ y: 500 }}
-                        pagination = {false}
-                        onRef={(ref)=>{this.table=ref;}}
-                    />
+                    <div style={{marginTop:-20}}>
+                        <DragAndEditTable
+                            storageType={this.state.storageType}
+                            fieldTypes={this.props.config.fieldTypes}
+                            columns={tableColunms}
+                            dataSource={this.state.dataSource}
+                            scroll={{ y: 500 }}
+                            pagination = {false}
+                            onRef={(ref)=>{this.table=ref;}}
+                        />
+                    </div>
                 </Card>
-                <div style={{textAlign: 'right'}}>
+                <div style={{textAlign: 'right',marginTop:10}}>
                     <Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
                 </div>
 

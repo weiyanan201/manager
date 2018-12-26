@@ -14,17 +14,9 @@ const menus=[
         "id": 11,
         "pid": 1,
         "icon": "idcard",
-        "name": "组信息",
+        "name": "游戏列表",
         "route": "/table/groups",
-        "bread": "组列表",
-        "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
-    },{
-        "id": 16,
-        "pid": 1,
-        "icon": "idcard",
-        "name": "表信息",
-        "route": "/table/groups",
-        "bread": "table列表",
+        "bread": "游戏列表",
         "roles":[roles.PLATFORM,roles.GLOBAL_ANALYST,roles.GLOBAL_DEVELOPER,roles.GROUP_USER]
     },{
         "id": 17,
@@ -54,9 +46,9 @@ const menus=[
         "id": 22,
         "pid": 2,
         "iconfont": "icon-user4",
-        "name": "outService",
+        "name": "系统用户",
         "route": "/user/outService",
-        "bread": "outService",
+        "bread": "系统用户",
         "roles":[roles.PLATFORM]
     },{
         "id": 3,

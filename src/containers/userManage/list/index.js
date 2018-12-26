@@ -3,7 +3,7 @@
  */
 
 import React, {Component} from 'react';
-import { Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
+import { Input, Button, Table, Modal, message, Spin, Divider, Pagination} from 'antd';
 
 import util from "../../../util/util";
 import { TenantType } from "../../../config"
@@ -11,6 +11,7 @@ import axios from '../../../util/axios';
 
 import AddUserForm from './component/addUserForm';
 import NavLink from '../../../components/NavLink/NavLink'
+import CommonTable from '../../../components/commonTable';
 
 import globalStyle from '../../../index.less';
 import style from './style.less'
@@ -33,18 +34,32 @@ class UserList extends Component {
                 title: 'id',
                 dataIndex: 'id',
                 align: 'center',
+                width: '5%',
             },{
                 title: '用户名',
                 dataIndex: 'userName',
                 align: 'center',
+                width: '10%',
+                className: globalStyle.resultColumns,
+                render:
+                    (text, record) => (
+                        <div title={record.userName} className={globalStyle.resultColumnsDiv}>{record.userName}</div>
+                    ),
             },{
                 title: '工号',
                 dataIndex: 'sourceId',
                 align: 'center',
+                width: '8%',
             },{
                 title: '部门',
                 dataIndex: 'deptName',
                 align: 'center',
+                width: '12%',
+                className: globalStyle.resultColumns,
+                render:
+                    (text, record) => (
+                        <div title={record.deptName} className={globalStyle.resultColumnsDiv}>{record.deptName}</div>
+                    ),
             },{
                 title: '用户类别',
                 dataIndex: 'tenantType',
@@ -59,20 +74,29 @@ class UserList extends Component {
                     }
                 }),
                 onFilter: (value, record) => record.tenantType.indexOf(value) === 0,
+                width: '10%',
             }, {
                 title: '联系方式',
                 dataIndex: 'mobile',
                 align: 'center',
+                width: '10%',
             },{
                 title: '邮箱',
                 dataIndex: 'email',
                 align: 'center',
+                width: '15%',
+                className: globalStyle.resultColumns,
+                render:
+                    (text, record) => (
+                        <div title={record.email} className={globalStyle.resultColumnsDiv}>{record.email}</div>
+                    ),
             },{
                 title: '创建时间',
                 dataIndex: 'createTime',
                 align: 'center',
                 render: createTime => util.formatDate(createTime),
                 sorter: (a, b) => a.createTime - b.createTime,
+                width: '15%',
             },{
                 title: '更新时间',
                 dataIndex: 'updateTime',
@@ -80,6 +104,7 @@ class UserList extends Component {
                 align: 'center',
                 render: val => util.formatDate(val),
                 sorter: (a, b) => a.updateTime - b.updateTime,
+                width: '15%',
             },{
                 title: '权限',
                 align: 'center',
@@ -87,7 +112,8 @@ class UserList extends Component {
                     if (record.tenantType===TenantType.GROUP_USER.key){
                         return <NavLink target={`/user/list/${record.id}`} linkText={"详情"}/>
                     }
-                }
+                },
+                width: '5%',
             },{
                 title: '操作',
                 align: 'center',
@@ -98,7 +124,8 @@ class UserList extends Component {
 
                         <a onClick={()=>this.showDeleteConfirm(record.userName,record.id)}>删除</a>
                     </span>
-                )
+                ),
+                width: '10%',
             }
         ];
 
@@ -109,6 +136,7 @@ class UserList extends Component {
             addLoading:false,
             columns:columns,
             globalLoading:false,
+            data:[],
         };
 
     }
@@ -206,6 +234,11 @@ class UserList extends Component {
                     });
                     message.success("创建成功!");
                 })
+                .catch(errror=>{
+                    this.setState({
+                        addLoading:false
+                    });
+                })
         });
     };
 
@@ -216,7 +249,7 @@ class UserList extends Component {
             data = dataBack.slice(0);
         }else{
             //顾虑
-            data = dataBack.filter(item=>item.userName.indexOf(value)!==-1);
+            data = dataBack.filter(item=>item.userName.indexOf(value)!==-1 || ( !util.isEmpty(item.py) && item.py.indexOf(value)!==-1));
         }
         this.setState({
             data
@@ -265,7 +298,7 @@ class UserList extends Component {
 
     render() {
         return (
-            <div>
+            <div className = {globalStyle.hasPaginationDiv}>
                 <Spin spinning={this.state.globalLoading}>
                     <div>
                         用户名：<Search
@@ -281,7 +314,22 @@ class UserList extends Component {
                     </div>
 
                     <div className={globalStyle.tableToSearchPadding}>
-                        <Table columns={this.state.columns} dataSource={this.state.data} bordered/>
+                        {/*<Table columns={this.state.columns}*/}
+                               {/*dataSource={this.state.data}*/}
+                               {/*size="small"*/}
+                               {/*// pagination = {false}*/}
+                               {/*pagination = {*/}
+                                   {/*{*/}
+                                       {/*"showSizeChanger":true,*/}
+                                       {/*"size":"middle",*/}
+                                       {/*"showQuickJumper":true,*/}
+                                   {/*}*/}
+                               {/*}*/}
+                        {/*/>*/}
+                        <CommonTable
+                            columns={this.state.columns}
+                            dataSource={this.state.data}
+                        />
                     </div>
                     <Modal
                         title="新建用户"

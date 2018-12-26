@@ -10,6 +10,7 @@ import MyBreadcrumb from './Breadcrumb';
 import HomePage from "../HomePage";
 import GroupList from '../tableManage/GroupList';
 import TableList from '../tableManage/TableList';
+import TableIndexList from '../tableManage/TableIndexList';
 import TableInfo from '../tableManage/TableInfo';
 import AddTable from '../tableManage/AddTable';
 import UserList from '../../containers/userManage/list';
@@ -55,6 +56,7 @@ class MainContent extends React.Component{
                         <Route path="/table/groups" exact component={GroupList}/>
                         <Route path="/table/groups/:groupId" exact component={TableList}/>
                         <Route path="/table/groups/:groupId/:tableId" exact component={TableInfo}/>
+                        <Route path="/table/tables" exact component={TableIndexList}/>
                         <Route path="/table/addTable" exact component={AddTable}/>
                         <Route path="/user/list" exact component={UserList}/>
                         <Route path="/user/list/:tenantId" exact component={UserGroupPermission}/>
@@ -65,15 +67,6 @@ class MainContent extends React.Component{
                         <Route path="/db/list/:databaseId" exact component={DbTableList}/>
                         <Route path="/db/list/:databaseId/:tableId" exact component={TableInfo}/>
                         <Route path="/mobileGame/list" exact component={MobileGameList}/>
-                        <Route path="/test" exact component={EditTable}/>
-                        <Route path="/test2" exact component={DragDropTable}/>
-                        <Route path="/test3" exact component={TestTable}/>
-                        <Route path="/test4" exact component={DragEditTable}/>
-                        <Route path="/test5" exact component={XXX}/>
-                        <Route path="/test6" exact component={Test6}/>
-                        <Route path="/test7" exact component={Test7}/>
-                        <Route path="/myTest" exact component={MyTest}/>
-                        <Route path="/myTest2" exact component={MyTest2}/>
                         <Route component={PermissionTransfer} />
                         </Switch>
                     </div>

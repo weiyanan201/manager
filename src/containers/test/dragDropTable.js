@@ -26,7 +26,6 @@ function dragDirection(
 
 class BodyRow extends React.Component {
     render() {
-        console.log("bodyRow:",this.props);
         const {
             isOver,
             connectDragSource,
@@ -41,9 +40,6 @@ class BodyRow extends React.Component {
         const style = { ...restProps.style, cursor: 'move' };
 
         let className = restProps.className;
-        if (this.props.isOver===true){
-            console.log("BodyRow:",this.props);
-        }
         if (isOver && initialClientOffset) {
 
             const direction = dragDirection(
@@ -54,14 +50,11 @@ class BodyRow extends React.Component {
                 sourceClientOffset
             );
             if (direction === 'downward') {
-                console.log("down:",restProps,";;;;rowIndex:",dragRow.index);
                 className += ' drop-over-downward';
             }
             if (direction === 'upward') {
                 className += ' drop-over-upward';
             }
-
-            console.log("after className : " , className);
         }
 
 
@@ -86,11 +79,9 @@ const rowSource = {
         };
     },
     canDrag(props){
-        console.log("canDrag");
         return true;
     },
     isDragging(props){
-        console.log("isDragging");
     }
 };
 
@@ -169,7 +160,6 @@ class DragSortingTable extends React.Component {
     }
 
     moveRow = (dragIndex, hoverIndex) => {
-        console.log("moveRow");
         const { data } = this.state;
         const dragRow = data[dragIndex];
 

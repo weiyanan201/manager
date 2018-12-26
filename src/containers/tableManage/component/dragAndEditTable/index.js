@@ -118,26 +118,34 @@ const DragableBodyRow = DropTarget('row', rowTarget, (connect, monitor) => ({
 
 const EditableFormRow = Form.create()(DragableBodyRow);
 
+
+//{key:{uuid:this}}
 const globalTypeCell = {};
 
 class EditableCell extends React.Component {
 
     //默认是打开的，否则表单无法验证完
     state = {
-        editing: true,
+        editing: false,
     };
     uuid = "";
+    //标志那条记录
+    key = "";
     componentDidMount() {
         if (this.props.editable) {
+            this.key = this.props.record.key;
             this.uuid =  util.uuid();
-            globalTypeCell[this.uuid] = this;
+            if (util.isEmpty(globalTypeCell[this.key])){
+                globalTypeCell[this.key] = {};
+            }
+            globalTypeCell[this.key][this.uuid] = this;
             document.addEventListener('click', this.handleClickOutside, true);
         }
     }
 
     componentWillUnmount() {
         if (this.props.editable) {
-            delete globalTypeCell[this.uuid];
+            delete globalTypeCell[this.key][this.uuid];
             document.removeEventListener('click', this.handleClickOutside, true);
         }
     }
@@ -169,15 +177,16 @@ class EditableCell extends React.Component {
     };
 
     save = () => {
-        console.log(this);
         const { record, handleSave, dataIndex } = this.props;
         this.form.validateFields({ force: true  },(error, values,) => {
             if (error) {
                 return ;
             }
+            const editing = this.state.editing;
             this.toggleEdit();
-            //fieldType CELL 与 record相关联
-            handleSave({ ...record, ...values},dataIndex,this.uuid);
+            if (editing){
+                handleSave({ ...record, ...values},dataIndex,this.uuid);
+            }
         });
 
     };
@@ -186,7 +195,7 @@ class EditableCell extends React.Component {
     validateToFieldType = (rule, value, callback)=>{
         if (!util.isEmpty(value)){
             if (!tableUtil.validateFieldType(this.props.fieldTypes,this.props.storageType,value)){
-                callback(FIELD_TYPE_NOT_MATCh_ERROR);
+                callback(value+" 与存储介质不匹配");
             }
         }
         callback();
@@ -210,7 +219,7 @@ class EditableCell extends React.Component {
                     {form.getFieldDecorator(dataIndex, {
                         rules: [{
                             required: required,
-                            message: `${title} is required.`,
+                            message: `${title} 必填项`,
                         }],
                         initialValue: record[dataIndex],
                         validateTrigger:'onForce'
@@ -226,7 +235,7 @@ class EditableCell extends React.Component {
                     {form.getFieldDecorator(dataIndex, {
                         rules: [{
                             required: required,
-                            message: `${title} is required.`,
+                            message: `${title} 必填项`,
                         },{
                             validator: this.validateToFieldType
                         }],
@@ -245,7 +254,7 @@ class EditableCell extends React.Component {
                     {form.getFieldDecorator(dataIndex, {
                         rules: [{
                             required: required,
-                            message: `${title} is required.`,
+                            message: `${title} 必填项`,
                         }],
                         valuePropName: 'checked',
                         initialValue: util.isEmpty(record[dataIndex])?false:record[dataIndex],
@@ -301,49 +310,91 @@ class DragAndEditTable extends Component {
 
     //渲染之前检查字段是否符合
     componentDidUpdate(){
-        this._checkColumn();
+        // this._checkColumn();
     }
 
+    //对外接口，接受字段列表
     modifyTableStateDataSource(dataSource){
         this.setState({
             dataSource
         })
     }
+    //对外接口，改变storageType 时检查类型是否符合
+    checkRecords=(storageType)=>{
+        const dataSource = this.state.dataSource;
+        let hasError = false;
+        dataSource.forEach(item=>{
+            if (!this._checkOneRecord(item.key,storageType)) {
+                hasError = true;
+            }
+        });
+        return !hasError;
+    };
 
-    _checkColumn=()=>{
-        const columns = this.props.columns;
+    _checkRecords=()=>{
         const storageType = this.props.storageType;
+        const dataSource = this.state.dataSource;
+        let hasError = false;
+        dataSource.forEach(item=>{
+            if (!this._checkOneRecord(item.key,storageType)) {
+                hasError = true;
+            }
+        });
+        return !hasError;
+    };
+
+
+    //检查单独一行
+    _checkOneRecord=(key,storageType)=>{
+        const columns = this.props.columns;
+        if (util.isEmpty(storageType)){
+            storageType = this.props.storageType;
+        }
         let colObject = {};
-        let isError = false;
+        let hasError = false;
         columns.forEach(col=>{
             if (!util.isEmpty(col.dataIndex)){
                 colObject[col.dataIndex] = col.required;
             }
         });
-        Object.keys(globalTypeCell).forEach(key=>{
-            const cell = globalTypeCell[key];
-            const { type,dataIndex,record } = cell.props;
-            if (colObject[dataIndex]){
-                //判断是否必填
-                if (util.isEmpty(record[dataIndex])){
-                    cell.save();
-                    cell.setState({
-                        editing: true
-                    });
-                    isError = true;
+        const cellObject = globalTypeCell[key];
+        if (!util.isEmpty(cellObject)){
+            Object.keys(cellObject).forEach(uuid=>{
+                const cell = cellObject[uuid];
+                const { type,dataIndex,record } = cell.props;
+                if (!this._checkColumn(record[dataIndex],type,cell,colObject[dataIndex],storageType)){
+                    hasError = true;
                 }
+            });
+        }
+        return !hasError;
+    };
+
+    /**
+     * 检查每行  必填项、类型是否匹配
+     * @return  false 不通过
+     */
+    _checkColumn = (value,type,cell,required,storageType)  =>{
+        if (required){
+            //判断是否必填
+            if (util.isEmpty(value)){
+                cell.save();
+                cell.setState({
+                    editing: true
+                });
+                return false;
             }
-            if (type==="fieldType") {
-                if (!tableUtil.validateFieldType(this.props.fieldTypes,storageType,record[dataIndex])){
-                    cell.save();
-                    cell.setState({
-                        editing: true
-                    });
-                    isError = true;
-                }
+        }
+        if (type==="fieldType") {
+            if (!tableUtil.validateFieldType(this.props.fieldTypes,storageType,value)){
+                cell.save();
+                cell.setState({
+                    editing: true
+                });
+                return false;
             }
-        });
-        return isError;
+        }
+        return true;
     };
 
     handleDelete  (key)  {
@@ -370,14 +421,14 @@ class DragAndEditTable extends Component {
 
     handleAdd = () => {
         const { count, dataSource } = this.state;
-        if (dataSource.length!==0) {
-            //判断上一行是否为空，如果只有key则认为是空行
-            const item = dataSource[dataSource.length-1];
-            if (Object.keys(item).length===1){
-                //编辑上一行
-                return ;
-            }
-        }
+        // if (dataSource.length!==0) {
+        //     //判断上一行是否为空，如果只有key则认为是空行
+        //     const item = dataSource[dataSource.length-1];
+        //     if (Object.keys(item).length===1){
+        //         //编辑上一行
+        //         return ;
+        //     }
+        // }
         const newData = {
             key: count,
         };
@@ -391,17 +442,12 @@ class DragAndEditTable extends Component {
         const newData = [...this.state.dataSource];
         const index = newData.findIndex(item => row.key === item.key);
         const item = newData[index];
-        if (!util.isEmpty(uuid) && !util.isEmpty(dataIndex)){
-            if (item.duMap===undefined){
-                item.duMap = {};
-            }
-            item.duMap.dataIndex = uuid;
-        }
         newData.splice(index, 1, {
             ...item,
             ...row,
         });
         this.setState({ dataSource: newData });
+        this._checkOneRecord(row.key)
     };
 
     moveRow = (dragIndex, hoverIndex) => {
@@ -423,8 +469,7 @@ class DragAndEditTable extends Component {
      */
     handleSubmit  ()  {
         const dataSource = this.state.dataSource;
-        const isError = this._checkColumn();
-        if (isError){
+        if (!this._checkRecords()){
             return null;
         }
         return dataSource;
@@ -457,34 +502,36 @@ class DragAndEditTable extends Component {
         });
         //添加删除操作按钮
         columns.push({
-            title: 'operation',
+            title: '操作',
             dataIndex: 'operation',
             align:'center',
             render: (text, record) => (
-                        <Popconfirm title="Sure to delete?" onConfirm={() => this.handleDelete(record.key)}>
-                            <a href="javascript:;">Delete</a>
+                        <Popconfirm title="是否删除该字段?" onConfirm={() => this.handleDelete(record.key)}>
+                            <a href="javascript:;">删除</a>
                         </Popconfirm>
             ),
         });
-        
-        console.log(this);
 
         return (
             <div className={style.dragTable}>
-                <Button type="primary" onClick={this.handleAdd}>添加字段</Button>
-                <Button type="danger" onClick={this.handleClear}>清空字段</Button>
-                <Table
-                    components={this.components}
-                    dataSource={this.state.dataSource}
-                    columns={columns}
-                    pagination={false}
-                    onRow={(record, index) => ({
-                        index,
-                        moveRow: this.moveRow,
-                    })}
-                    bordered
-                    wrappedComponentRef={(form) => this.rows.push(form) }
-                />
+                <div>
+                    <Button type="danger" onClick={this.handleClear} style={{float:"right","zIndex":9999}}>清空字段</Button>
+                    <Button type="primary" onClick={this.handleAdd} style={{float:"right","zIndex":9999,marginRight:10}}>添加字段</Button>
+                </div>
+                <div style={{marginTop:20}}>
+                    <Table
+                        components={this.components}
+                        dataSource={this.state.dataSource}
+                        columns={columns}
+                        pagination={false}
+                        onRow={(record, index) => ({
+                            index,
+                            moveRow: this.moveRow,
+                        })}
+                        bordered
+                        wrappedComponentRef={(form) => this.rows.push(form) }
+                    />
+                </div>
             </div>
         );
     }

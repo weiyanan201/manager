@@ -38,6 +38,19 @@ export default {
             return false;
         }
     },
+    //page 从零开始
+    tablePagination(array,page,pageSize,callback){
+        let newArray = [];
+        if (!this.isEmpty(callback)){
+            array = array.filter(item=>{
+                return callback(item);
+            })
+        }
+        let startIndex = page * pageSize;
+        let endIndex = (page+1)*pageSize;
+        return array.slice(startIndex,endIndex);
+    },
+
 
     getWordwrapContent(strings) {
         if (strings === undefined || strings === null || strings.length === 0) {

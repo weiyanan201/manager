@@ -7,6 +7,7 @@ import NavLink from '../../../components/NavLink/NavLink';
 import AddDbForm from './component/addDbForm';
 import {StorageType, ProduceType} from '../../../config';
 
+import CommonTable from '../../../components/commonTable';
 import globalStyle from '../../../index.less';
 
 const Search = Input.Search;
@@ -160,7 +161,7 @@ class DatabaseList extends Component {
                     </div>
 
                     <div className = {globalStyle.tableToSearchPadding}>
-                        <Table columns={this.state.columns} dataSource={this.state.data}  bordered/>
+                        <CommonTable columns={this.state.columns} dataSource={this.state.data} />
                     </div>
 
                     <Modal

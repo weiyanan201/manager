@@ -86,7 +86,6 @@ export default class BaseTable extends React.Component{
     render(){
         return(
             <Table
-                bordered
                 {...this.props}
                 rowSelection={this.rowSelection}
                 onRow={(record, index) => {

@@ -12,6 +12,7 @@ import axios from "../../../util/axios";
 import AddAppForm from './component/addAppForm';
 import {TenantType} from '../../../config'
 
+import CommonTable from '../../../components/commonTable';
 import globalStyle from '../../../index.less';
 
 const Search = Input.Search;
@@ -35,30 +36,57 @@ class AppList extends Component {
                     title: 'id',
                     dataIndex: 'id',
                     align: 'center',
+                    width:'10%'
                 }, {
                     title: '应用名称',
                     dataIndex: 'appName',
                     align: 'center',
+                    width:'10%',
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.appName} className={globalStyle.resultColumnsDiv}>{record.appName}</div>
+                        ),
                 }, {
                     title: '应用缩写',
                     dataIndex: 'appAbbrName',
                     align: 'center',
+                    width:'10%',
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.appAbbrName} className={globalStyle.resultColumnsDiv}>{record.appAbbrName}</div>
+                        ),
                 }, {
                     title: '描述',
                     dataIndex: 'appDesc',
                     align: 'center',
+                    width:'10%',
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.appDesc} className={globalStyle.resultColumnsDiv}>{record.appDesc}</div>
+                        ),
                 }, {
                     title: '类型',
                     dataIndex: 'appType',
                     align: 'center',
+                    width:'8%'
                 }, {
                     title: '来源',
                     dataIndex: 'appSource',
                     align: 'center',
+                    width:'8%'
                 }, {
                     title: '运营归属',
                     dataIndex: 'operationMode',
                     align: 'center',
+                    width:'10%',
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.operationMode} className={globalStyle.resultColumnsDiv}>{record.operationMode}</div>
+                        ),
                 }, {
                     title: '工作室',
                     dataIndex: 'parentId',
@@ -69,23 +97,40 @@ class AppList extends Component {
                         }
                     },
                     align: 'center',
+                    width:'10%'
                 }, {
                     title: '创建时间',
                     dataIndex: 'createTime',
                     align: 'center',
-                    render: createTime => util.formatDate(createTime),
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.createTime} className={globalStyle.resultColumnsDiv}>{util.formatDate(record.createTime)}</div>
+                        ),
                     sorter: (a, b) => a.createTime - b.createTime,
+                    width:'15%'
                 }, {
                     title: '更新时间',
                     dataIndex: 'updateTime',
                     align: 'center',
                     defaultSortOrder: 'descend',
-                    render: updateTime => util.formatDate(updateTime),
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.updateTime} className={globalStyle.resultColumnsDiv}>{util.formatDate(record.updateTime)}</div>
+                        ),
                     sorter: (a, b) => a.updateTime - b.updateTime,
+                    width:'15%'
                 }, {
                     title: '操作人员',
                     dataIndex: 'operator',
                     align: 'center',
+                    width:'10%',
+                    className: globalStyle.resultColumns,
+                    render:
+                        (text, record) => (
+                            <div title={record.operator} className={globalStyle.resultColumnsDiv}>{record.operator}</div>
+                        ),
                 }, {
                     title: '操作',
                     align: 'center',
@@ -99,7 +144,9 @@ class AppList extends Component {
                             <span>
                                 <a onClick={()=>this.modalToggle(true,INFO_TITLE,record)}>详情</a>
                             </span>
-                    )
+                    ),
+                    width:'12%',
+
                 }
             ],
             appType: [],
@@ -243,7 +290,7 @@ class AppList extends Component {
             data = dataBack.slice(0);
         } else {
             //过滤
-            data = dataBack.filter(item => item.appName.indexOf(value) !== -1);
+            data = dataBack.filter(item => item.appName.indexOf(value) !== -1 || (!util.isEmpty(item.py)&&item.py.indexOf(value)!==-1));
         }
         this.setState({
             data
@@ -339,7 +386,7 @@ class AppList extends Component {
                     </div>
 
                     <div className = {globalStyle.tableToSearchPadding}>
-                        <Table columns={this.state.columns} dataSource={this.state.data} bordered/>
+                        <CommonTable columns={this.state.columns} dataSource={this.state.data} />
                     </div>
 
                     <Modal

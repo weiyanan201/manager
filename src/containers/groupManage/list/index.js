@@ -7,6 +7,7 @@ import { Input, Button, Table, Modal, message, Spin, Divider} from 'antd';
 import util from "../../../util/util";
 import axios from "../../../util/axios";
 
+import CommonTable from '../../../components/commonTable';
 import AddGroupForm from './component/addGroupForm';
 
 import globalStyle from '../../../index.less';
@@ -104,8 +105,8 @@ class GroupList extends Component{
         if (util.isEmpty(value)){
             data = dataBack.slice(0);
         }else{
-            //顾虑
-            data = dataBack.filter(item=>item.name.indexOf(value)!==-1);
+            //过滤
+            data = dataBack.filter(item=>item.name.indexOf(value)!==-1 || ( !util.isEmpty(item.py) && item.py.indexOf(value)!==-1) );
         }
         this.setState({
             data
@@ -218,8 +219,6 @@ class GroupList extends Component{
                     });
             }
         });
-
-
     };
 
     render(){
@@ -228,18 +227,17 @@ class GroupList extends Component{
                 <Spin spinning={this.state.globalLoading}>
                     <div>
                         组名：<Search
-                        placeholder="input search text"
-                        onChange={(e) => {
-                            this.handleFilterSearch(e.target.value)
-                        }}
-                        enterButton
-                        style={{width: 200}}
-                    />
+                                    placeholder="input search text"
+                                    onChange={(e) => {
+                                        this.handleFilterSearch(e.target.value)
+                                    }}
+                                    style={{width: 200}}
+                                />
                         <Button type='primary'  onClick={()=>this.modalToggle(true)} style={{float:"right"}}>新建组</Button>
                     </div>
 
                     <div className={globalStyle.tableToSearchPadding}>
-                        <Table columns={this.state.columns} dataSource={this.state.data}  bordered/>
+                        <CommonTable columns={this.state.columns} dataSource={this.state.data} />
                     </div>
 
                     <Modal

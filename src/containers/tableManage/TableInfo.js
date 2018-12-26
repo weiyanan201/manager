@@ -344,7 +344,7 @@ export default class TableInfo extends Component {
                                 existed.splice(existedIndex, 1, column.name);
                                 this.setState({dataSource, columnEditVisible: false, rows: [column]});
                             }).catch(error => {
-                                console.log(error);
+                                console.error(error);
                             })
                     }
                     this.setState({columnEditVisible: false})
@@ -437,7 +437,7 @@ export default class TableInfo extends Component {
                 });
                 this.setState({existed, columnEditVisible: false, loading: false,news:[]});
             }).catch(err => {
-            console.log(err);
+            console.error(err);
             this.setState({loading: false});
         })
     };
@@ -460,7 +460,8 @@ export default class TableInfo extends Component {
                                 this.state.modifyPermission ?
                                     <Button type="primary" onClick={() => {
                                         this.setState({tableInfoEditVisible: true})
-                                    }}>编辑</Button>
+                                    }} style={{marginRight:5}}
+                                    >编辑</Button>
                                     : null
                             }
                             {
@@ -491,15 +492,14 @@ export default class TableInfo extends Component {
                         <div style={{textAlign: 'right'}}>
                             {
                                 this.state.modifyPermission ?
-                                    <Button onClick={() => this.handelModalColumn('编辑字段')}>编辑字段</Button>
+                                    <Button onClick={() => this.handelModalColumn('编辑字段')} style={{marginBottom: 10,marginRight: 5}} type="primary">编辑字段</Button>
                                     : null
                             }
                             {
                                 this.state.modifyPermission ?
-                                    <Button onClick={() => this.handelModalColumn('添加字段')}>添加字段</Button>
+                                    <Button onClick={() => this.handelModalColumn('添加字段')} style={{marginBottom: 10}} type="primary">添加字段</Button>
                                     : null
                             }
-
                         </div>
 
                         <BaseTable
@@ -508,12 +508,12 @@ export default class TableInfo extends Component {
                             selection={selections}
                             pagination={false}
                             rowKey={"key"}
-                            scroll={{y: 500}}
+                            size="small"
                         />
                         {
                             this.state.modifyPermission ?
                                 <div style={{textAlign: 'right'}}>
-                                    <Button type="primary" onClick={this.handleUpdate}>更新</Button>
+                                    <Button type="primary" onClick={this.handleUpdate} style={{marginTop:10}}>更新</Button>
                                 </div>
                                 : null
                         }

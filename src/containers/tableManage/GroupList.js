@@ -1,28 +1,28 @@
 import React, { Component } from 'react';
-import {connect} from 'react-redux';
-import {Pagination, Input} from 'antd';
+import {Input,Spin} from 'antd';
 
-import BaseTable from '../../components/BaseTable';
 import NavLink from '../../components/NavLink/NavLink';
-import {getGroupList, getShowGroup, getShowGroupById} from "../../reducers/table.redux";
-import style from './table.less';
+
+import CommonTable from '../../components/commonTable';
 import globalStyle from '../../index.less';
 import {GROUP_PERMISSION} from '../../util/config';
 import util from '../../util/util';
+import axios from "../../util/axios";
 
 const Search = Input.Search;
 
 const columns = [
     {
-        title: '组名',
+        //group概念对用户透明
+        title: '游戏名',
         dataIndex: 'name',
         align: 'center',
-        width: '300px',
+        width: '20%',
     }, {
         title: '游戏ID',
         dataIndex: "appId",
         align: 'center',
-        width: '250px',
+        width: '20%',
     }, {
         title: '权限',
         dataIndex: 'permissions',
@@ -36,113 +36,90 @@ const columns = [
                 return "分析师";
             }
         },
-        width: '250px',
+        width: '10%',
     }, {
         title: '创建时间',
         dataIndex: "createTime",
         align: 'center',
         render: createTime => util.formatDate(createTime),
-        width: '300px',
+        width: '20%',
     }, {
         title: '更新时间',
         dataIndex: "updateTime",
         align: 'center',
         render: updateTime => util.formatDate(updateTime),
-        width: '300px',
+        width: '20%',
     }, {
         align: 'center',
-        render: (item) => <NavLink target={`/table/groups/${item.id}`} linkText={"详情"}/>
+        render: (item) => <NavLink target={`/table/groups/${item.id}`} linkText={"详情"}/>,
+        width:"10%"
     },
 ];
 
-@connect(
-    state => state.group,
-    {getGroupList, getShowGroup, getShowGroupById}
-)
 export default class GroupList extends Component {
 
     state = {
         searchText: '',
         pageSize: 10,
-        textValue: ''
+        textValue: '',
+        data:[]
     };
-
-    constructor(props) {
-        super(props);
-        if (!this.props.allGroup || this.props.allGroup.length === 0) {
-            this.props.getGroupList();
-        }
-    }
 
     //初始化状态
     componentDidMount() {
-        this.props.getShowGroup(1, 10, "");
-        this.setState({
-            searchText: '',
-            pageSize: 10,
-        })
-    }
 
-    //搜索框为空时自动刷新
-    handleChangeText(value) {
-        this.handleSearch(value);
         this.setState({
-            textValue: value
+            globalLoading:true
         });
+        axios.get("/table/getGroupList")
+            .then(res=>{
+                const data = res.data.data;
+                const dataBack = data.slice(0);
+                this.setState({
+                    data,dataBack,globalLoading:false
+                })
+            }).catch(()=>{
+            this.setState({
+                globalLoading:false
+            });
+        })
 
     }
 
-    handleChange = (page, pageSize) => {
-        this.props.getShowGroup(page, pageSize, this.state.searchText);
-    };
-
-    handleChangeSize = (current, pageSize) => {
-        this.setState({current, pageSize});
-        this.props.getShowGroup(current, pageSize, this.state.searchText);
-    };
-
-    handleSearch = (search) => {
-        this.props.getShowGroup(1, this.state.pageSize, search);
-        this.setState({searchText: search, current: 1})
-    };
-
-    selection = {
-        type: "checkbox",
-        rows: "rows",
-        rowKeys: "rowKeys",
-        _self: this
+    handleFilterSearch = (value) =>{
+        let data = [];
+        const dataBack = this.state.dataBack;
+        if (util.isEmpty(value)){
+            data = dataBack.slice(0);
+        }else{
+            //过滤
+            data = dataBack.filter(item=>{return item.name.indexOf(value)!==-1 || item.py.indexOf(value)!==-1 });
+        }
+        this.setState({
+            data
+        })
     };
 
     render() {
         return (
             <div>
-                group名称：<Search
-                placeholder="input search text"
-                onSearch={value => this.handleSearch(value)}
-                onChange={(e) => {
-                    this.handleChangeText(e.target.value)
-                }}
-                enterButton
-                style={{width: 200}}
-            />
-                <BaseTable
-                    bordered
-                    columns={columns}
-                    dataSource={this.props.data}
-                    rowKey="id"
-                    loading={this.props.groupLoading}
-                    pagination={false}
-                    className = {globalStyle.tableToSearchPadding}
-                />
-                <Pagination total={this.props.total} showSizeChanger showQuickJumper
-                            onChange={(page, pageSize) => {
-                                this.handleChange(page, pageSize)
-                            }}
-                            onShowSizeChange={(current, size) => {
-                                this.handleChangeSize(current, size)
-                            }}
-                            className={style.tablePagination}
-                />
+                <Spin spinning={this.state.globalLoading}>
+                    游戏名称：<Search
+                                    placeholder="input search text"
+                                    onChange={(e) => {
+                                        this.handleFilterSearch(e.target.value)
+                                    }}
+                                    style={{width: 200}}
+                                />
+
+                    <div className={globalStyle.tableToSearchPadding}>
+                        <CommonTable
+                            columns={columns}
+                            dataSource={this.state.data}
+                        />
+                    </div>
+                </Spin>
+
             </div>
         );
     }

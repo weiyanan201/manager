@@ -92,6 +92,7 @@ class CreateTable extends React.Component{
         this.props.form.setFieldsValue({
             db: '',
         });
+        this.table.checkRecords(item);
     };
     //选取Format
     //ORC 隐藏 分隔符
@@ -164,7 +165,7 @@ class CreateTable extends React.Component{
         //调用子组件的函数
         const records =  this.table.handleSubmit();
         if (util.isEmpty(records)){
-            message.error("字段列表出错或未空!");
+            message.error("字段列表出错!");
             return ;
         }
 
@@ -291,14 +292,15 @@ class CreateTable extends React.Component{
                     key:'key',
                     align:'center',
                     render:(text,row,index)=>index+1,
-                    width:'80px'
+                    width:'5%'
                 },{
-                    title: 'name',
+                    title: '字段名',
                     dataIndex: 'name',
                     editable: true,
                     type:'input',
                     required:true,
                     align:'center',
+                    width:"30%"
                 }, {
                     title: '类型',
                     dataIndex: 'type',
@@ -308,15 +310,15 @@ class CreateTable extends React.Component{
                     fieldTypes:this.props.fieldTypes,
                     required:true,
                     render: (text) => tableUtil.fieldTypeRender(text),
-                    width:'300px',
+                    width:'20%',
                     align:'center',
                 }, {
-                    title: '注释',
+                    title: '描述',
                     dataIndex: 'comment',
                     editable: true,
                     type:'input',
                     required:!this.state.isTemp,
-                    width: '500px',
+                    width: '30%',
                     align:'center',
                 }, {
                     title: <div>分区字段<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
@@ -325,9 +327,8 @@ class CreateTable extends React.Component{
                     type:'checkbox',
                     required:false,
                     render: (text) => <Checkbox checked={text===true} />,
-                    width:'200px',
+                    width:'10%',
                     align:'center',
-
                 }],
             "PHOENIX":[
                 {
@@ -335,15 +336,16 @@ class CreateTable extends React.Component{
                     align:'center',
                     key:'key',
                     render:(text,row,index)=>index+1,
-                    width:'80px',
+                    width:'5%',
                 },
                 {
-                    title: 'name',
+                    title: '字段名',
                     dataIndex: 'name',
                     editable: true,
                     type:'input',
                     required:true,
                     align:'center',
+                    width:'20%'
                 }, {
                     title: '类型',
                     dataIndex: 'type',
@@ -354,13 +356,15 @@ class CreateTable extends React.Component{
                     required:true,
                     render: (text) => tableUtil.fieldTypeRender(text),
                     align:'center',
+                    width:'10%'
             }, {
-                    title: '注释',
+                    title: '描述',
                     dataIndex: 'comment',
                     editable: true,
                     type:'input',
                     required:!this.state.isTemp,
                     align:'center',
+                    width:'20%'
             },{
                     title:<div>主键<Icon type="question-circle" theme="outlined" title={"主键|分区键的编辑顺序即为创建顺序"} style={{marginLeft:"5px"}}/></div>,
                     dataIndex: 'primaryKey',
@@ -368,8 +372,8 @@ class CreateTable extends React.Component{
                     type:'checkbox',
                     required:false,
                     render: (text) => <Checkbox checked={text===true} />,
-                    width:'200px',
                     align:'center',
+                    width:'10%'
             }, {
                     title: '可为空',
                     dataIndex: 'beNull',
@@ -377,8 +381,8 @@ class CreateTable extends React.Component{
                     type:'checkbox',
                     required:false,
                     render: (text) => <Checkbox checked={text===true} />,
-                    width:'200px',
                     align:'center',
+                    width:'10%'
             }],
             "ES":[
                 {
@@ -386,15 +390,16 @@ class CreateTable extends React.Component{
                     key:'key',
                     align:'center',
                     render:(text,row,index)=>index+1,
-                    width:'100px',
+                    width:'5%',
                 },
                 {
-                    title: 'name',
+                    title: '字段名',
                     dataIndex: 'name',
                     editable: true,
                     type:'input',
                     required:true,
                     align:'center',
+                    width:'20%'
                 }, {
                     title: '类型',
                     dataIndex: 'type',
@@ -405,13 +410,14 @@ class CreateTable extends React.Component{
                     required:true,
                     render: (text) => tableUtil.fieldTypeRender(text),
                     align:'center',
+                    width:'10%'
             }, {
-                    title: '注释',
+                    title: '描述',
                     dataIndex: 'comment',
                     editable: true,
                     type:'input',
                     required:!this.state.isTemp,
-                    width:'500px',
+                    width:'20%',
                     align:'center',
             },],
             "":[]
@@ -455,7 +461,7 @@ class CreateTable extends React.Component{
 
         return (
             <div>
-                <Spin spinning={this.state.loading} >
+                {/*<Spin spinning={this.state.loading} >*/}
                 <Card title={"表信息"}>
                     <Form layout="inline" >
                         <Row>
@@ -473,13 +479,13 @@ class CreateTable extends React.Component{
                                 {getFieldDecorator('comment', {
                                     rules: [{
                                         required: true,
-                                        message: '表注释不可为空',
+                                        message: '表描述不可为空',
                                     }],
                                 })(
-                                    <Input rows={3} placeholder="请输入注释" onChange={(e)=>{this.handleChangeText("comment",e.target.value)}}/>
+                                    <Input rows={3} placeholder="请输入描述" onChange={(e)=>{this.handleChangeText("comment",e.target.value)}}/>
                                 )}
                             </FormItem>
-                            <FormItem label="组名" >
+                            <FormItem label="游戏名" >
                                 {getFieldDecorator('groupId', {
                                     rules: [{
                                         required: true,
@@ -510,7 +516,7 @@ class CreateTable extends React.Component{
                                     <Select style={{ width: 150 }} value={this.state.storageType} onChange={this.handleSelectStorageType}>
                                         {tableUtil.getStorageType().map((item)=><Option value={item} key={item}>{item}</Option>)}
                                     </Select>
-                                )}模板表
+                                )}
                             </FormItem>
                             <FormItem label="数据库" >
                                 {getFieldDecorator('db', {
@@ -545,20 +551,21 @@ class CreateTable extends React.Component{
                     </Form>
                 </Card>
                 <Card title={"字段详情"} className={style["roll-table"]}>
-                    <DragAndEditTable
-                                   storageType={this.state.storageType}
-                                   fieldTypes={this.props.fieldTypes}
-                                   columns={tableColumns[this.state.storageType]}
-                                   dataSource={this.state.dataSource}
-                                   scroll={{ y: 500 }}
-                                   pagination = {false}
-                                   onRef={(ref)=>{this.table=ref;}}
-                    />
+                    <div style={{marginTop:-20}}>
+                        <DragAndEditTable
+                                       storageType={this.state.storageType}
+                                       fieldTypes={this.props.fieldTypes}
+                                       columns={tableColumns[this.state.storageType]}
+                                       dataSource={this.state.dataSource}
+                                       pagination = {false}
+                                       onRef={(ref)=>{this.table=ref;}}
+                        />
+                    </div>
                 </Card>
-                    <div style={{textAlign: 'right'}}>
+                    <div style={{textAlign: 'right',marginTop:10}}>
                            <Button type={"primary"} onClick={this.handleSubmit} >创建</Button>
                     </div>
-                </Spin>
+                {/*</Spin>*/}
             </div>
         )
     }

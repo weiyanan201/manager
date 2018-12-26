@@ -3,7 +3,8 @@
  */
 .tablePagination{
   text-align: center;
-  margin-top: 20px;
+  float:right;
+  margin-top: 10px !important;
 }
 
 .command-textarea{
@@ -22,6 +23,8 @@
  */
 .advanced{
 
+  margin-bottom: -32px;
+
   :global{
 
     .ant-collapse{
@@ -31,6 +34,11 @@
     .ant-collapse-header{
       background-color: white;
       margin-top: -17px;
+    }
+
+    //去掉  隐藏的折叠header的鼠标小手形状
+    .ant-collapse > .ant-collapse-item.ant-collapse-no-arrow > .ant-collapse-header {
+      cursor: default;
     }
 
   }
@@ -71,6 +79,10 @@
 
     tr.drop-over-upward td {
       border-top: 2px dashed #1890ff;
+    }
+
+    .ant-spin-container {
+      margin-top: 40px;
     }
   }
 }

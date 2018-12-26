@@ -8,6 +8,7 @@ import { Link, withRouter} from 'react-router-dom';
 import {Breadcrumb} from 'antd';
 import {is} from 'immutable';
 
+import globalStyle from '../../index.less';
 import style from './layout.less';
 
 const routeMap = new Map();
@@ -31,7 +32,8 @@ class MyBreadcrumb extends React.Component {
         let tempPrx = '/';
         let breadcrumbItems = [
         ];
-        url.split('/').filter(v => {
+        const countInext = url.split("/").length-1;
+        url.split('/').forEach((v,index) => {
             const paths = this.props.bread.path;
             if (v !== '') {
                 tempUrl.push(v);
@@ -39,8 +41,8 @@ class MyBreadcrumb extends React.Component {
                 if (routeMap.has(routeUrl)) {
                     let item = routeMap.get(routeUrl);
                     breadcrumbItems = breadcrumbItems.concat(
-                        <Breadcrumb.Item key={item.id}>
-                            <Link to={item.route}>
+                        <Breadcrumb.Item key={item.id} >
+                            <Link to={item.route} style={index===countInext?{color:"rgba(0, 0, 0, 0.45)",textDecoration:"none",cursor:"default"}:null}>
                                 {item.bread}
                             </Link>
                         </Breadcrumb.Item>
@@ -51,7 +53,7 @@ class MyBreadcrumb extends React.Component {
                             const name = paths[routeUrl];
                             breadcrumbItems = breadcrumbItems.concat(
                                 <Breadcrumb.Item key={routeUrl}>
-                                    <Link to={routeUrl}>
+                                    <Link to={routeUrl} style={index===countInext?{color:"rgba(0, 0, 0, 0.45)",textDecoration:"none",cursor:"default"}:null} >
                                         {name}
                                     </Link>
                                 </Breadcrumb.Item>

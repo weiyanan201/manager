@@ -5,6 +5,7 @@ import axios from "../../../util/axios";
 
 import AddMobileGameForm from './component/addMobileGameForm';
 
+import CommonTable from '../../../components/commonTable';
 import globalStyle from '../../../index.less';
 
 const Search = Input.Search;
@@ -21,24 +22,29 @@ class MobileGameList extends Component {
                     title: 'id',
                     dataIndex: 'id',
                     align: 'center',
+                    width:'8%'
                 },{
                     title: '名称',
                     dataIndex: 'name',
                     align: 'center',
+                    width:'20%'
                 },{
                     title: '描述',
                     dataIndex: 'desc',
                     align: 'center',
+                    width:'20%'
                 },{
                     title: '操作人',
                     dataIndex: 'operator',
                     align: 'center',
+                    width:'10%'
                 },{
                     title: '创建时间',
                     dataIndex: 'createTime',
                     align: 'center',
                     render: createTime => util.formatDate(createTime),
                     sorter: (a, b) => a.createTime - b.createTime,
+                    width:'15%'
                 },{
                     title: '更新时间',
                     dataIndex: 'updateTime',
@@ -46,12 +52,14 @@ class MobileGameList extends Component {
                     align: 'center',
                     render: val => util.formatDate(val),
                     sorter: (a, b) => a.updateTime - b.updateTime,
+                    width:'15%'
                 },{
                     title: '操作',
                     align: 'center',
                     render: (text, record) => (
                         <a onClick={()=>this.modalToggle(true,EDIT_TITLE,record)}>编辑</a>
-                    )
+                    ),
+                    width:'8%'
                 }
             ],
             modalVisible:false,
@@ -98,7 +106,7 @@ class MobileGameList extends Component {
             data = dataBack.slice(0);
         }else{
             //过滤
-            data = dataBack.filter(item=>item.name.indexOf(value)!==-1);
+            data = dataBack.filter(item=>item.name.indexOf(value)!==-1 || ( !util.isEmpty(item.py) && item.py.indexOf(value)!==-1) );
         }
         this.setState({
             data
@@ -177,7 +185,7 @@ class MobileGameList extends Component {
                     </div>
 
                     <div className = {globalStyle.tableToSearchPadding}>
-                        <Table columns={this.state.columns} dataSource={this.state.data}  bordered/>
+                        <CommonTable columns={this.state.columns} dataSource={this.state.data} />
                     </div>
 
                     <Modal
