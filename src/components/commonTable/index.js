@@ -12,6 +12,7 @@ const CommonTable = (props)=>{
         "showSizeChanger":true,
         "size":"middle",
         "showQuickJumper":true,
+        "defaultPageSize":20
     };
     const {onChange} = props;
     if (!util.isEmpty(onChange)){
