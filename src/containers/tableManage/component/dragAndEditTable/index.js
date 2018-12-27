@@ -515,8 +515,8 @@ class DragAndEditTable extends Component {
         return (
             <div className={style.dragTable}>
                 <div>
-                    <Button type="danger" onClick={this.handleClear} style={{float:"right","zIndex":9999}}>清空字段</Button>
-                    <Button type="primary" onClick={this.handleAdd} style={{float:"right","zIndex":9999,marginRight:10}}>添加字段</Button>
+                    <Button type="danger" onClick={this.handleClear} style={{float:"right","zIndex":1000}}>清空字段</Button>
+                    <Button type="primary" onClick={this.handleAdd} style={{float:"right","zIndex":1000,marginRight:10}}>添加字段</Button>
                 </div>
                 <div style={{marginTop:20}}>
                     <Table
